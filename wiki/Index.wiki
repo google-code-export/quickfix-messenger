@@ -80,7 +80,7 @@ Fields can be filtered to only show required fields. There is also an option whe
 
 Fields whose names are shown in <font color='blue'>blue</font> are required.
 
-Double-clicking on the field name will launch the browser to the selected message's [http://fixwiki.org/ FIXwiki] page.
+Double-clicking on the field name will launch the browser to the selected field's [http://fixwiki.org/ FIXwiki] page.
 
 === Messages Table ===
 Messages sent or received from the application are logged at the bottom of the application.
