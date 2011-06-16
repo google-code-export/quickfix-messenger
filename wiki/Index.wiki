@@ -21,7 +21,7 @@ Unless planning to make changes to default distribution, it is recommended to do
 The binary distribution file is usually named `qfix-messenger-<version>-bin.zip`.
 
 === Source ===
-The source distribution contains an Eclipse project which can be directly imported to an existing Eclipse project.
+The source distribution contains an Eclipse project which can be directly imported to an existing Eclipse workspace.
 
 The source distribution file is usually named `qfix-messenger-<version>-src.zip`.
 
