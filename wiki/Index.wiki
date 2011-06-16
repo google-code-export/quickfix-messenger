@@ -13,7 +13,7 @@ QuickFIX Messenger is a perfect tool for testing different messages and scenario
 == Downloading QuickFIX Messenger ==
 QuickFIX Messenger can be downloaded as an executable binary or can be built from source.
 
-Both binary and source distributions can be downloaded from [http://code.google.com/p/quickfix-messenger/downloads/list Google Code]
+Both binary and source distributions can be downloaded CVfrom [http://code.google.com/p/quickfix-messenger/downloads/list Google Code]
 
 === Executable Binary ===
 Unless planning to make changes to default distribution, it is recommended to download the executable binary.
@@ -44,7 +44,7 @@ QuickFIX Messenger comes with 3 configuration files:
   * `quickfix.cfg` - Configure the QuickFIX engine
 
 === Messenger Configuration ===
-  * `messenger.isInitiator` - Indicates whether the messenger acts as an connection initiator or not (acceptor)
+  * `messenger.isInitiator` - Indicates whether the messenger acts as a connection initiator or not (acceptor)
   * `messenger.parser.threads` - Indicates the number of threads to use when parsing a QuickFIX dictionary XML
   * `messenger.license` - Indicates the file path to the BSD license
   * `messenger.icon.send` - Indicates which icon to use for the Send Button
