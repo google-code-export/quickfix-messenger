@@ -82,6 +82,6 @@ Double-clicking on the field name will launch the browser to the selected messag
 === Messages Table ===
 Messages sent or received from the application are logged at the bottom of the application.
 
-Each row of the table represents a FIX message.
+Each row of the table represents a FIX message. Rows colored <font color='#FF8040'>orange</font> are received, while rows colored <font color='#669900'>green</font> are sent.
 
 Double-clicking on a row will popup the details of the message.
