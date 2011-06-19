@@ -81,6 +81,8 @@ Fields can be filtered to only show required fields. There is also an option whe
 
 Fields whose names are shown in <font color='blue'>blue</font> are required.
 
+Fields belonging to a message component (FIX 4.3 or later), are displayed under the component name.
+
 Double-clicking on the field name will launch the browser to the selected field's [http://fixwiki.org/ FIXwiki] page.
 
 As of version 1.1, QuickFIX Messenger comes with a feature to send FIX messages in free text form
