@@ -16,7 +16,7 @@ QuickFIX Messenger can be downloaded as an executable binary or can be built fro
 Both binary and source distributions can be downloaded from [http://code.google.com/p/quickfix-messenger/downloads/list Google Code]
 
 === Executable Binary ===
-Unless planning to make changes to default distribution, it is recommended to download the executable binary.
+Unless planning to make changes to the default distribution, it is recommended to download the executable binary.
 
 The binary distribution file is usually named `qfix-messenger-<version>-bin.zip`.
 
