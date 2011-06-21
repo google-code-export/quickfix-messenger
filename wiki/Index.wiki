@@ -61,7 +61,7 @@ Please refer to QuickFIX/J's [http://www.quickfixj.org/quickfixj/usermanual/1.5.
 http://img690.imageshack.us/img690/3115/screenshot11v.png
 
 === Sessions List ===
-The top left corner of the application lists all sessions configured in the FIX engine. Selecting a session will load all messages allowed for that session. If the selected session is using FIXT, the correct `ApplVerID` must be selected (currently, only FIX 5.0 is supported).
+The top left corner of the application lists all sessions configured in the FIX engine. Selecting a session will load all messages allowed for that session. If the selected session is using FIXT, the correct `ApplVerID` must be selected.
 
 Sessions in <font color='blue'>blue</font> are connected, while sessions in <font color='red'>red</font> are disconnected.
 
