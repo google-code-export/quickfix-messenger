@@ -28,7 +28,7 @@ The source distribution file is usually named `qfix-messenger-<version>-src.zip`
 == Running QuickFIX Messenger ==
 As of version 1.1, the binary distribution includes executable batch files for an Initiator instance and an Acceptor instance. Both batch files comes in 2 flavors (`qfix-messenger-<instance>.bat` for Windows, `qfix-messenger=<instance>.sh` for Linux/Unix).
 
-Note that *JRE 1.6* or later is required in order to run QuickFIX Messenger.
+Note that *JRE 1.6* or later is required to run QuickFIX Messenger.
 
 == Building from Source ==
 The source distribution includes an *Ant* script which should be used to build QuickFIX Messenger. The default target is `clean.deploy` which will build the project and copy all files to the `deploy` directory.
