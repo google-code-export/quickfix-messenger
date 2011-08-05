@@ -26,7 +26,7 @@ The source distribution contains an Eclipse project which can be directly import
 The source distribution file is usually named `qfix-messenger-<version>-src.zip`.
 
 == Running QuickFIX Messenger ==
-As of version 1.1, the binary distribution includes executable batch files for an Initiator instance and an Acceptor instance. Both batch files comes in 2 flavors (`qfix-messenger-<instance>.bat` for Windows, `qfix-messenger=<instance>.sh` for Linux/Unix).
+As of version 1.1, the binary distribution includes executable batch files for an Initiator instance and an Acceptor instance. Both batch files comes in 2 flavors: (`qfix-messenger-<instance>.bat` for Windows, `qfix-messenger=<instance>.sh` for Linux/Unix).
 
 Note that *JRE 1.6* or later is required to run QuickFIX Messenger.
 
@@ -85,7 +85,7 @@ Fields belonging to a message component (FIX 4.3 or later), are displayed under 
 
 Double-clicking on the field name will launch the browser to the selected field's [http://fixwiki.org/ FIXwiki] page.
 
-As of version 1.1, QuickFIX Messenger comes with a feature to send FIX messages in free text form
+As of version 1.1, QuickFIX Messenger comes with a feature to send FIX messages in free text form. Note that CheckSum (10) and SendingTime (52) will automatically be populated by QuickFIX/J.
 
 http://img696.imageshack.us/img696/2281/freetext12.png
 
