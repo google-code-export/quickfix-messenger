@@ -85,7 +85,7 @@ Fields belonging to a message component (FIX 4.3 or later), are displayed under 
 
 Double-clicking on the field name will launch the browser to the selected field's [http://fixwiki.org/ FIXwiki] page.
 
-As of version 1.1, QuickFIX Messenger comes with a feature to send FIX messages in free text form. _Note that CheckSum (tag 10) and SendingTime (tag 52) will automatically be populated by QuickFIX/J_.
+As of version 1.1, QuickFIX Messenger comes with a feature to send FIX messages in free text form. Note that !CheckSum (10) and !SendingTime (52) will automatically be populated by QuickFIX/J.
 
 http://img696.imageshack.us/img696/2281/freetext12.png
 
