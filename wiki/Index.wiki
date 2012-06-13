@@ -28,6 +28,9 @@ The source distribution file is usually named `qfix-messenger-<version>-src.zip`
 == Running QuickFIX Messenger ==
 As of version 1.1, the binary distribution includes executable batch files for an Initiator instance and an Acceptor instance. Both batch files comes in 2 flavors: (`qfix-messenger-<instance>.bat` for Windows, `qfix-messenger=<instance>.sh` for Linux/Unix).
 
+By default, QuickFIX Messenger uses a cross-platform look-and-feel called [http://sourceforge.net/projects/lipstiklf/ Lipstik]. To switch to the native look-and-feel of the OS, run QuickFIX Messenger with the following property:
+{{{-DuseSystemLAF=true}}}
+
 Note that *JRE 1.6* or later is required to run QuickFIX Messenger.
 
 == Building from Source ==
