@@ -1,0 +1,284 @@
+=CREATE_ANONYMIZED_VIEWS=
+
+{{{
+-- Author: Jan Amoyo
+-- Date: 28 June 2012
+create or replace procedure CREATE_ANONYMIZED_VIEWS
+(
+    FROM_OBJECT_NAME    VARCHAR,
+    VIEW_PREFIX         VARCHAR
+)
+AUTHID CURRENT_USER
+as
+    max_stmt_length     NUMBER := 3900;
+    view_name           VARCHAR2(30);
+    create_stmt         VARCHAR2(100);
+    column_stmt_01      VARCHAR2(4000);
+    column_stmt_02      VARCHAR2(4000);
+    column_stmt_03      VARCHAR2(4000);
+    column_stmt_04      VARCHAR2(4000);
+    column_stmt_05      VARCHAR2(4000);
+    column_stmt_06      VARCHAR2(4000);
+    column_stmt_07      VARCHAR2(4000);
+    column_stmt_08      VARCHAR2(4000);
+    column_stmt_09      VARCHAR2(4000);
+    column_stmt_10      VARCHAR2(4000);
+    column_stmt_11      VARCHAR2(4000);
+    column_stmt_12      VARCHAR2(4000);
+    column_stmt_13      VARCHAR2(4000);
+    column_stmt_14      VARCHAR2(4000);
+    column_stmt_15      VARCHAR2(4000);
+    table_stmt          VARCHAR2(100);    
+    is_first_col        NUMBER;
+    prefix_length       NUMBER;
+begin
+    -- Drop existing anonymized view
+    DBMS_OUTPUT.PUT_LINE('Dropping anonymized views prefixed by ''' || VIEW_PREFIX || '''...');
+    for x in
+    (select OBJECT_NAME from USER_OBJECTS 
+        where OBJECT_TYPE = 'VIEW'
+        and OBJECT_NAME like view_prefix || '%'
+        order by 1)
+    loop
+        execute immediate 'drop view '|| x.OBJECT_NAME;
+    end loop;
+    DBMS_OUTPUT.PUT_LINE('Drop complete.');
+
+    
+    DBMS_OUTPUT.PUT_LINE('Creating anonymized views for objects like ''' || FROM_OBJECT_NAME || '''...');
+    -- Iterate each table
+    for x in
+    (select OBJECT_NAME from USER_OBJECTS 
+        where OBJECT_TYPE = 'TABLE'
+        and OBJECT_NAME like from_object_name
+        order by 1)
+    loop
+        -- Initialize variables
+        prefix_length := length(VIEW_PREFIX) + 1;
+        view_name := view_prefix || substr(x.OBJECT_NAME, prefix_length);
+        create_stmt := 'create or replace force view ' || view_name || ' as select';
+        column_stmt_01 := '';
+        column_stmt_02 := '';
+        column_stmt_03 := '';
+        column_stmt_04 := '';
+        column_stmt_05 := '';
+        column_stmt_06 := '';
+        column_stmt_07 := '';
+        column_stmt_08 := '';
+        column_stmt_09 := '';
+        column_stmt_10 := '';
+        column_stmt_11 := '';
+        column_stmt_12 := '';
+        column_stmt_13 := '';
+        column_stmt_14 := '';
+        column_stmt_15 := '';
+        table_stmt := ' from ' || x.OBJECT_NAME;
+        is_first_col := 1;
+        -- Iterate each column
+        for y in
+        (select COLUMN_NAME from USER_TAB_COLUMNS
+            where TABLE_NAME = x.OBJECT_NAME)
+        loop
+            -- Columns are distributed across variables
+            -- to compensate for the max VARCHAR2 length 
+            if length(column_stmt_01) is null or length(column_stmt_01) < max_stmt_length
+            then
+                if is_first_col <> 1
+                then
+                    column_stmt_01 := column_stmt_01 || ', ';
+                else 
+                    column_stmt_01 := column_stmt_01 || ' ';
+                end if;
+
+                if IS_COLUMN_ANONYMIZED(x.OBJECT_NAME, y.COLUMN_NAME) = 1
+                then
+                    column_stmt_01 := column_stmt_01 || ANONYMIZE_COLUMN(y.COLUMN_NAME) || ' as ' || y.COLUMN_NAME;
+                else
+                    column_stmt_01 := column_stmt_01 || y.COLUMN_NAME || ' as ' || y.COLUMN_NAME;
+                end if;
+
+            elsif length(column_stmt_02) is null or length(column_stmt_02) < max_stmt_length
+            then
+                if IS_COLUMN_ANONYMIZED(x.OBJECT_NAME, y.COLUMN_NAME) = 1
+                then                    
+                    column_stmt_02 := column_stmt_02 || ', ' || ANONYMIZE_COLUMN(y.COLUMN_NAME) || ' as ' || y.COLUMN_NAME;
+                else
+                    column_stmt_02 := column_stmt_02 || ', ' || y.COLUMN_NAME || ' as ' || y.COLUMN_NAME;
+                end if;
+            
+            elsif length(column_stmt_03) is null or length(column_stmt_03) < max_stmt_length
+            then
+                if IS_COLUMN_ANONYMIZED(x.OBJECT_NAME, y.COLUMN_NAME) = 1
+                then                    
+                    column_stmt_03 := column_stmt_03 || ', ' || ANONYMIZE_COLUMN(y.COLUMN_NAME) || ' as ' || y.COLUMN_NAME;
+                else
+                    column_stmt_03 := column_stmt_03 || ', ' || y.COLUMN_NAME || ' as ' || y.COLUMN_NAME;
+                end if;
+                
+            elsif length(column_stmt_04) is null or length(column_stmt_04) < max_stmt_length
+            then
+                if IS_COLUMN_ANONYMIZED(x.OBJECT_NAME, y.COLUMN_NAME) = 1
+                then                    
+                    column_stmt_04 := column_stmt_04 || ', ' || ANONYMIZE_COLUMN(y.COLUMN_NAME) || ' as ' || y.COLUMN_NAME;
+                else
+                    column_stmt_04 := column_stmt_04 || ', ' || y.COLUMN_NAME || ' as ' || y.COLUMN_NAME;
+                end if;
+
+            elsif length(column_stmt_05) is null or length(column_stmt_05) < max_stmt_length
+            then
+                if IS_COLUMN_ANONYMIZED(x.OBJECT_NAME, y.COLUMN_NAME) = 1
+                then                    
+                    column_stmt_05 := column_stmt_05 || ', ' || ANONYMIZE_COLUMN(y.COLUMN_NAME) || ' as ' || y.COLUMN_NAME;
+                else
+                    column_stmt_05 := column_stmt_05 || ', ' || y.COLUMN_NAME || ' as ' || y.COLUMN_NAME;
+                end if;
+
+            elsif length(column_stmt_06) is null or length(column_stmt_06) < max_stmt_length
+            then
+                if IS_COLUMN_ANONYMIZED(x.OBJECT_NAME, y.COLUMN_NAME) = 1
+                then                    
+                    column_stmt_06 := column_stmt_06 || ', ' || ANONYMIZE_COLUMN(y.COLUMN_NAME) || ' as ' || y.COLUMN_NAME;
+                else
+                    column_stmt_06 := column_stmt_06 || ', ' || y.COLUMN_NAME || ' as ' || y.COLUMN_NAME;
+                end if;
+                
+            elsif length(column_stmt_07) is null or length(column_stmt_07) < max_stmt_length
+            then
+                if IS_COLUMN_ANONYMIZED(x.OBJECT_NAME, y.COLUMN_NAME) = 1
+                then                    
+                    column_stmt_07 := column_stmt_07 || ', ' || ANONYMIZE_COLUMN(y.COLUMN_NAME) || ' as ' || y.COLUMN_NAME;
+                else
+                    column_stmt_07 := column_stmt_07 || ', ' || y.COLUMN_NAME || ' as ' || y.COLUMN_NAME;
+                end if;
+            
+            elsif length(column_stmt_08) is null or length(column_stmt_08) < max_stmt_length
+            then
+                if IS_COLUMN_ANONYMIZED(x.OBJECT_NAME, y.COLUMN_NAME) = 1
+                then                    
+                    column_stmt_08 := column_stmt_08 || ', ' || ANONYMIZE_COLUMN(y.COLUMN_NAME) || ' as ' || y.COLUMN_NAME;
+                else
+                    column_stmt_08 := column_stmt_08 || ', ' || y.COLUMN_NAME || ' as ' || y.COLUMN_NAME;
+                end if;
+
+            elsif length(column_stmt_09) is null or length(column_stmt_09) < max_stmt_length
+            then
+                if IS_COLUMN_ANONYMIZED(x.OBJECT_NAME, y.COLUMN_NAME) = 1
+                then                    
+                    column_stmt_09 := column_stmt_09 || ', ' || ANONYMIZE_COLUMN(y.COLUMN_NAME) || ' as ' || y.COLUMN_NAME;
+                else
+                    column_stmt_09 := column_stmt_09 || ', ' || y.COLUMN_NAME || ' as ' || y.COLUMN_NAME;
+                end if;
+                
+            elsif length(column_stmt_10) is null or length(column_stmt_10) < max_stmt_length
+            then
+                if IS_COLUMN_ANONYMIZED(x.OBJECT_NAME, y.COLUMN_NAME) = 1
+                then                    
+                    column_stmt_10 := column_stmt_10 || ', ' || ANONYMIZE_COLUMN(y.COLUMN_NAME) || ' as ' || y.COLUMN_NAME;
+                else
+                    column_stmt_10 := column_stmt_10 || ', ' || y.COLUMN_NAME || ' as ' || y.COLUMN_NAME;
+                end if;
+
+            elsif length(column_stmt_11) is null or length(column_stmt_11) < max_stmt_length
+            then
+                if IS_COLUMN_ANONYMIZED(x.OBJECT_NAME, y.COLUMN_NAME) = 1
+                then                    
+                    column_stmt_11 := column_stmt_11 || ', ' || ANONYMIZE_COLUMN(y.COLUMN_NAME) || ' as ' || y.COLUMN_NAME;
+                else
+                    column_stmt_11 := column_stmt_11 || ', ' || y.COLUMN_NAME || ' as ' || y.COLUMN_NAME;
+                end if;
+                
+            elsif length(column_stmt_12) is null or length(column_stmt_12) < max_stmt_length
+            then
+                if IS_COLUMN_ANONYMIZED(x.OBJECT_NAME, y.COLUMN_NAME) = 1
+                then                    
+                    column_stmt_12 := column_stmt_12 || ', ' || ANONYMIZE_COLUMN(y.COLUMN_NAME) || ' as ' || y.COLUMN_NAME;
+                else
+                    column_stmt_12 := column_stmt_12 || ', ' || y.COLUMN_NAME || ' as ' || y.COLUMN_NAME;
+                end if;
+
+            elsif length(column_stmt_13) is null or length(column_stmt_13) < max_stmt_length
+            then
+                if IS_COLUMN_ANONYMIZED(x.OBJECT_NAME, y.COLUMN_NAME) = 1
+                then                    
+                    column_stmt_13 := column_stmt_13 || ', ' || ANONYMIZE_COLUMN(y.COLUMN_NAME) || ' as ' || y.COLUMN_NAME;
+                else
+                    column_stmt_13 := column_stmt_13 || ', ' || y.COLUMN_NAME || ' as ' || y.COLUMN_NAME;
+                end if;
+                
+            elsif length(column_stmt_14) is null or length(column_stmt_14) < max_stmt_length
+            then
+                if IS_COLUMN_ANONYMIZED(x.OBJECT_NAME, y.COLUMN_NAME) = 1
+                then                    
+                    column_stmt_14 := column_stmt_14 || ', ' || ANONYMIZE_COLUMN(y.COLUMN_NAME) || ' as ' || y.COLUMN_NAME;
+                else
+                    column_stmt_14 := column_stmt_14 || ', ' || y.COLUMN_NAME || ' as ' || y.COLUMN_NAME;
+                end if;
+                
+            else
+                if IS_COLUMN_ANONYMIZED(x.OBJECT_NAME, y.COLUMN_NAME) = 1
+                then                    
+                    column_stmt_15 := column_stmt_15 || ', ' || ANONYMIZE_COLUMN(y.COLUMN_NAME) || ' as ' || y.COLUMN_NAME;
+                else
+                    column_stmt_15 := column_stmt_15 || ', ' || y.COLUMN_NAME || ' as ' || y.COLUMN_NAME;
+                end if;
+            end if;
+            
+            is_first_col := 0;
+        end loop;
+        
+        DBMS_OUTPUT.PUT_LINE('Creating anonymized view for ' || x.OBJECT_NAME || ' : ' || view_name);
+        execute immediate create_stmt || column_stmt_01 || column_stmt_02 || column_stmt_03 || column_stmt_04 || column_stmt_05 || table_stmt;        
+    end loop;
+    DBMS_OUTPUT.PUT_LINE('Done.');
+end;
+/
+}}}
+
+=IS_COLUMN_ANONYMIZED= 
+
+{{{
+-- Author: Jan Amoyo
+-- Date: 28 June 2012
+create or replace function IS_COLUMN_ANONYMIZED
+(
+    table_name  VARCHAR2,
+    column_name VARCHAR2
+)
+return NUMBER
+is
+    is_column_anonymized NUMBER;
+begin
+    is_column_anonymized := 0; 
+    
+    -- TODO : Select from a table    
+    if table_name = 'EMPLOYEE'
+    then
+        if column_name = 'FIRST_NAME' 
+        then
+            is_column_anonymized := 1; 
+        end if;
+    end if;
+    
+    return is_column_anonymized;
+end;
+/
+}}}
+
+=ANONYMIZE_COLUMN=
+
+{{{
+-- Author: Jan Amoyo
+-- Date: 28 June 2012
+create or replace function ANONYMIZE_COLUMN
+(    
+    column_name VARCHAR2
+)
+return VARCHAR2
+is
+    anonymized_value VARCHAR2(4000);
+begin
+    anonymized_value := 'dbms_random.string(''U'', 20)';
+    return anonymized_value;
+end;
+/
+}}}
