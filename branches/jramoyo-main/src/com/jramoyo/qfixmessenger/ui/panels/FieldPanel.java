@@ -76,7 +76,7 @@ public class FieldPanel extends AbstractMemberPanel
 
 	private JTextField fieldTextField;
 
-	private JComboBox fieldComboBox;
+	private JComboBox<Field> fieldComboBox;
 
 	private JButton dateButton;
 
@@ -186,7 +186,8 @@ public class FieldPanel extends AbstractMemberPanel
 			}
 
 			fieldValues.addAll(field.getValues());
-			fieldComboBox = new JComboBox(fieldValues.toArray());
+			fieldComboBox = new JComboBox<Field>(
+					fieldValues.toArray(new Field[] {}));
 			fieldComboBox.setRenderer(new FieldComboBoxCellRenderer());
 
 			fieldValuePanel.add(fieldComboBox);

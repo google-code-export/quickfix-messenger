@@ -191,11 +191,11 @@ public class QFixMessengerFrame extends JFrame
 
 	private JPanel rightPanel;
 
-	private JList sessionsList;
+	private JList<Session> sessionsList;
 
-	private JList messagesList;
+	private JList<Message> messagesList;
 
-	private JComboBox appVersionsComboBox;
+	private JComboBox<String> appVersionsComboBox;
 
 	private JCheckBox requiredCheckBox;
 
@@ -358,8 +358,8 @@ public class QFixMessengerFrame extends JFrame
 		leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
 
 		// Sessions Panel
-		sessionsList = new JList();
-		appVersionsComboBox = new JComboBox(
+		sessionsList = new JList<Session>();
+		appVersionsComboBox = new JComboBox<String>(
 				QFixMessengerConstants.FIXT_APP_VERSIONS);
 		JPanel sessionsPanel = new JPanel();
 		sessionsPanel.setBorder(new TitledBorder("Current Sessions"));
@@ -386,7 +386,7 @@ public class QFixMessengerFrame extends JFrame
 		sessionsPanel.setMaximumSize(sessionsPanel.getPreferredSize());
 
 		// Messages Panel
-		messagesList = new JList();
+		messagesList = new JList<Message>();
 		JPanel messagesPanel = new JPanel();
 		messagesPanel.setBorder(new TitledBorder("Available Messages"));
 		messagesPanel.setLayout(new BoxLayout(messagesPanel, BoxLayout.Y_AXIS));
@@ -593,9 +593,8 @@ public class QFixMessengerFrame extends JFrame
 			{
 				logonMenuItem.setSelected(false);
 			}
-			session
-					.addStateListener(new LogonSessionMenuItemSessionStateListener(
-							logonMenuItem));
+			session.addStateListener(new LogonSessionMenuItemSessionStateListener(
+					logonMenuItem));
 
 			resetMenuItem = new JMenuItem("Reset");
 			resetMenuItem.addActionListener(new ResetSessionActionListener(
@@ -645,7 +644,7 @@ public class QFixMessengerFrame extends JFrame
 
 	private void initSessionsList()
 	{
-		sessionsList = new JList();
+		sessionsList = new JList<Session>();
 
 		List<SessionID> sessionIds = messenger.getConnector().getSessions();
 		List<Session> sessions = new ArrayList<Session>(sessionIds.size());
@@ -662,12 +661,12 @@ public class QFixMessengerFrame extends JFrame
 			@Override
 			public int compare(Session o1, Session o2)
 			{
-				return o1.getSessionID().getBeginString().compareTo(
-						o2.getSessionID().getBeginString());
+				return o1.getSessionID().getBeginString()
+						.compareTo(o2.getSessionID().getBeginString());
 			}
 		});
 
-		sessionsList.setListData(sessions.toArray());
+		sessionsList.setListData(sessions.toArray(new Session[] {}));
 		sessionsList.setCellRenderer(new SessionsListCellRenderer());
 		sessionsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		sessionsList.getSelectionModel().addListSelectionListener(
@@ -885,7 +884,7 @@ public class QFixMessengerFrame extends JFrame
 			messagesList.setListData(messages.toArray(new Message[] {}));
 		} else
 		{
-			messagesList.setListData(new String[] {});
+			messagesList.setListData(new Message[] {});
 		}
 	}
 
@@ -986,7 +985,8 @@ public class QFixMessengerFrame extends JFrame
 								java.net.URI.create(url));
 					} catch (IOException ex)
 					{
-						JOptionPane.showMessageDialog(frame,
+						JOptionPane.showMessageDialog(
+								frame,
 								"An exception occured:\n"
 										+ Arrays.toString(ex.getStackTrace()),
 								"Error", JOptionPane.ERROR_MESSAGE);
@@ -1163,9 +1163,7 @@ public class QFixMessengerFrame extends JFrame
 							}
 						} else
 						{
-							logger
-									.info("Sending message "
-											+ message.toString());
+							logger.info("Sending message " + message.toString());
 							session.send(message);
 						}
 					}
@@ -1177,9 +1175,9 @@ public class QFixMessengerFrame extends JFrame
 				}
 			} else
 			{
-				JOptionPane.showMessageDialog(frame, QFixUtil
-						.getSessionName(session.getSessionID())
-						+ " is not logged on!", "Error",
+				JOptionPane.showMessageDialog(frame,
+						QFixUtil.getSessionName(session.getSessionID())
+								+ " is not logged on!", "Error",
 						JOptionPane.ERROR_MESSAGE);
 			}
 		}
@@ -1303,10 +1301,9 @@ public class QFixMessengerFrame extends JFrame
 
 				if (!frame.isFixTSession)
 				{
-					message
-							.fromString(frame.freeTextMessagePanel
-									.getFixString(), session
-									.getDataDictionary(), false);
+					message.fromString(
+							frame.freeTextMessagePanel.getFixString(),
+							session.getDataDictionary(), false);
 				} else
 				{
 					/*
@@ -1323,11 +1320,11 @@ public class QFixMessengerFrame extends JFrame
 								.getMessenger().getConfig()
 								.getFixT11DictionaryLocation());
 						appDictionary = new DataDictionary(frame.getMessenger()
-								.getConfig().getFixDictionaryLocation(
-										appVersion));
-						message.fromString(frame.freeTextMessagePanel
-								.getFixString(), sessionDictionary,
-								appDictionary, false);
+								.getConfig()
+								.getFixDictionaryLocation(appVersion));
+						message.fromString(
+								frame.freeTextMessagePanel.getFixString(),
+								sessionDictionary, appDictionary, false);
 					} catch (ConfigError ex)
 					{
 						message = null;
@@ -1390,9 +1387,8 @@ public class QFixMessengerFrame extends JFrame
 					{
 						logonMenuItem.setSelected(false);
 					}
-					session
-							.addStateListener(new LogonSessionMenuItemSessionStateListener(
-									logonMenuItem));
+					session.addStateListener(new LogonSessionMenuItemSessionStateListener(
+							logonMenuItem));
 
 					resetMenuItem = new JMenuItem("Reset");
 					resetMenuItem
@@ -1408,8 +1404,8 @@ public class QFixMessengerFrame extends JFrame
 					sessionMenuPopup.add(resetMenuItem);
 					sessionMenuPopup.add(statusMenuItem);
 
-					sessionMenuPopup.show(frame.sessionsList, e.getX(), e
-							.getY());
+					sessionMenuPopup.show(frame.sessionsList, e.getX(),
+							e.getY());
 				}
 			}
 		}
