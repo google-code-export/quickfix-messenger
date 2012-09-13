@@ -2,12 +2,13 @@
 
 = Introduction =
 
-Add your content here.
+*QuickFIX Messenger* is a front-end messaging application for the [http://www.quickfixj.org QuickFIX/J] engine.
 
+It provides an easy to use graphical user interface (GUI) for constructing and sending FIX messages across a given FIX session.
 
-= Details =
+QuickFIX Messenger is fully open source under the [http://opensource.org/licenses/BSD-3-Clause new BSD License]. Interested contributors may let their intentions known to <a href="mailto:jramoyo@gmail.com">jramoyo@gmail.com</a>
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+= Development Environment =
+== Required Tools ==
+ * A modern Java IDE; [http://www.eclipse.org/downloads/ Eclipse] is highly recommended
+ * An updated [http://www.oracle.com/technetwork/java/javase/downloads/index.html Java Development Kit]
