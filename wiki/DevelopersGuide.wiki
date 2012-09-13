@@ -6,9 +6,82 @@
 
 It provides an easy to use graphical user interface (GUI) for constructing and sending FIX messages across a given FIX session.
 
-QuickFIX Messenger is fully open source under the [http://opensource.org/licenses/BSD-3-Clause new BSD License]. Interested contributors may let their intentions known to <a href="mailto:jramoyo@gmail.com">jramoyo@gmail.com</a>
+QuickFIX Messenger is fully open source under the [http://opensource.org/licenses/BSD-3-Clause new BSD License]. Interested contributors may let their intentions known to jramoyo@gmail.com.
 
 = Development Environment =
 == Required Tools ==
  * A modern Java IDE; [http://www.eclipse.org/downloads/ Eclipse] is highly recommended
  * An updated [http://www.oracle.com/technetwork/java/javase/downloads/index.html Java Development Kit]
+ * A Subversion (SVN) client
+
+== Building the Source Code ==
+_This guide assumes that Eclipse (with Subversion plugin) is the chosen IDE._
+
+=== Connecting to Subversion ===
+ # Open the SVN Repository perspective
+ # Create a new repository location pointing to https://quickfix-messenger.googlecode.com/svn/
+  * Username is your Gmail address
+  * Password is your [https://code.google.com/hosting/settings Google code] generated password
+
+=== Checking out from Subversion ===
+ # Traverse to the repository node: trunk > qfix-messenger
+ # Right-click > Checkout
+ # Eclipse should detect that a Java project is being checked-out, accept and proceed
+
+=== Executing the Ant script ===
+ # Locate the Ant script (`build.xml`) at the project's root directory
+ # Right-click > Run As > Ant Script
+  * This will execute the default Ant target (`clean.deploy`)
+  * A different Ant target may be selected from the Ant run configuration (Right-click > Run As > Run Configurations...)
+ # The default Ant target will:
+  # Clean all temporary files
+  # Compile the source code
+  # Create the JAR file
+  # Deploy all files to a working directory
+ # The working directory contains the distributables of the application
+  * The default working directory is `deploy`
+  * The scripts (_`.sh` for Linux and `.cmd` for Windows_) from this directory can be used to launch the application
+
+== Running from Eclipse ==
+ # Locate the Main class
+  * `com.jramoyo.qfixmessenger.QFixMessenger`
+ # Right-click > Run As > Java Application
+  * If running for the 1st time, an error message will appear:
+   * <font color="red">`Usage: QFixMessenger <app cfg file> <quickfix cfg file>`</font>
+  * Right-click > Run As > Run Configurations...
+  * Switch to the Arguments tab
+  * Under Program arguments, enter the path to `messenger.cfg` and `quickfix.cfg`
+   * Variables... > `${resource_loc}` can aid in locating these configuration files
+ # Running in debug mode should work the same way
+  * Right-click > Debug As > Java Application
+
+= Development Standards =
+== Code Standards ==
+_The included Eclipse project files contains the 'Java Code Style' used throughout the project_
+
+=== Convention ===
+ * Always CTRL-Shift-F (Source > Format) to ensure that the code follows the convention used throughout the project
+ * Always CTRL-Shift-O (Source > Organize Imports) to ensure that imports are neat and granular
+ * Do not ignore warnings (they're there for a reason)
+ * Always use curly braces `{ }` on IF statements, even single liners
+
+=== Comments ===
+ * For non-UI classes, always provide a Javadoc for public, package-protected, and protected methods.
+  * Unless new behavior is added, Javadoc is not required for overridden methods
+ * Use `/* */` for multi-line comments
+ * Comment on complex logic, avoid too much comments
+ * Do not check-in code that's been commented-out (use version history to retrieve previous code)
+
+=== Naming ===
+ * Nouns for classes
+ * Verbs for methods
+ * Use descriptive names
+ * Always use camel-case, even for acronyms
+  * *`XmlParser`* vs. `XMLParser`
+ * For directories (including SVN), use hyphen (`-`) to separate words
+  * *`my-directory`* vs. `myDirectory` or `my_directory`
+
+== Process ==
+ * Code changes must be assigned a ticket
+ * Always work on a branch
+ * Delete already merged branch
