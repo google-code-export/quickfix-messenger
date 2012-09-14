@@ -32,7 +32,7 @@ _This guide assumes that Eclipse (with Subversion plugin) is the chosen IDE._
  # Locate the Ant script (`build.xml`) at the project's root directory
  # Right-click > Run As > Ant Build
   * This will execute the default Ant target (`clean.deploy`)
-  * A different Ant target may be selected from the Ant run configuration (Right-click > Run As > External Tools Configurations...)
+  * A different Ant target may be selected from the Ant run configuration (Right-click > Run As > Ant Build...)
  # The default Ant target will:
   # Clean all temporary files
   # Compile the source code
