@@ -43,6 +43,7 @@
 		</delete>
 	</target>
 
+	<!--
 	<target name="jaxb" depends="jaxb.message">
 		<java classname="com.sun.tools.internal.xjc.XJCFacade">
 			<arg value="-p" />
@@ -50,8 +51,9 @@
 			<arg value="${resources.dir}/xsd/message.xsd" />
 		</java>
 	</target>
+	-->
 
-	<target name="build" depends="jaxb, build.message">
+	<target name="build" depends="build.message">
 		<javac includeantruntime="true" source="${java.source.version}" target="${java.source.version}" srcdir="${src.dir}" destdir="${classes.dir}" deprecation="${compile.deprecation}" debug="${compile.debug}" verbose="${compile.verbose}">
 			<classpath refid="lib.classpath" />
 		</javac>
