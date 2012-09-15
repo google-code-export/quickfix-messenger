@@ -9,7 +9,7 @@
 		</fileset>
 	</path>
 
-	<target name="jaxb.message">
+	<target name="xjc.message">
 		<echo message="Generating JAXB code..." />
 	</target>
 
@@ -36,6 +36,7 @@
 	<target name="clean" depends="clean.message">
 		<delete includeemptydirs="true" failonerror="false">
 			<fileset dir="${classes.dir}" includes="**/*" />
+			<fileset dir="${gen.dir}" includes="**/*" />
 			<fileset dir="${package.dir}" includes="**/*" />
 			<fileset dir="${log.dir}" includes="**/*" />
 			<fileset dir="${deploy.dir}" includes="**/*" />
@@ -43,17 +44,16 @@
 		</delete>
 	</target>
 
-	<!--
-	<target name="jaxb" depends="jaxb.message">
-		<java classname="com.sun.tools.internal.xjc.XJCFacade">
-			<arg value="-p" />
-			<arg value="com.jramoyo.qfixmessenger" />
-			<arg value="${resources.dir}/xsd/message.xsd" />
-		</java>
+	<target name="xjc" depends="xjc.message">
+		<taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
+			<classpath refid="lib.classpath" />
+		</taskdef>
+		<xjc destdir="${gen.dir}" extension="true">
+			<schema dir="${resources.dir}/xsd" includes="*.xsd" />
+		</xjc>
 	</target>
-	-->
 
-	<target name="build" depends="build.message">
+	<target name="build" depends="xjc,build.message">
 		<javac includeantruntime="true" source="${java.source.version}" target="${java.source.version}" srcdir="${src.dir}" destdir="${classes.dir}" deprecation="${compile.deprecation}" debug="${compile.debug}" verbose="${compile.verbose}">
 			<classpath refid="lib.classpath" />
 		</javac>
