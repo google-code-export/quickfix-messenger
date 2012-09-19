@@ -133,6 +133,8 @@ import com.jramoyo.qfixmessenger.ui.panels.MemberPanelFactory;
 import com.jramoyo.qfixmessenger.ui.renderers.MessagesListCellRenderer;
 import com.jramoyo.qfixmessenger.ui.renderers.MessagesTableCellRender;
 import com.jramoyo.qfixmessenger.ui.renderers.SessionsListCellRenderer;
+import com.jramoyo.qfixmessenger.xml.MessageType;
+import com.jramoyo.qfixmessenger.xml.ObjectFactory;
 
 /**
  * Main frame
@@ -181,6 +183,8 @@ public class QFixMessengerFrame extends JFrame
 	private JMenuBar menuBar;
 
 	private JMenu sessionMenu;
+
+	private JMenu messageMenu;
 
 	private JMenu helpMenu;
 
@@ -418,12 +422,31 @@ public class QFixMessengerFrame extends JFrame
 		menuBar = new JMenuBar();
 
 		initSessionMenu();
+		initMessageMenu();
 		initHelpMenu();
 
 		menuBar.add(sessionMenu);
+		menuBar.add(messageMenu);
 		menuBar.add(helpMenu);
 
 		setJMenuBar(menuBar);
+	}
+
+	private void initMessageMenu()
+	{
+		messageMenu = new JMenu("Message");
+		messageMenu.setMnemonic('M');
+
+		JMenuItem exportMenuItem = new JMenuItem("Export");
+		exportMenuItem.setMnemonic('X');
+		exportMenuItem.addActionListener(new ExportMessageActionListener(this));
+
+		JMenuItem importMenuItem = new JMenuItem("Import");
+		importMenuItem.setMnemonic('M');
+		importMenuItem.addActionListener(new ImportMessageActionListener(this));
+
+		messageMenu.add(exportMenuItem);
+		messageMenu.add(importMenuItem);
 	}
 
 	private void initMessagesList()
@@ -941,6 +964,66 @@ public class QFixMessengerFrame extends JFrame
 				logger.debug("Selected dictionary " + frame.activeDictionary);
 			}
 			frame.loadMessagesList();
+		}
+	}
+
+	private static class ExportMessageActionListener implements ActionListener
+	{
+		private QFixMessengerFrame frame;
+
+		public ExportMessageActionListener(QFixMessengerFrame frame)
+		{
+			this.frame = frame;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e)
+		{
+			Session session = (Session) frame.sessionsList.getSelectedValue();
+
+			if (frame.activeMessage != null)
+			{
+				if (!frame.activeMessage.equals(frame.freeTextMessage))
+				{
+					MessageType xmlMessage = getXmlMessageFromForm(session);
+				} else
+				{
+					JOptionPane.showMessageDialog(frame,
+							"Free text message cannot be exported!", "Error",
+							JOptionPane.WARNING_MESSAGE);
+				}
+			} else
+			{
+				JOptionPane.showMessageDialog(frame,
+						"Please select a message!", "Error",
+						JOptionPane.WARNING_MESSAGE);
+			}
+		}
+
+		private MessageType getXmlMessageFromForm(Session session)
+		{
+			ObjectFactory xmlObjectFactory = new ObjectFactory();
+
+			MessageType xmlMessageTYpe = xmlObjectFactory.createMessageType();
+			xmlMessageTYpe.setName(frame.activeMessage.getName());
+			xmlMessageTYpe.setMsgType(frame.activeMessage.getMsgType());
+
+			return xmlMessageTYpe;
+		}
+	}
+
+	private static class ImportMessageActionListener implements ActionListener
+	{
+		private QFixMessengerFrame frame;
+
+		public ImportMessageActionListener(QFixMessengerFrame frame)
+		{
+			this.frame = frame;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e)
+		{
 		}
 	}
 

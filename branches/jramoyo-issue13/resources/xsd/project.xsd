@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	targetNamespace="http://schema.qfixmessenger.jramoyo.com" xmlns="http://schema.qfixmessenger.jramoyo.com">
+	targetNamespace="http://xml.qfixmessenger.jramoyo.com" xmlns="http://xml.qfixmessenger.jramoyo.com">
 
 	<xs:include schemaLocation="message.xsd" />
 
