@@ -43,6 +43,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.swing.BoxLayout;
+import javax.swing.ComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -146,6 +147,27 @@ public class FieldPanel extends AbstractMemberPanel
 	public Member getMember()
 	{
 		return field;
+	}
+
+	public void populate(com.jramoyo.fix.xml.FieldType xmlFieldType)
+	{
+		if (fieldComboBox != null)
+		{
+			ComboBoxModel<FieldValue> comboBoxModel = fieldComboBox.getModel();
+			for (int i = 0; i < comboBoxModel.getSize(); i++)
+			{
+				FieldValue fieldValue = comboBoxModel.getElementAt(i);
+				if (fieldValue.getEnumValue().equals(xmlFieldType.getName()))
+				{
+					fieldComboBox.setSelectedIndex(i);
+				}
+			}
+		}
+
+		else
+		{
+			fieldTextField.setText(xmlFieldType.getValue());
+		}
 	}
 
 	private void copyValue(FieldPanel fieldPanel)

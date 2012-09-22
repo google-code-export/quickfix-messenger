@@ -248,6 +248,48 @@ public class GroupPanel extends AbstractMemberPanel
 		return group;
 	}
 
+	public void populate(GroupsType xmlGroupsType)
+	{
+		groupTextField.setText(String.valueOf(xmlGroupsType.getCount()));
+		loadMembers();
+
+		for (int i = 0; i < xmlGroupsType.getGroup().size(); i++)
+		{
+			GroupType xmlGroupType = xmlGroupsType.getGroup().get(i);
+			List<MemberPanel> groupMembers = groups.get(i);
+
+			for (Object xmlMember : xmlGroupType.getFieldOrGroupsOrComponent())
+			{
+				if (xmlMember instanceof FieldType)
+				{
+					FieldType xmlFieldType = (FieldType) xmlMember;
+					FieldPanel fieldPanel = (FieldPanel) MemberPanelUtil
+							.findMemberPanelByName(xmlFieldType.getName(),
+									groupMembers);
+					fieldPanel.populate(xmlFieldType);
+				}
+
+				if (xmlMember instanceof GroupsType)
+				{
+					GroupsType xmlGroupsTypeMember = (GroupsType) xmlMember;
+					GroupPanel groupPanel = (GroupPanel) MemberPanelUtil
+							.findMemberPanelByName(
+									xmlGroupsTypeMember.getName(), groupMembers);
+					groupPanel.populate(xmlGroupsTypeMember);
+				}
+
+				if (xmlMember instanceof ComponentType)
+				{
+					ComponentType xmlComponentType = (ComponentType) xmlMember;
+					ComponentPanel componentPanel = (ComponentPanel) MemberPanelUtil
+							.findMemberPanelByName(xmlComponentType.getName(),
+									groupMembers);
+					componentPanel.populate(xmlComponentType);
+				}
+			}
+		}
+	}
+
 	private void copyValue(GroupPanel groupPanel)
 	{
 		groupTextField.setText(groupPanel.groupTextField.getText().trim());

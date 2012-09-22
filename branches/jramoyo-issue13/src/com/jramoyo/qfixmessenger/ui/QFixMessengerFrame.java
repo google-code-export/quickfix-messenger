@@ -64,6 +64,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -83,6 +84,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
+import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
@@ -118,7 +120,9 @@ import com.jramoyo.fix.model.Message;
 import com.jramoyo.fix.model.parser.FixDictionaryParser;
 import com.jramoyo.fix.model.parser.FixParsingException;
 import com.jramoyo.fix.xml.BodyType;
+import com.jramoyo.fix.xml.ComponentType;
 import com.jramoyo.fix.xml.FieldType;
+import com.jramoyo.fix.xml.GroupsType;
 import com.jramoyo.fix.xml.HeaderType;
 import com.jramoyo.fix.xml.MessageType;
 import com.jramoyo.fix.xml.ObjectFactory;
@@ -146,6 +150,7 @@ import com.jramoyo.qfixmessenger.ui.panels.FreeTextMessagePanel;
 import com.jramoyo.qfixmessenger.ui.panels.GroupPanel;
 import com.jramoyo.qfixmessenger.ui.panels.MemberPanel;
 import com.jramoyo.qfixmessenger.ui.panels.MemberPanelFactory;
+import com.jramoyo.qfixmessenger.ui.panels.MemberPanelUtil;
 import com.jramoyo.qfixmessenger.ui.renderers.MessagesListCellRenderer;
 import com.jramoyo.qfixmessenger.ui.renderers.MessagesTableCellRender;
 import com.jramoyo.qfixmessenger.ui.renderers.SessionsListCellRenderer;
@@ -979,6 +984,188 @@ public class QFixMessengerFrame extends JFrame
 		}
 	}
 
+	private void populateMembers(MessageType xmlMessageType)
+	{
+		if (xmlMessageType.getHeader() != null
+				&& xmlMessageType.getHeader().getField() != null
+				&& xmlMessageType.getHeader().getField().isEmpty())
+		{
+			modifyHeaderCheckBox.setSelected(true);
+			HeaderType xmlHeaderType = xmlMessageType.getHeader();
+			for (Object xmlMember : xmlHeaderType.getField())
+			{
+				if (xmlMember instanceof FieldType)
+				{
+					FieldType xmlFieldType = (FieldType) xmlMember;
+					FieldPanel fieldPanel = (FieldPanel) MemberPanelUtil
+							.findMemberPanelByName(xmlFieldType.getName(),
+									headerMembers);
+					fieldPanel.populate(xmlFieldType);
+				}
+			}
+		} else
+		{
+			modifyHeaderCheckBox.setSelected(false);
+		}
+
+		BodyType xmlBodyType = xmlMessageType.getBody();
+		for (Object xmlMember : xmlBodyType.getFieldOrGroupsOrComponent())
+		{
+			if (xmlMember instanceof FieldType)
+			{
+				FieldType xmlFieldType = (FieldType) xmlMember;
+				FieldPanel fieldPanel = (FieldPanel) MemberPanelUtil
+						.findMemberPanelByName(xmlFieldType.getName(),
+								bodyMembers);
+				fieldPanel.populate(xmlFieldType);
+			}
+
+			if (xmlMember instanceof GroupsType)
+			{
+				GroupsType xmlGroupsType = (GroupsType) xmlMember;
+				GroupPanel groupPanel = (GroupPanel) MemberPanelUtil
+						.findMemberPanelByName(xmlGroupsType.getName(),
+								bodyMembers);
+				groupPanel.populate(xmlGroupsType);
+			}
+
+			if (xmlMember instanceof ComponentType)
+			{
+				ComponentType xmlComponentTypeMember = (ComponentType) xmlMember;
+				ComponentPanel componentPanel = (ComponentPanel) MemberPanelUtil
+						.findMemberPanelByName(
+								xmlComponentTypeMember.getName(), bodyMembers);
+				componentPanel.populate(xmlComponentTypeMember);
+			}
+		}
+
+		if (xmlMessageType.getTrailer() != null
+				&& xmlMessageType.getTrailer().getField() != null
+				&& xmlMessageType.getTrailer().getField().isEmpty())
+		{
+			modifyTrailerCheckBox.setSelected(true);
+			TrailerType xmlTrailerType = xmlMessageType.getTrailer();
+			for (Object xmlMember : xmlTrailerType.getField())
+			{
+				if (xmlMember instanceof FieldType)
+				{
+					FieldType xmlFieldType = (FieldType) xmlMember;
+					FieldPanel fieldPanel = (FieldPanel) MemberPanelUtil
+							.findMemberPanelByName(xmlFieldType.getName(),
+									trailerMembers);
+					fieldPanel.populate(xmlFieldType);
+				}
+			}
+		} else
+		{
+			modifyTrailerCheckBox.setSelected(false);
+		}
+	}
+
+	private boolean selectMessage(MessageType xmlMessageType)
+	{
+		boolean isRecognizedMessage = false;
+		ListModel<Message> listModel = messagesList.getModel();
+		for (int i = 0; i < listModel.getSize(); i++)
+		{
+			Message message = listModel.getElementAt(i);
+			if (message.getMsgType().equals(xmlMessageType.getMsgType()))
+			{
+				messagesList.setSelectedIndex(i);
+				isRecognizedMessage = true;
+			}
+		}
+
+		if (isRecognizedMessage)
+		{
+
+		} else
+		{
+			logger.error("Unrecognized message: ", xmlMessageType.getName()
+					+ " (" + xmlMessageType.getMsgType() + ")");
+			JOptionPane.showMessageDialog(
+					this,
+					"Unable to import message from unrecognized message: "
+							+ xmlMessageType.getName() + " ("
+							+ xmlMessageType.getMsgType() + ")", "Error",
+					JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+
+		return true;
+	}
+
+	private boolean selectSession(SessionType xmlSessionType)
+	{
+		boolean isRecognizedSession = false;
+		ListModel<Session> listModel = sessionsList.getModel();
+		for (int i = 0; i < listModel.getSize(); i++)
+		{
+			Session session = listModel.getElementAt(i);
+			if (QFixUtil.getSessionName(session.getSessionID()).equals(
+					xmlSessionType.getName()))
+			{
+				sessionsList.setSelectedIndex(i);
+				isRecognizedSession = true;
+			}
+		}
+
+		if (isRecognizedSession)
+		{
+			if (isFixTSession)
+			{
+				if (xmlSessionType.getAppVersionId() != null
+						&& !xmlSessionType.getAppVersionId().isEmpty())
+				{
+					boolean isRecognizedAppVersionId = false;
+					ComboBoxModel<String> comboBoxModel = appVersionsComboBox
+							.getModel();
+					for (int i = 0; i < comboBoxModel.getSize(); i++)
+					{
+						if (comboBoxModel.getElementAt(i).equals(
+								xmlSessionType.getAppVersionId()))
+						{
+							appVersionsComboBox.setSelectedIndex(i);
+							isRecognizedAppVersionId = true;
+						}
+					}
+
+					if (!isRecognizedAppVersionId)
+					{
+						logger.error("Unrecognized AppVersionId: "
+								+ xmlSessionType.getAppVersionId());
+						JOptionPane.showMessageDialog(
+								this,
+								"Unrecognized AppVersionId: "
+										+ xmlSessionType.getAppVersionId(),
+								"Error", JOptionPane.ERROR_MESSAGE);
+						return false;
+					}
+				} else
+				{
+					logger.error("FIXT session ", xmlSessionType.getName()
+							+ " has no AppVersionId");
+					JOptionPane.showMessageDialog(this,
+							"Unable to find AppVersionId for FIXT session: "
+									+ xmlSessionType.getName(), "Error",
+							JOptionPane.ERROR_MESSAGE);
+					return false;
+				}
+			}
+
+		} else
+		{
+			logger.error("Unrecognized session: ", xmlSessionType.getName());
+			JOptionPane.showMessageDialog(this, "Unable to"
+					+ " import message from unrecognized session: "
+					+ xmlSessionType.getName(), "Error",
+					JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+
+		return true;
+	}
+
 	private static class AppVersionsComboBoxActionListener implements
 			ActionListener
 	{
@@ -1201,6 +1388,14 @@ public class QFixMessengerFrame extends JFrame
 					JAXBElement<MessageType> rootElement = (JAXBElement<MessageType>) unmarshaller
 							.unmarshal(file);
 					MessageType xmlMessageType = rootElement.getValue();
+
+					if (frame.selectSession(xmlMessageType.getSession()))
+					{
+						if (frame.selectMessage(xmlMessageType))
+						{
+							frame.populateMembers(xmlMessageType);
+						}
+					}
 				} catch (JAXBException ex)
 				{
 					logger.error(

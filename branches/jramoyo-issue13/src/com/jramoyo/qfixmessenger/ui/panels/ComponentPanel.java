@@ -198,6 +198,37 @@ public class ComponentPanel extends AbstractMemberPanel
 		return component;
 	}
 
+	public void populate(ComponentType xmlComponentType)
+	{
+		for (Object xmlMember : xmlComponentType.getFieldOrGroupsOrComponent())
+		{
+			if (xmlMember instanceof FieldType)
+			{
+				FieldType xmlFieldType = (FieldType) xmlMember;
+				FieldPanel fieldPanel = (FieldPanel) MemberPanelUtil
+						.findMemberPanelByName(xmlFieldType.getName(), members);
+				fieldPanel.populate(xmlFieldType);
+			}
+
+			if (xmlMember instanceof GroupsType)
+			{
+				GroupsType xmlGroupsType = (GroupsType) xmlMember;
+				GroupPanel groupPanel = (GroupPanel) MemberPanelUtil
+						.findMemberPanelByName(xmlGroupsType.getName(), members);
+				groupPanel.populate(xmlGroupsType);
+			}
+
+			if (xmlMember instanceof ComponentType)
+			{
+				ComponentType xmlComponentTypeMember = (ComponentType) xmlMember;
+				ComponentPanel componentPanel = (ComponentPanel) MemberPanelUtil
+						.findMemberPanelByName(
+								xmlComponentTypeMember.getName(), members);
+				componentPanel.populate(xmlComponentTypeMember);
+			}
+		}
+	}
+
 	private void initComponents()
 	{
 		setLayout(new BorderLayout());
