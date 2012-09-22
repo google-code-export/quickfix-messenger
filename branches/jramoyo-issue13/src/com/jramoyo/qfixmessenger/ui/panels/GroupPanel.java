@@ -102,18 +102,6 @@ public class GroupPanel extends AbstractMemberPanel
 		initComponents();
 	}
 
-	public GroupPanel(GroupPanel groupPanel)
-	{
-		this.group = groupPanel.group;
-		this.isRequired = groupPanel.isRequired;
-		this.isRequiredOnly = groupPanel.isRequiredOnly;
-
-		this.groups = new ArrayList<List<MemberPanel>>();
-
-		initComponents();
-		copyValue(groupPanel);
-	}
-
 	public GroupsType getXmlGroups()
 	{
 		ObjectFactory xmlObjectFactory = new ObjectFactory();
@@ -288,11 +276,6 @@ public class GroupPanel extends AbstractMemberPanel
 				}
 			}
 		}
-	}
-
-	private void copyValue(GroupPanel groupPanel)
-	{
-		groupTextField.setText(groupPanel.groupTextField.getText().trim());
 	}
 
 	private void initComponents()

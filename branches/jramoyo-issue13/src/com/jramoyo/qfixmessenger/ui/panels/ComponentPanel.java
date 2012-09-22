@@ -93,18 +93,6 @@ public class ComponentPanel extends AbstractMemberPanel
 		initComponents();
 	}
 
-	public ComponentPanel(ComponentPanel componentPanel)
-	{
-		this.component = componentPanel.component;
-		this.isRequiredOnly = componentPanel.isRequiredOnly;
-		this.isRequired = componentPanel.isRequired;
-
-		this.members = new ArrayList<MemberPanel>();
-		this.prevMembers = new ArrayList<MemberPanel>(componentPanel.members);
-
-		initComponents();
-	}
-
 	public ComponentType getXmlComponent()
 	{
 		ObjectFactory xmlObjectFactory = new ObjectFactory();

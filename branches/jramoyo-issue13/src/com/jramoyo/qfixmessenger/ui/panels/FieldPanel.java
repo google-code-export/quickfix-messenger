@@ -90,15 +90,6 @@ public class FieldPanel extends AbstractMemberPanel
 		initComponents();
 	}
 
-	public FieldPanel(FieldPanel fieldPanel)
-	{
-		this.field = fieldPanel.field;
-		this.isRequired = fieldPanel.isRequired;
-
-		initComponents();
-		copyValue(fieldPanel);
-	}
-
 	public com.jramoyo.fix.xml.FieldType getXmlField()
 	{
 		if (!StringUtil.isNullOrEmpty(getValue()))
@@ -167,20 +158,6 @@ public class FieldPanel extends AbstractMemberPanel
 		else
 		{
 			fieldTextField.setText(xmlFieldType.getValue());
-		}
-	}
-
-	private void copyValue(FieldPanel fieldPanel)
-	{
-		if (fieldComboBox != null && fieldPanel.fieldComboBox != null)
-		{
-			fieldComboBox.setSelectedItem(fieldPanel.fieldComboBox
-					.getSelectedItem());
-		}
-
-		else
-		{
-			fieldTextField.setText(fieldPanel.fieldTextField.getText().trim());
 		}
 	}
 
