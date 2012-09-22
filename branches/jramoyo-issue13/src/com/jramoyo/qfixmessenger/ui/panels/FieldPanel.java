@@ -55,6 +55,7 @@ import com.jramoyo.fix.model.Field;
 import com.jramoyo.fix.model.FieldType;
 import com.jramoyo.fix.model.FieldValue;
 import com.jramoyo.fix.model.Member;
+import com.jramoyo.fix.xml.ObjectFactory;
 import com.jramoyo.qfixmessenger.QFixMessengerConstants;
 import com.jramoyo.qfixmessenger.ui.renderers.FieldComboBoxCellRenderer;
 import com.jramoyo.qfixmessenger.util.StringUtil;
@@ -97,14 +98,31 @@ public class FieldPanel extends AbstractMemberPanel
 		copyValue(fieldPanel);
 	}
 
-	/*
-	 * Since all values are entered as text, all fields are represented as an
-	 * instance of StringField.
-	 */
+	public com.jramoyo.fix.xml.FieldType getXmlField()
+	{
+		if (!StringUtil.isNullOrEmpty(getValue()))
+		{
+			com.jramoyo.fix.xml.FieldType xmlFieldType = new ObjectFactory()
+					.createFieldType();
+			xmlFieldType.setId(field.getNumber());
+			xmlFieldType.setName(field.getName());
+			xmlFieldType.setValue(getValue());
+
+			return xmlFieldType;
+		} else
+		{
+			return null;
+		}
+	}
+
 	public StringField getQuickFixField()
 	{
 		if (!StringUtil.isNullOrEmpty(getValue()))
 		{
+			/*
+			 * Since all values are entered as text, all fields are represented
+			 * as an instance of StringField.
+			 */
 			return new StringField(field.getNumber(), getValue());
 		} else
 		{
@@ -117,8 +135,7 @@ public class FieldPanel extends AbstractMemberPanel
 	{
 		if (!StringUtil.isNullOrEmpty(getValue()))
 		{
-			return new StringBuilder("" + field.getNumber()).append('=')
-					.append(getValue()).toString();
+			return "" + field.getNumber() + "=" + getValue();
 		} else
 		{
 			return "";

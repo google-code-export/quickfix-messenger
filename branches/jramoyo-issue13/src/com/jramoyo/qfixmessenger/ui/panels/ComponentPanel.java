@@ -53,6 +53,10 @@ import com.jramoyo.fix.model.Component;
 import com.jramoyo.fix.model.Field;
 import com.jramoyo.fix.model.Group;
 import com.jramoyo.fix.model.Member;
+import com.jramoyo.fix.xml.ComponentType;
+import com.jramoyo.fix.xml.FieldType;
+import com.jramoyo.fix.xml.GroupsType;
+import com.jramoyo.fix.xml.ObjectFactory;
 import com.jramoyo.qfixmessenger.QFixMessengerConstants;
 
 /**
@@ -101,9 +105,39 @@ public class ComponentPanel extends AbstractMemberPanel
 		initComponents();
 	}
 
+	public ComponentType getXmlComponent()
+	{
+		ObjectFactory xmlObjectFactory = new ObjectFactory();
+		ComponentType xmlComponentType = xmlObjectFactory.createComponentType();
+
+		for (MemberPanel memberPanel : members)
+		{
+			if (memberPanel instanceof FieldPanel)
+			{
+				FieldType xmlFieldType = ((FieldPanel) memberPanel)
+						.getXmlField();
+				if (xmlFieldType != null)
+				{
+					xmlComponentType.getFieldOrGroupsOrComponent().add(
+							xmlFieldType);
+				}
+			}
+
+			if (memberPanel instanceof GroupPanel)
+			{
+				GroupsType xmlGroupsTypeMember = ((GroupPanel) memberPanel)
+						.getXmlGroups();
+				xmlComponentType.getFieldOrGroupsOrComponent().add(
+						xmlGroupsTypeMember);
+			}
+		}
+
+		return xmlComponentType;
+	}
+
 	/*
 	 * This is a work-around because QuickFIX does not provide a non type-safe
-	 * of representing message components.
+	 * representation message components.
 	 */
 	public List<StringField> getQuickFixFields()
 	{
@@ -126,7 +160,7 @@ public class ComponentPanel extends AbstractMemberPanel
 
 	/*
 	 * This is a work-around because QuickFIX does not provide a non type-safe
-	 * of representing message components.
+	 * representation message components.
 	 */
 	public List<quickfix.Group> getQuickFixGroups()
 	{
@@ -232,8 +266,8 @@ public class ComponentPanel extends AbstractMemberPanel
 				if (!field.equals(firstTag))
 				{
 					FieldPanel fieldPanel = MemberPanelFactory
-							.createFieldPanel(prevMembers, field, entry
-									.getValue());
+							.createFieldPanel(prevMembers, field,
+									entry.getValue());
 					fieldPanel.setMaximumSize(new Dimension(
 							getPreferredSize().width, fieldPanel
 									.getPreferredSize().height));

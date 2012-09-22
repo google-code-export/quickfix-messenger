@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	targetNamespace="http://xml.qfixmessenger.jramoyo.com" xmlns="http://xml.qfixmessenger.jramoyo.com">
+	targetNamespace="http://xml.fix.jramoyo.com" xmlns="http://xml.fix.jramoyo.com">
 
 	<xs:simpleType name="fieldValueType">
 		<xs:restriction base="xs:string" />
@@ -17,10 +17,7 @@
 
 	<xs:complexType name="groupsType">
 		<xs:choice minOccurs="0" maxOccurs="unbounded">
-			<xs:element name="field" type="fieldType" />
 			<xs:element name="group" type="groupType" />
-			<xs:element name="groups" type="groupsType" />
-			<xs:element name="component" type="componentType" />
 		</xs:choice>
 		<xs:attribute name="name" type="xs:string" use="required" />
 		<xs:attribute name="id" type="xs:int" use="required" />
