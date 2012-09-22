@@ -986,12 +986,9 @@ public class QFixMessengerFrame extends JFrame
 
 	private void populateMembers(MessageType xmlMessageType)
 	{
-		if (xmlMessageType.getHeader() != null
-				&& xmlMessageType.getHeader().getField() != null
-				&& xmlMessageType.getHeader().getField().isEmpty())
+		HeaderType xmlHeaderType = xmlMessageType.getHeader();
+		if (xmlHeaderType != null)
 		{
-			modifyHeaderCheckBox.setSelected(true);
-			HeaderType xmlHeaderType = xmlMessageType.getHeader();
 			for (Object xmlMember : xmlHeaderType.getField())
 			{
 				if (xmlMember instanceof FieldType)
@@ -1003,9 +1000,6 @@ public class QFixMessengerFrame extends JFrame
 					fieldPanel.populate(xmlFieldType);
 				}
 			}
-		} else
-		{
-			modifyHeaderCheckBox.setSelected(false);
 		}
 
 		BodyType xmlBodyType = xmlMessageType.getBody();
@@ -1039,12 +1033,9 @@ public class QFixMessengerFrame extends JFrame
 			}
 		}
 
-		if (xmlMessageType.getTrailer() != null
-				&& xmlMessageType.getTrailer().getField() != null
-				&& xmlMessageType.getTrailer().getField().isEmpty())
+		TrailerType xmlTrailerType = xmlMessageType.getTrailer();
+		if (xmlTrailerType != null)
 		{
-			modifyTrailerCheckBox.setSelected(true);
-			TrailerType xmlTrailerType = xmlMessageType.getTrailer();
 			for (Object xmlMember : xmlTrailerType.getField())
 			{
 				if (xmlMember instanceof FieldType)
@@ -1056,9 +1047,6 @@ public class QFixMessengerFrame extends JFrame
 					fieldPanel.populate(xmlFieldType);
 				}
 			}
-		} else
-		{
-			modifyTrailerCheckBox.setSelected(false);
 		}
 	}
 
@@ -1076,10 +1064,7 @@ public class QFixMessengerFrame extends JFrame
 			}
 		}
 
-		if (isRecognizedMessage)
-		{
-
-		} else
+		if (!isRecognizedMessage)
 		{
 			logger.error("Unrecognized message: ", xmlMessageType.getName()
 					+ " (" + xmlMessageType.getMsgType() + ")");
@@ -1090,6 +1075,28 @@ public class QFixMessengerFrame extends JFrame
 							+ xmlMessageType.getMsgType() + ")", "Error",
 					JOptionPane.ERROR_MESSAGE);
 			return false;
+		}
+
+		requiredCheckBox.setSelected(false);
+
+		if (xmlMessageType.getHeader() != null
+				&& xmlMessageType.getHeader().getField() != null
+				&& xmlMessageType.getHeader().getField().isEmpty())
+		{
+			modifyHeaderCheckBox.setSelected(true);
+		} else
+		{
+			modifyHeaderCheckBox.setSelected(false);
+		}
+
+		if (xmlMessageType.getTrailer() != null
+				&& xmlMessageType.getTrailer().getField() != null
+				&& xmlMessageType.getTrailer().getField().isEmpty())
+		{
+			modifyTrailerCheckBox.setSelected(true);
+		} else
+		{
+			modifyTrailerCheckBox.setSelected(false);
 		}
 
 		return true;
