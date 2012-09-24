@@ -36,6 +36,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -126,6 +127,7 @@ import com.jramoyo.fix.xml.GroupsType;
 import com.jramoyo.fix.xml.HeaderType;
 import com.jramoyo.fix.xml.MessageType;
 import com.jramoyo.fix.xml.ObjectFactory;
+import com.jramoyo.fix.xml.ProjectType;
 import com.jramoyo.fix.xml.SessionType;
 import com.jramoyo.fix.xml.TrailerType;
 import com.jramoyo.qfixmessenger.QFixMessenger;
@@ -138,6 +140,7 @@ import com.jramoyo.qfixmessenger.ui.listeners.LogoffAllSessionsActionListener;
 import com.jramoyo.qfixmessenger.ui.listeners.LogonAllSessionsActionListener;
 import com.jramoyo.qfixmessenger.ui.listeners.LogonSessionItemListener;
 import com.jramoyo.qfixmessenger.ui.listeners.LogonSessionMenuItemSessionStateListener;
+import com.jramoyo.qfixmessenger.ui.listeners.NewProjectActionListener;
 import com.jramoyo.qfixmessenger.ui.listeners.ResetAllSessionsActionListener;
 import com.jramoyo.qfixmessenger.ui.listeners.ResetSessionActionListener;
 import com.jramoyo.qfixmessenger.ui.listeners.SessionStatusActionListener;
@@ -187,6 +190,12 @@ public class QFixMessengerFrame extends JFrame
 
 	private JAXBContext jaxbContext;
 
+	private String frameTitle;
+
+	private String projectTitle = "NONE";
+
+	private ProjectType currentProject;
+
 	private volatile FixDictionary activeDictionary;
 
 	private volatile Message activeMessage;
@@ -208,6 +217,8 @@ public class QFixMessengerFrame extends JFrame
 	private JMenu sessionMenu;
 
 	private JMenu helpMenu;
+
+	private JMenu windowMenu;
 
 	private JPanel leftPanel;
 
@@ -236,6 +247,8 @@ public class QFixMessengerFrame extends JFrame
 	private JTable messagesTable;
 
 	private FreeTextMessagePanel freeTextMessagePanel;
+
+	private ProjectFrame projectFrame;
 
 	private List<MemberPanel> headerMembers;
 
@@ -291,6 +304,27 @@ public class QFixMessengerFrame extends JFrame
 		}
 	}
 
+	public ProjectType getCurrentProject()
+	{
+		return currentProject;
+	}
+
+	public QFixMessenger getMessenger()
+	{
+		return messenger;
+	}
+
+	public void importMessage(MessageType xmlMessageType)
+	{
+		if (selectSession(xmlMessageType.getSession()))
+		{
+			if (selectMessage(xmlMessageType))
+			{
+				populateMembers(xmlMessageType);
+			}
+		}
+	}
+
 	public void launch()
 	{
 		setIconImage(new ImageIcon(messenger.getConfig().getAppIconLocation())
@@ -298,22 +332,37 @@ public class QFixMessengerFrame extends JFrame
 
 		if (messenger.getConfig().isInitiator())
 		{
-			setTitle("QuickFIX Messenger " + VERSION + " (Initiator)");
+			frameTitle = "QuickFIX Messenger " + VERSION + " (Initiator)";
 		} else
 		{
-			setTitle("QuickFIX Messenger " + VERSION + " (Acceptor)");
+			frameTitle = "QuickFIX Messenger " + VERSION + " (Acceptor)";
 		}
+		loadFrameTitle();
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		addWindowListener(new FrameWindowAdapter(this));
 
 		initComponents();
-
 		setVisible(true);
 	}
 
-	public QFixMessenger getMessenger()
+	public void saveCurrentProject()
 	{
-		return messenger;
+		// TODO Provide implementation
+	}
+
+	public void setCurrentProject(ProjectType currentProject)
+	{
+		this.currentProject = currentProject;
+
+		projectTitle = currentProject.getName();
+		loadFrameTitle();
+
+		if (projectFrame != null)
+		{
+			projectFrame.dispose();
+			projectFrame = null;
+		}
+		launchProjectFrame();
 	}
 
 	private void exit()
@@ -369,6 +418,54 @@ public class QFixMessengerFrame extends JFrame
 		initRightPanel();
 
 		pack();
+	}
+
+	private void initFileMenu()
+	{
+		fileMenu = new JMenu("File");
+		fileMenu.setMnemonic('F');
+
+		JMenuItem newProjectMenuItem = new JMenuItem("New Project");
+		newProjectMenuItem.setMnemonic('N');
+		newProjectMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,
+				InputEvent.CTRL_MASK));
+		newProjectMenuItem
+				.addActionListener(new NewProjectActionListener(this));
+
+		JMenuItem saveProjectMenuItem = new JMenuItem("Save Project");
+		saveProjectMenuItem.setMnemonic('S');
+		saveProjectMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+				KeyEvent.VK_S, InputEvent.CTRL_MASK));
+
+		JMenuItem openProjectMenuItem = new JMenuItem("Open Project");
+		openProjectMenuItem.setMnemonic('O');
+		openProjectMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+				KeyEvent.VK_O, InputEvent.CTRL_MASK));
+
+		JMenuItem saveMessageMenuItem = new JMenuItem("Export Message");
+		saveMessageMenuItem.setMnemonic('X');
+		saveMessageMenuItem.addActionListener(new ExportMessageActionListener(
+				this));
+
+		JMenuItem loadMessageMenuItem = new JMenuItem("Import Message");
+		loadMessageMenuItem.setMnemonic('I');
+		loadMessageMenuItem.addActionListener(new ImportMessageActionListener(
+				this));
+
+		JMenuItem exitMenuItem = new JMenuItem("Exit");
+		exitMenuItem.setMnemonic('x');
+		exitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X,
+				InputEvent.ALT_MASK));
+		exitMenuItem.addActionListener(new FrameExitActionListener(this));
+
+		fileMenu.add(newProjectMenuItem);
+		fileMenu.add(saveProjectMenuItem);
+		fileMenu.add(openProjectMenuItem);
+		fileMenu.addSeparator();
+		fileMenu.add(saveMessageMenuItem);
+		fileMenu.add(loadMessageMenuItem);
+		fileMenu.addSeparator();
+		fileMenu.add(exitMenuItem);
 	}
 
 	private void initHelpMenu()
@@ -455,58 +552,14 @@ public class QFixMessengerFrame extends JFrame
 		initFileMenu();
 		initSessionMenu();
 		initHelpMenu();
+		initWindowMenu();
 
 		menuBar.add(fileMenu);
 		menuBar.add(sessionMenu);
 		menuBar.add(helpMenu);
+		menuBar.add(windowMenu);
 
 		setJMenuBar(menuBar);
-	}
-
-	private void initFileMenu()
-	{
-		fileMenu = new JMenu("File");
-		fileMenu.setMnemonic('F');
-
-		JMenuItem newProjectMenuItem = new JMenuItem("New Project");
-		newProjectMenuItem.setMnemonic('N');
-		newProjectMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,
-				InputEvent.CTRL_MASK));
-
-		JMenuItem saveProjectMenuItem = new JMenuItem("Save Project");
-		saveProjectMenuItem.setMnemonic('S');
-		saveProjectMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_S, InputEvent.CTRL_MASK));
-
-		JMenuItem openProjectMenuItem = new JMenuItem("Open Project");
-		openProjectMenuItem.setMnemonic('O');
-		openProjectMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_O, InputEvent.CTRL_MASK));
-
-		JMenuItem saveMessageMenuItem = new JMenuItem("Export Message");
-		saveMessageMenuItem.setMnemonic('X');
-		saveMessageMenuItem.addActionListener(new ExportMessageActionListener(
-				this));
-
-		JMenuItem loadMessageMenuItem = new JMenuItem("Import Message");
-		loadMessageMenuItem.setMnemonic('I');
-		loadMessageMenuItem.addActionListener(new ImportMessageActionListener(
-				this));
-
-		JMenuItem exitMenuItem = new JMenuItem("Exit");
-		exitMenuItem.setMnemonic('x');
-		exitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X,
-				InputEvent.ALT_MASK));
-		exitMenuItem.addActionListener(new FrameExitActionListener(this));
-
-		fileMenu.add(newProjectMenuItem);
-		fileMenu.add(saveProjectMenuItem);
-		fileMenu.add(openProjectMenuItem);
-		fileMenu.addSeparator();
-		fileMenu.add(saveMessageMenuItem);
-		fileMenu.add(loadMessageMenuItem);
-		fileMenu.addSeparator();
-		fileMenu.add(exitMenuItem);
 	}
 
 	private void initMessagesList()
@@ -748,6 +801,40 @@ public class QFixMessengerFrame extends JFrame
 		sessionsList.getSelectionModel().addListSelectionListener(
 				new SessionsListSelectionListener(this));
 		sessionsList.addMouseListener(new SessionsListMouseAdapter(this));
+	}
+
+	private void initWindowMenu()
+	{
+		windowMenu = new JMenu("Window");
+		windowMenu.setMnemonic('W');
+
+		JMenuItem projectWindowMenuItem = new JMenuItem("Project Window");
+		projectWindowMenuItem.setMnemonic('P');
+		projectWindowMenuItem
+				.addActionListener(new ProjectWindowActionListener(this));
+
+		windowMenu.add(projectWindowMenuItem);
+	}
+
+	private void launchProjectFrame()
+	{
+		if (projectFrame == null || !projectFrame.isDisplayable())
+		{
+			projectFrame = new ProjectFrame(this, currentProject);
+			projectFrame.launch();
+		} else
+		{
+			if (projectFrame.getState() == Frame.ICONIFIED)
+			{
+				projectFrame.setState(Frame.NORMAL);
+			}
+			projectFrame.requestFocus();
+		}
+	}
+
+	private void loadFrameTitle()
+	{
+		setTitle(frameTitle + " - " + projectTitle);
 	}
 
 	private void loadMainPanel()
@@ -1272,7 +1359,7 @@ public class QFixMessengerFrame extends JFrame
 			} else
 			{
 				JOptionPane.showMessageDialog(frame,
-						"Please select a message!", "Error",
+						"Please create a message!", "Error",
 						JOptionPane.WARNING_MESSAGE);
 			}
 		}
@@ -1368,54 +1455,6 @@ public class QFixMessengerFrame extends JFrame
 		}
 	}
 
-	private static class ImportMessageActionListener implements ActionListener
-	{
-		private QFixMessengerFrame frame;
-
-		public ImportMessageActionListener(QFixMessengerFrame frame)
-		{
-			this.frame = frame;
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e)
-		{
-			JFileChooser jFileChooser = new JFileChooser();
-			jFileChooser.setFileFilter(XmlFileFilter.INSTANCE);
-
-			int choice = jFileChooser.showOpenDialog(frame);
-			if (choice == JFileChooser.APPROVE_OPTION)
-			{
-				File file = jFileChooser.getSelectedFile();
-				try
-				{
-					Unmarshaller unmarshaller = frame.jaxbContext
-							.createUnmarshaller();
-					@SuppressWarnings("unchecked")
-					JAXBElement<MessageType> rootElement = (JAXBElement<MessageType>) unmarshaller
-							.unmarshal(file);
-					MessageType xmlMessageType = rootElement.getValue();
-
-					if (frame.selectSession(xmlMessageType.getSession()))
-					{
-						if (frame.selectMessage(xmlMessageType))
-						{
-							frame.populateMembers(xmlMessageType);
-						}
-					}
-				} catch (JAXBException ex)
-				{
-					logger.error(
-							"A JAXBException occurred while importing message.",
-							ex);
-					JOptionPane.showMessageDialog(frame,
-							"Unable to open file!", "Error",
-							JOptionPane.ERROR_MESSAGE);
-				}
-			}
-		}
-	}
-
 	private static class FrameExitActionListener implements ActionListener
 	{
 		private QFixMessengerFrame frame;
@@ -1445,6 +1484,48 @@ public class QFixMessengerFrame extends JFrame
 		public void windowClosing(WindowEvent e)
 		{
 			frame.exit();
+		}
+	}
+
+	private static class ImportMessageActionListener implements ActionListener
+	{
+		private QFixMessengerFrame frame;
+
+		public ImportMessageActionListener(QFixMessengerFrame frame)
+		{
+			this.frame = frame;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e)
+		{
+			JFileChooser jFileChooser = new JFileChooser();
+			jFileChooser.setFileFilter(XmlFileFilter.INSTANCE);
+
+			int choice = jFileChooser.showOpenDialog(frame);
+			if (choice == JFileChooser.APPROVE_OPTION)
+			{
+				File file = jFileChooser.getSelectedFile();
+				try
+				{
+					Unmarshaller unmarshaller = frame.jaxbContext
+							.createUnmarshaller();
+					@SuppressWarnings("unchecked")
+					JAXBElement<MessageType> rootElement = (JAXBElement<MessageType>) unmarshaller
+							.unmarshal(file);
+					MessageType xmlMessageType = rootElement.getValue();
+
+					frame.importMessage(xmlMessageType);
+				} catch (JAXBException ex)
+				{
+					logger.error(
+							"A JAXBException occurred while importing message.",
+							ex);
+					JOptionPane.showMessageDialog(frame,
+							"Unable to open file!", "Error",
+							JOptionPane.ERROR_MESSAGE);
+				}
+			}
 		}
 	}
 
@@ -1614,6 +1695,23 @@ public class QFixMessengerFrame extends JFrame
 		}
 	}
 
+	private static class ProjectWindowActionListener implements ActionListener
+	{
+		private QFixMessengerFrame frame;
+
+		public ProjectWindowActionListener(QFixMessengerFrame frame)
+		{
+			this.frame = frame;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e)
+		{
+			frame.launchProjectFrame();
+		}
+
+	}
+
 	private static class SendActionListener implements ActionListener
 	{
 		private QFixMessengerFrame frame;
@@ -1663,7 +1761,7 @@ public class QFixMessengerFrame extends JFrame
 				} else
 				{
 					JOptionPane.showMessageDialog(frame,
-							"Please select a message!", "Error",
+							"Please create a message!", "Error",
 							JOptionPane.WARNING_MESSAGE);
 				}
 			} else
@@ -1978,4 +2076,5 @@ public class QFixMessengerFrame extends JFrame
 		}
 
 	}
+
 }
