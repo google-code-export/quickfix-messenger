@@ -192,7 +192,7 @@ public class QFixMessengerFrame extends JFrame
 
 	private String frameTitle;
 
-	private String projectTitle = "NONE";
+	private String projectTitle = "None";
 
 	private ProjectType currentProject;
 
