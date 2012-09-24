@@ -40,7 +40,6 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -242,6 +241,8 @@ public class QFixMessengerFrame extends JFrame
 
 	private JCheckBox previewBeforeSendCheckBox;
 
+	private JButton saveButton;
+
 	private JButton sendButton;
 
 	private JTable messagesTable;
@@ -362,6 +363,7 @@ public class QFixMessengerFrame extends JFrame
 			projectFrame.dispose();
 			projectFrame = null;
 		}
+		saveButton.setEnabled(true);
 		launchProjectFrame();
 	}
 
@@ -683,23 +685,30 @@ public class QFixMessengerFrame extends JFrame
 			}
 		});
 
-		ImageIcon imageIcon = new ImageIcon(messenger.getConfig()
+		ImageIcon saveImageIcon = new ImageIcon(messenger.getConfig()
+				.getSaveIconLocation());
+		saveButton = new JButton(saveImageIcon);
+		saveButton.setToolTipText("Click to save the FIX"
+				+ " message to the current project");
+		saveButton.setEnabled(false);
+
+		ImageIcon sendImageIcon = new ImageIcon(messenger.getConfig()
 				.getSendIconLocation());
-		Image img = imageIcon.getImage();
-		Image scaledImg = img.getScaledInstance(80, 80,
-				java.awt.Image.SCALE_SMOOTH);
-		ImageIcon scaledImageIcon = new ImageIcon(scaledImg);
-		sendButton = new JButton(scaledImageIcon);
+		sendButton = new JButton(sendImageIcon);
 		sendButton.addActionListener(new SendActionListener(this));
 		sendButton.setToolTipText("Click to send the FIX message");
 
 		c.gridx = 0;
 		c.gridy = 0;
-		sendPanel.add(previewBeforeSendCheckBox, c);
+		sendPanel.add(saveButton, c);
 
 		c.gridx = 0;
 		c.gridy = 1;
 		sendPanel.add(sendButton, c);
+
+		c.gridx = 0;
+		c.gridy = 2;
+		sendPanel.add(previewBeforeSendCheckBox, c);
 
 		rightPanel.add(optionsPanel, BorderLayout.NORTH);
 		rightPanel.add(sendPanel, BorderLayout.SOUTH);
