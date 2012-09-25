@@ -27,28 +27,24 @@
  * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH 
  * DAMAGE.
  *
- * NewProjectActionListener.java
- * Sep 23, 2012
+ * SaveProjectActionListener.java
+ * Sep 25, 2012
  */
 package com.jramoyo.qfixmessenger.ui.listeners;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JOptionPane;
-
-import com.jramoyo.fix.xml.ObjectFactory;
-import com.jramoyo.fix.xml.ProjectType;
 import com.jramoyo.qfixmessenger.ui.QFixMessengerFrame;
 
 /**
  * @author jramoyo
  */
-public class NewProjectActionListener implements ActionListener
+public class SaveProjectActionListener implements ActionListener
 {
 	private QFixMessengerFrame frame;
 
-	public NewProjectActionListener(QFixMessengerFrame frame)
+	public SaveProjectActionListener(QFixMessengerFrame frame)
 	{
 		this.frame = frame;
 	}
@@ -56,32 +52,6 @@ public class NewProjectActionListener implements ActionListener
 	@Override
 	public void actionPerformed(ActionEvent e)
 	{
-		if (frame.getXmlProject() != null)
-		{
-			int choice = JOptionPane.showConfirmDialog(frame,
-					"Do you want to save "
-							+ frame.getXmlProject().getName() + "?");
-			switch (choice)
-			{
-			case JOptionPane.NO_OPTION:
-				break;
-			case JOptionPane.YES_NO_OPTION:
-				frame.saveXmlProject();
-				break;
-			case JOptionPane.CANCEL_OPTION:
-				return;
-			}
-		}
-
-		String projectName = JOptionPane
-				.showInputDialog(frame, "Project Name:", "New Project",
-						JOptionPane.INFORMATION_MESSAGE);
-		if (projectName != null)
-		{
-			ProjectType xmlProjectType = new ObjectFactory()
-					.createProjectType();
-			xmlProjectType.setName(projectName);
-			frame.setXmlProject(xmlProjectType);
-		}
+		frame.saveXmlProject();
 	}
 }

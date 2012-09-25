@@ -27,28 +27,39 @@
  * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH 
  * DAMAGE.
  *
- * NewProjectActionListener.java
- * Sep 23, 2012
+ * OpenProjectActionListener.java
+ * Sep 25, 2012
  */
 package com.jramoyo.qfixmessenger.ui.listeners;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 
-import com.jramoyo.fix.xml.ObjectFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.jramoyo.fix.xml.ProjectType;
 import com.jramoyo.qfixmessenger.ui.QFixMessengerFrame;
+import com.jramoyo.qfixmessenger.ui.QFixMessengerFrame.XmlFileFilter;
 
 /**
  * @author jramoyo
  */
-public class NewProjectActionListener implements ActionListener
+public class OpenProjectActionListener implements ActionListener
 {
+	private static final Logger logger = LoggerFactory
+			.getLogger(OpenProjectActionListener.class);
+
 	private QFixMessengerFrame frame;
 
-	public NewProjectActionListener(QFixMessengerFrame frame)
+	public OpenProjectActionListener(QFixMessengerFrame frame)
 	{
 		this.frame = frame;
 	}
@@ -56,32 +67,30 @@ public class NewProjectActionListener implements ActionListener
 	@Override
 	public void actionPerformed(ActionEvent e)
 	{
-		if (frame.getXmlProject() != null)
-		{
-			int choice = JOptionPane.showConfirmDialog(frame,
-					"Do you want to save "
-							+ frame.getXmlProject().getName() + "?");
-			switch (choice)
-			{
-			case JOptionPane.NO_OPTION:
-				break;
-			case JOptionPane.YES_NO_OPTION:
-				frame.saveXmlProject();
-				break;
-			case JOptionPane.CANCEL_OPTION:
-				return;
-			}
-		}
+		JFileChooser jFileChooser = new JFileChooser();
+		jFileChooser.setFileFilter(XmlFileFilter.INSTANCE);
 
-		String projectName = JOptionPane
-				.showInputDialog(frame, "Project Name:", "New Project",
-						JOptionPane.INFORMATION_MESSAGE);
-		if (projectName != null)
+		int choice = jFileChooser.showOpenDialog(frame);
+		if (choice == JFileChooser.APPROVE_OPTION)
 		{
-			ProjectType xmlProjectType = new ObjectFactory()
-					.createProjectType();
-			xmlProjectType.setName(projectName);
-			frame.setXmlProject(xmlProjectType);
+			File file = jFileChooser.getSelectedFile();
+			try
+			{
+				Unmarshaller unmarshaller = frame.getJaxbContext()
+						.createUnmarshaller();
+				@SuppressWarnings("unchecked")
+				JAXBElement<ProjectType> rootElement = (JAXBElement<ProjectType>) unmarshaller
+						.unmarshal(file);
+				ProjectType xmlProjectType = rootElement.getValue();
+
+				frame.setXmlProject(xmlProjectType);
+			} catch (JAXBException ex)
+			{
+				logger.error(
+						"A JAXBException occurred while importing message.", ex);
+				JOptionPane.showMessageDialog(frame, "Unable to open file!",
+						"Error", JOptionPane.ERROR_MESSAGE);
+			}
 		}
 	}
 }

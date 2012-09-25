@@ -140,6 +140,7 @@ import com.jramoyo.qfixmessenger.ui.listeners.LogonAllSessionsActionListener;
 import com.jramoyo.qfixmessenger.ui.listeners.LogonSessionItemListener;
 import com.jramoyo.qfixmessenger.ui.listeners.LogonSessionMenuItemSessionStateListener;
 import com.jramoyo.qfixmessenger.ui.listeners.NewProjectActionListener;
+import com.jramoyo.qfixmessenger.ui.listeners.OpenProjectActionListener;
 import com.jramoyo.qfixmessenger.ui.listeners.ResetAllSessionsActionListener;
 import com.jramoyo.qfixmessenger.ui.listeners.ResetSessionActionListener;
 import com.jramoyo.qfixmessenger.ui.listeners.SessionStatusActionListener;
@@ -193,7 +194,9 @@ public class QFixMessengerFrame extends JFrame
 
 	private String projectTitle = "None";
 
-	private ProjectType currentProject;
+	private ProjectType xmlProject;
+
+	private File xmlProjectFile;
 
 	private volatile FixDictionary activeDictionary;
 
@@ -305,7 +308,128 @@ public class QFixMessengerFrame extends JFrame
 		}
 	}
 
-	public MessageType exportFormAsXmlMessage(Session session)
+	public void exportXmlMessage(MessageType xmlMessageType)
+	{
+		JFileChooser jFileChooser = new JFileChooser();
+		jFileChooser.setFileFilter(XmlFileFilter.INSTANCE);
+
+		int choice = jFileChooser.showSaveDialog(this);
+		if (choice == JFileChooser.APPROVE_OPTION)
+		{
+			File file = jFileChooser.getSelectedFile();
+			try
+			{
+				JAXBElement<MessageType> rootElement = new JAXBElement<MessageType>(
+						new QName("http://xml.fix.jramoyo.com", "message"),
+						MessageType.class, xmlMessageType);
+				Marshaller marshaller = jaxbContext.createMarshaller();
+				marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
+						Boolean.TRUE);
+				marshaller.marshal(rootElement, file);
+				logger.debug("Message exported to " + file.getName());
+				JOptionPane.showMessageDialog(this, "Message exported to "
+						+ file.getName(), "Export",
+						JOptionPane.INFORMATION_MESSAGE);
+			} catch (JAXBException ex)
+			{
+				logger.error(
+						"A JAXBException occurred while exporting message.", ex);
+				JOptionPane.showMessageDialog(this,
+						"An error occurred while exporting message!", "Error",
+						JOptionPane.ERROR_MESSAGE);
+			}
+		}
+	}
+
+	public JAXBContext getJaxbContext()
+	{
+		return jaxbContext;
+	}
+
+	public QFixMessenger getMessenger()
+	{
+		return messenger;
+	}
+
+	public ProjectType getXmlProject()
+	{
+		return xmlProject;
+	}
+
+	public void importXmlMessage(MessageType xmlMessageType)
+	{
+		if (selectSession(xmlMessageType.getSession()))
+		{
+			if (selectMessage(xmlMessageType))
+			{
+				populateMembers(xmlMessageType);
+			}
+		}
+	}
+
+	public void launch()
+	{
+		setIconImage(new ImageIcon(messenger.getConfig().getAppIconLocation())
+				.getImage());
+
+		if (messenger.getConfig().isInitiator())
+		{
+			frameTitle = "QuickFIX Messenger " + VERSION + " (Initiator)";
+		} else
+		{
+			frameTitle = "QuickFIX Messenger " + VERSION + " (Acceptor)";
+		}
+		loadFrameTitle();
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		addWindowListener(new FrameWindowAdapter(this));
+
+		initComponents();
+		setVisible(true);
+	}
+
+	public void saveXmlProject()
+	{
+		if (xmlProjectFile == null)
+		{
+			JFileChooser jFileChooser = new JFileChooser();
+			jFileChooser.setFileFilter(XmlFileFilter.INSTANCE);
+
+			int choice = jFileChooser.showSaveDialog(this);
+			if (choice == JFileChooser.APPROVE_OPTION)
+			{
+				xmlProjectFile = jFileChooser.getSelectedFile();
+			}
+
+			else if (choice == JOptionPane.CANCEL_OPTION)
+			{
+				return;
+			}
+		}
+
+		try
+		{
+			JAXBElement<ProjectType> rootElement = new JAXBElement<ProjectType>(
+					new QName("http://xml.fix.jramoyo.com", "project"),
+					ProjectType.class, xmlProject);
+			Marshaller marshaller = jaxbContext.createMarshaller();
+			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
+					Boolean.TRUE);
+			marshaller.marshal(rootElement, xmlProjectFile);
+			logger.debug("Message exported to " + xmlProjectFile.getName());
+			JOptionPane.showMessageDialog(this, "Project saved to "
+					+ xmlProjectFile.getName(), "Export",
+					JOptionPane.INFORMATION_MESSAGE);
+		} catch (JAXBException ex)
+		{
+			logger.error("A JAXBException occurred while exporting message.",
+					ex);
+			JOptionPane.showMessageDialog(this,
+					"An error occurred while saving project!", "Error",
+					JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	public MessageType serializeFormAsXmlMessage(Session session)
 	{
 		ObjectFactory xmlObjectFactory = new ObjectFactory();
 
@@ -395,57 +519,11 @@ public class QFixMessengerFrame extends JFrame
 		return xmlMessageType;
 	}
 
-	public ProjectType getCurrentProject()
+	public void setXmlProject(ProjectType xmlProject)
 	{
-		return currentProject;
-	}
+		this.xmlProject = xmlProject;
 
-	public QFixMessenger getMessenger()
-	{
-		return messenger;
-	}
-
-	public void importXmlMessage(MessageType xmlMessageType)
-	{
-		if (selectSession(xmlMessageType.getSession()))
-		{
-			if (selectMessage(xmlMessageType))
-			{
-				populateMembers(xmlMessageType);
-			}
-		}
-	}
-
-	public void launch()
-	{
-		setIconImage(new ImageIcon(messenger.getConfig().getAppIconLocation())
-				.getImage());
-
-		if (messenger.getConfig().isInitiator())
-		{
-			frameTitle = "QuickFIX Messenger " + VERSION + " (Initiator)";
-		} else
-		{
-			frameTitle = "QuickFIX Messenger " + VERSION + " (Acceptor)";
-		}
-		loadFrameTitle();
-		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		addWindowListener(new FrameWindowAdapter(this));
-
-		initComponents();
-		setVisible(true);
-	}
-
-	public void saveCurrentProject()
-	{
-		// TODO Provide implementation
-	}
-
-	public void setCurrentProject(ProjectType currentProject)
-	{
-		this.currentProject = currentProject;
-
-		projectTitle = currentProject.getName();
+		projectTitle = xmlProject.getName();
 		loadFrameTitle();
 
 		if (projectFrame != null)
@@ -528,11 +606,15 @@ public class QFixMessengerFrame extends JFrame
 		saveProjectMenuItem.setMnemonic('S');
 		saveProjectMenuItem.setAccelerator(KeyStroke.getKeyStroke(
 				KeyEvent.VK_S, InputEvent.CTRL_MASK));
+		saveProjectMenuItem.addActionListener(new SaveMessageActionListener(
+				this));
 
 		JMenuItem openProjectMenuItem = new JMenuItem("Open Project");
 		openProjectMenuItem.setMnemonic('O');
 		openProjectMenuItem.setAccelerator(KeyStroke.getKeyStroke(
 				KeyEvent.VK_O, InputEvent.CTRL_MASK));
+		openProjectMenuItem.addActionListener(new OpenProjectActionListener(
+				this));
 
 		JMenuItem exportMessageMenuItem = new JMenuItem("Export Message");
 		exportMessageMenuItem.setMnemonic('X');
@@ -919,7 +1001,7 @@ public class QFixMessengerFrame extends JFrame
 	{
 		if (projectFrame == null || !projectFrame.isDisplayable())
 		{
-			projectFrame = new ProjectFrame(this, currentProject);
+			projectFrame = new ProjectFrame(this, xmlProject);
 			projectFrame.launch();
 		} else
 		{
@@ -1365,6 +1447,28 @@ public class QFixMessengerFrame extends JFrame
 		return true;
 	}
 
+	public static class XmlFileFilter extends FileFilter
+	{
+		public static final XmlFileFilter INSTANCE = new XmlFileFilter();
+
+		@Override
+		public boolean accept(File f)
+		{
+			if (f.isDirectory())
+			{
+				return true;
+			}
+			return f.getName().endsWith(".xml");
+		}
+
+		@Override
+		public String getDescription()
+		{
+			return "XML Files (*.xml)";
+		}
+
+	}
+
 	private static class AppVersionsComboBoxActionListener implements
 			ActionListener
 	{
@@ -1400,51 +1504,6 @@ public class QFixMessengerFrame extends JFrame
 		}
 	}
 
-	private static class SaveMessageActionListener implements ActionListener
-	{
-		private QFixMessengerFrame frame;
-
-		public SaveMessageActionListener(QFixMessengerFrame frame)
-		{
-			this.frame = frame;
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e)
-		{
-			Session session = (Session) frame.sessionsList.getSelectedValue();
-
-			if (frame.activeMessage != null)
-			{
-				if (!frame.activeMessage.equals(frame.freeTextMessage))
-				{
-					MessageType xmlMessageType = frame
-							.exportFormAsXmlMessage(session);
-
-					ProjectType xmlProjectType = frame.getCurrentProject();
-					if (xmlProjectType.getMessages() == null)
-					{
-						xmlProjectType.setMessages(new ObjectFactory()
-								.createMessagesType());
-						xmlProjectType.getMessages().getMessage()
-								.add(xmlMessageType);
-					}
-
-				} else
-				{
-					JOptionPane.showMessageDialog(frame,
-							"Free text message cannot be saved!", "Error",
-							JOptionPane.WARNING_MESSAGE);
-				}
-			} else
-			{
-				JOptionPane.showMessageDialog(frame,
-						"Please create a message!", "Error",
-						JOptionPane.WARNING_MESSAGE);
-			}
-		}
-	}
-
 	private static class ExportMessageActionListener implements ActionListener
 	{
 		private QFixMessengerFrame frame;
@@ -1463,44 +1522,9 @@ public class QFixMessengerFrame extends JFrame
 			{
 				if (!frame.activeMessage.equals(frame.freeTextMessage))
 				{
-					JFileChooser jFileChooser = new JFileChooser();
-					jFileChooser.setFileFilter(XmlFileFilter.INSTANCE);
-
-					int choice = jFileChooser.showSaveDialog(frame);
-					if (choice == JFileChooser.APPROVE_OPTION)
-					{
-						MessageType xmlMessageType = frame
-								.exportFormAsXmlMessage(session);
-						File file = jFileChooser.getSelectedFile();
-						try
-						{
-							JAXBElement<MessageType> rootElement = new JAXBElement<MessageType>(
-									new QName("http://xml.fix.jramoyo.com",
-											"message"), MessageType.class,
-									xmlMessageType);
-							Marshaller marshaller = frame.jaxbContext
-									.createMarshaller();
-							marshaller.setProperty(
-									Marshaller.JAXB_FORMATTED_OUTPUT,
-									Boolean.TRUE);
-							marshaller.marshal(rootElement, file);
-							logger.debug("Message exported to "
-									+ file.getName());
-							JOptionPane.showMessageDialog(frame,
-									"Message exported to " + file.getName(),
-									"Export", JOptionPane.INFORMATION_MESSAGE);
-						} catch (JAXBException ex)
-						{
-							logger.error(
-									"A JAXBException occurred while exporting message.",
-									ex);
-							JOptionPane
-									.showMessageDialog(
-											frame,
-											"An error occurred while exporting message!",
-											"Error", JOptionPane.ERROR_MESSAGE);
-						}
-					}
+					MessageType xmlMessageType = frame
+							.serializeFormAsXmlMessage(session);
+					frame.exportXmlMessage(xmlMessageType);
 				} else
 				{
 					JOptionPane.showMessageDialog(frame,
@@ -1768,13 +1792,58 @@ public class QFixMessengerFrame extends JFrame
 		@Override
 		public void actionPerformed(ActionEvent e)
 		{
-			if (frame.currentProject != null)
+			if (frame.xmlProject != null)
 			{
 				frame.launchProjectFrame();
 			} else
 			{
 				JOptionPane.showMessageDialog(frame, "No active project!",
 						"Error", JOptionPane.WARNING_MESSAGE);
+			}
+		}
+	}
+
+	private static class SaveMessageActionListener implements ActionListener
+	{
+		private QFixMessengerFrame frame;
+
+		public SaveMessageActionListener(QFixMessengerFrame frame)
+		{
+			this.frame = frame;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e)
+		{
+			Session session = (Session) frame.sessionsList.getSelectedValue();
+
+			if (frame.activeMessage != null)
+			{
+				if (!frame.activeMessage.equals(frame.freeTextMessage))
+				{
+					MessageType xmlMessageType = frame
+							.serializeFormAsXmlMessage(session);
+
+					ProjectType xmlProjectType = frame.getXmlProject();
+					if (xmlProjectType.getMessages() == null)
+					{
+						xmlProjectType.setMessages(new ObjectFactory()
+								.createMessagesType());
+						xmlProjectType.getMessages().getMessage()
+								.add(xmlMessageType);
+					}
+
+				} else
+				{
+					JOptionPane.showMessageDialog(frame,
+							"Free text message cannot be saved!", "Error",
+							JOptionPane.WARNING_MESSAGE);
+				}
+			} else
+			{
+				JOptionPane.showMessageDialog(frame,
+						"Please create a message!", "Error",
+						JOptionPane.WARNING_MESSAGE);
 			}
 		}
 	}
@@ -2130,28 +2199,6 @@ public class QFixMessengerFrame extends JFrame
 				frame.loadMessagesList();
 			}
 		}
-	}
-
-	private static class XmlFileFilter extends FileFilter
-	{
-		private static final XmlFileFilter INSTANCE = new XmlFileFilter();
-
-		@Override
-		public boolean accept(File f)
-		{
-			if (f.isDirectory())
-			{
-				return true;
-			}
-			return f.getName().endsWith(".xml");
-		}
-
-		@Override
-		public String getDescription()
-		{
-			return "XML Files (*.xml)";
-		}
-
 	}
 
 }
