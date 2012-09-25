@@ -7,10 +7,10 @@
  * are met:
  *
  * - Redistributions of source code must retain the above copyright 
- *   notice, this list of conditions and the following disclaimer.
+ *   notice list of conditions and the following disclaimer.
  * 
  * - Redistributions in binary form must reproduce the above copyright
- *   notice, this list of conditions and the following disclaimer 
+ *   notice list of conditions and the following disclaimer 
  *   in the documentation and/or other materials provided with the
  *   distribution.
  *
@@ -43,10 +43,9 @@ public class MessageTypeProjectTreeNode extends
 
 	private static final long serialVersionUID = 2827928561912339113L;
 
-	public MessageTypeProjectTreeNode(MessageType xmlObject,
-			AbstractProjectTreeNode<?> parent)
+	public MessageTypeProjectTreeNode(MessageType xmlObject)
 	{
-		super(xmlObject, parent, true);
+		super(xmlObject, true);
 	}
 
 	@Override
@@ -56,31 +55,32 @@ public class MessageTypeProjectTreeNode extends
 				+ ")";
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void populateChildren(MessageType xmlObject)
 	{
+		int i = 0;
 		if (xmlObject.getSession() != null)
 		{
-			children.add(new SessionTypeProjectTreeNode(xmlObject.getSession(),
-					this));
+			insert(new SessionTypeProjectTreeNode(xmlObject.getSession()), i);
+			i++;
 		}
 
 		if (xmlObject.getHeader() != null)
 		{
-			children.add(new HeaderTypeProjectTreeNode(xmlObject.getHeader(),
-					this));
+			insert(new HeaderTypeProjectTreeNode(xmlObject.getHeader()), i);
+			i++;
 		}
 
 		if (xmlObject.getBody() != null)
 		{
-			children.add(new BodyTypeProjectTreeNode(xmlObject.getBody(), this));
+			insert(new BodyTypeProjectTreeNode(xmlObject.getBody()), i);
+			i++;
 		}
 
 		if (xmlObject.getTrailer() != null)
 		{
-			children.add(new TrailerProjectTreeNode(xmlObject.getTrailer(),
-					this));
+			insert(new TrailerProjectTreeNode(xmlObject.getTrailer()), i);
+			i++;
 		}
 	}
 }

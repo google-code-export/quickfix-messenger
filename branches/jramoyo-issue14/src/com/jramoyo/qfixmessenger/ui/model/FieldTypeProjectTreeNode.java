@@ -42,10 +42,9 @@ public class FieldTypeProjectTreeNode extends
 {
 	private static final long serialVersionUID = -5426093982642823979L;
 
-	public FieldTypeProjectTreeNode(FieldType xmlObject,
-			AbstractProjectTreeNode<?> parent)
+	public FieldTypeProjectTreeNode(FieldType xmlObject)
 	{
-		super(xmlObject, parent, true);
+		super(xmlObject, true);
 	}
 
 	@Override
@@ -54,13 +53,12 @@ public class FieldTypeProjectTreeNode extends
 		return getXmlObject().getName() + " (" + getXmlObject().getId() + ")";
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void populateChildren(FieldType xmlObject)
 	{
 		if (!xmlObject.getValue().isEmpty())
 		{
-			children.add(new StringProjectTreeNode(xmlObject.getValue(), this));
+			insert(new StringProjectTreeNode(xmlObject.getValue()), 0);
 		}
 	}
 }

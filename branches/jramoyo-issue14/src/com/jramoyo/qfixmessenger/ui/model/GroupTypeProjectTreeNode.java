@@ -35,6 +35,7 @@ package com.jramoyo.qfixmessenger.ui.model;
 import com.jramoyo.fix.xml.ComponentType;
 import com.jramoyo.fix.xml.FieldType;
 import com.jramoyo.fix.xml.GroupType;
+import com.jramoyo.fix.xml.GroupsType;
 
 /**
  * @author jramoyo
@@ -44,10 +45,9 @@ public class GroupTypeProjectTreeNode extends
 {
 	private static final long serialVersionUID = -5751165255403799038L;
 
-	public GroupTypeProjectTreeNode(GroupType xmlObject,
-			AbstractProjectTreeNode<?> parent)
+	public GroupTypeProjectTreeNode(GroupType xmlObject)
 	{
-		super(xmlObject, parent, true);
+		super(xmlObject, true);
 	}
 
 	@Override
@@ -56,28 +56,28 @@ public class GroupTypeProjectTreeNode extends
 		return "Group";
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void populateChildren(GroupType xmlObject)
 	{
+		int i = 0;
 		for (Object child : xmlObject.getFieldOrGroupsOrComponent())
 		{
 			if (child instanceof FieldType)
 			{
-				children.add(new FieldTypeProjectTreeNode((FieldType) child,
-						this));
+				insert(new FieldTypeProjectTreeNode((FieldType) child), i);
+				i++;
 			}
 
-			else if (child instanceof GroupType)
+			else if (child instanceof GroupsType)
 			{
-				children.add(new GroupTypeProjectTreeNode((GroupType) child,
-						this));
+				insert(new GroupsTypeProjectTreeNode((GroupsType) child), i);
+				i++;
 			}
 
 			else if (child instanceof ComponentType)
 			{
-				children.add(new ComponentProjectTreeNode(
-						(ComponentType) child, this));
+				insert(new ComponentProjectTreeNode((ComponentType) child), i);
+				i++;
 			}
 		}
 	}

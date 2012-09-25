@@ -44,7 +44,7 @@ public class ProjectTypeProjectTreeNode extends
 
 	public ProjectTypeProjectTreeNode(ProjectType xmlObject)
 	{
-		super(xmlObject, null, true);
+		super(xmlObject, true);
 	}
 
 	@Override
@@ -53,14 +53,12 @@ public class ProjectTypeProjectTreeNode extends
 		return getXmlObject().getName();
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void populateChildren(ProjectType xmlObject)
 	{
 		if (xmlObject.getMessages() != null)
 		{
-			children.add(new MessagesTypeProjectTreeNode(xmlObject
-					.getMessages(), this));
+			insert(new MessagesTypeProjectTreeNode(xmlObject.getMessages()), 0);
 		}
 	}
 }

@@ -43,10 +43,9 @@ public class HeaderTypeProjectTreeNode extends
 {
 	private static final long serialVersionUID = -6464036172031499032L;
 
-	public HeaderTypeProjectTreeNode(HeaderType xmlObject,
-			AbstractProjectTreeNode<?> parent)
+	public HeaderTypeProjectTreeNode(HeaderType xmlObject)
 	{
-		super(xmlObject, parent, true);
+		super(xmlObject, true);
 	}
 
 	@Override
@@ -55,13 +54,14 @@ public class HeaderTypeProjectTreeNode extends
 		return "Header";
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void populateChildren(HeaderType xmlObject)
 	{
+		int i = 0;
 		for (FieldType child : xmlObject.getField())
 		{
-			children.add(new FieldTypeProjectTreeNode(child, this));
+			insert(new FieldTypeProjectTreeNode(child), i);
+			i++;
 		}
 	}
 }

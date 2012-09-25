@@ -7,10 +7,10 @@
  * are met:
  *
  * - Redistributions of source code must retain the above copyright 
- *   notice, this list of conditions and the following disclaimer.
+ *   notice list of conditions and the following disclaimer.
  * 
  * - Redistributions in binary form must reproduce the above copyright
- *   notice, this list of conditions and the following disclaimer 
+ *   notice list of conditions and the following disclaimer 
  *   in the documentation and/or other materials provided with the
  *   distribution.
  *
@@ -34,7 +34,7 @@ package com.jramoyo.qfixmessenger.ui.model;
 
 import com.jramoyo.fix.xml.ComponentType;
 import com.jramoyo.fix.xml.FieldType;
-import com.jramoyo.fix.xml.GroupType;
+import com.jramoyo.fix.xml.GroupsType;
 
 /**
  * @author jramoyo
@@ -44,10 +44,9 @@ public class ComponentProjectTreeNode extends
 {
 	private static final long serialVersionUID = -3447542250978315037L;
 
-	public ComponentProjectTreeNode(ComponentType xmlObject,
-			AbstractProjectTreeNode<?> parent)
+	public ComponentProjectTreeNode(ComponentType xmlObject)
 	{
-		super(xmlObject, parent, true);
+		super(xmlObject, true);
 	}
 
 	@Override
@@ -56,28 +55,28 @@ public class ComponentProjectTreeNode extends
 		return getXmlObject().getName();
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void populateChildren(ComponentType xmlObject)
 	{
+		int i = 0;
 		for (Object child : xmlObject.getFieldOrGroupsOrComponent())
 		{
 			if (child instanceof FieldType)
 			{
-				children.add(new FieldTypeProjectTreeNode((FieldType) child,
-						this));
+				insert(new FieldTypeProjectTreeNode((FieldType) child), i);
+				i++;
 			}
 
-			else if (child instanceof GroupType)
+			else if (child instanceof GroupsType)
 			{
-				children.add(new GroupTypeProjectTreeNode((GroupType) child,
-						this));
+				insert(new GroupsTypeProjectTreeNode((GroupsType) child), i);
+				i++;
 			}
 
 			else if (child instanceof ComponentType)
 			{
-				children.add(new ComponentProjectTreeNode(
-						(ComponentType) child, this));
+				insert(new ComponentProjectTreeNode((ComponentType) child), i);
+				i++;
 			}
 		}
 	}

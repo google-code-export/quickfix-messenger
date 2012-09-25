@@ -43,10 +43,9 @@ public class TrailerProjectTreeNode extends
 {
 	private static final long serialVersionUID = -3278394996873975552L;
 
-	public TrailerProjectTreeNode(TrailerType xmlObject,
-			AbstractProjectTreeNode<?> parent)
+	public TrailerProjectTreeNode(TrailerType xmlObject)
 	{
-		super(xmlObject, parent, true);
+		super(xmlObject, true);
 	}
 
 	@Override
@@ -55,14 +54,14 @@ public class TrailerProjectTreeNode extends
 		return "Trailer";
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void populateChildren(TrailerType xmlObject)
 	{
+		int i = 0;
 		for (FieldType child : xmlObject.getField())
 		{
-			children.add(new FieldTypeProjectTreeNode(child, this));
+			insert(new FieldTypeProjectTreeNode(child), i);
+			i++;
 		}
-
 	}
 }

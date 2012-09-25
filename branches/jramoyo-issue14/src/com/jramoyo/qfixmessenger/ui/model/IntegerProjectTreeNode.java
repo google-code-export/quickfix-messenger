@@ -39,10 +39,9 @@ public class IntegerProjectTreeNode extends AbstractProjectTreeNode<Integer>
 {
 	private static final long serialVersionUID = 2804099319862437579L;
 
-	public IntegerProjectTreeNode(Integer xmlObject,
-			AbstractProjectTreeNode<?> parent)
+	public IntegerProjectTreeNode(Integer xmlObject)
 	{
-		super(xmlObject, parent, false);
+		super(xmlObject, false);
 	}
 
 	@Override

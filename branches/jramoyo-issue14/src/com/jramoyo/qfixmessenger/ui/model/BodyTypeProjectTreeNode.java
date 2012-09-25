@@ -35,7 +35,7 @@ package com.jramoyo.qfixmessenger.ui.model;
 import com.jramoyo.fix.xml.BodyType;
 import com.jramoyo.fix.xml.ComponentType;
 import com.jramoyo.fix.xml.FieldType;
-import com.jramoyo.fix.xml.GroupType;
+import com.jramoyo.fix.xml.GroupsType;
 
 /**
  * @author jramoyo
@@ -44,10 +44,9 @@ public class BodyTypeProjectTreeNode extends AbstractProjectTreeNode<BodyType>
 {
 	private static final long serialVersionUID = 5263142011975975670L;
 
-	public BodyTypeProjectTreeNode(BodyType xmlObject,
-			AbstractProjectTreeNode<?> parent)
+	public BodyTypeProjectTreeNode(BodyType xmlObject)
 	{
-		super(xmlObject, parent, true);
+		super(xmlObject, true);
 	}
 
 	@Override
@@ -56,28 +55,28 @@ public class BodyTypeProjectTreeNode extends AbstractProjectTreeNode<BodyType>
 		return "Body";
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void populateChildren(BodyType xmlObject)
 	{
+		int i = 0;
 		for (Object child : xmlObject.getFieldOrGroupsOrComponent())
 		{
 			if (child instanceof FieldType)
 			{
-				children.add(new FieldTypeProjectTreeNode((FieldType) child,
-						this));
+				insert(new FieldTypeProjectTreeNode((FieldType) child), i);
+				i++;
 			}
 
-			else if (child instanceof GroupType)
+			else if (child instanceof GroupsType)
 			{
-				children.add(new GroupTypeProjectTreeNode((GroupType) child,
-						this));
+				insert(new GroupsTypeProjectTreeNode((GroupsType) child), i);
+				i++;
 			}
 
 			else if (child instanceof ComponentType)
 			{
-				children.add(new ComponentProjectTreeNode(
-						(ComponentType) child, this));
+				insert(new ComponentProjectTreeNode((ComponentType) child), i);
+				i++;
 			}
 		}
 	}

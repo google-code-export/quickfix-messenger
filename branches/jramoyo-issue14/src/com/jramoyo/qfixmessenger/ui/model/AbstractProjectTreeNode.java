@@ -42,11 +42,9 @@ public abstract class AbstractProjectTreeNode<T> extends DefaultMutableTreeNode
 {
 	private static final long serialVersionUID = 6378967167372272446L;
 
-	public AbstractProjectTreeNode(T xmlObject,
-			AbstractProjectTreeNode<?> parent, boolean allowsChildren)
+	public AbstractProjectTreeNode(T xmlObject, boolean allowsChildren)
 	{
 		super(xmlObject, allowsChildren);
-		setParent(parent);
 		populateChildren(xmlObject);
 	}
 

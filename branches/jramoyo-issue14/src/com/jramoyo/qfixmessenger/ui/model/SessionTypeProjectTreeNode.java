@@ -42,10 +42,9 @@ public class SessionTypeProjectTreeNode extends
 {
 	private static final long serialVersionUID = -5684926499153397932L;
 
-	public SessionTypeProjectTreeNode(SessionType xmlObject,
-			AbstractProjectTreeNode<?> parent)
+	public SessionTypeProjectTreeNode(SessionType xmlObject)
 	{
-		super(xmlObject, parent, true);
+		super(xmlObject, true);
 	}
 
 	@Override
@@ -54,19 +53,20 @@ public class SessionTypeProjectTreeNode extends
 		return "Session";
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void populateChildren(SessionType xmlObject)
 	{
+		int i = 0;
 		if (xmlObject.getName() != null)
 		{
-			children.add(new StringProjectTreeNode(xmlObject.getName(), this));
+			insert(new StringProjectTreeNode(xmlObject.getName()), i);
+			i++;
 		}
 
 		if (xmlObject.getAppVersionId() != null)
 		{
-			children.add(new StringProjectTreeNode(xmlObject.getAppVersionId(),
-					this));
+			insert(new StringProjectTreeNode(xmlObject.getAppVersionId()), i);
+			i++;
 		}
 	}
 }

@@ -39,10 +39,9 @@ public class StringProjectTreeNode extends AbstractProjectTreeNode<String>
 {
 	private static final long serialVersionUID = 8420770439516526556L;
 
-	public StringProjectTreeNode(String xmlObject,
-			AbstractProjectTreeNode<?> parent)
+	public StringProjectTreeNode(String xmlObject)
 	{
-		super(xmlObject, parent, false);
+		super(xmlObject, false);
 	}
 
 	@Override

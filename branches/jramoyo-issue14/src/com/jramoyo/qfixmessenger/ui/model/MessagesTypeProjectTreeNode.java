@@ -43,10 +43,9 @@ public class MessagesTypeProjectTreeNode extends
 {
 	private static final long serialVersionUID = -4962240824083476256L;
 
-	public MessagesTypeProjectTreeNode(MessagesType xmlObject,
-			AbstractProjectTreeNode<?> parent)
+	public MessagesTypeProjectTreeNode(MessagesType xmlObject)
 	{
-		super(xmlObject, parent, true);
+		super(xmlObject, true);
 	}
 
 	@Override
@@ -55,13 +54,14 @@ public class MessagesTypeProjectTreeNode extends
 		return "Messages";
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void populateChildren(MessagesType xmlObject)
 	{
+		int i = 0;
 		for (MessageType child : xmlObject.getMessage())
 		{
-			children.add(new MessageTypeProjectTreeNode(child, this));
+			insert(new MessageTypeProjectTreeNode(child), i);
+			i++;
 		}
 	}
 }

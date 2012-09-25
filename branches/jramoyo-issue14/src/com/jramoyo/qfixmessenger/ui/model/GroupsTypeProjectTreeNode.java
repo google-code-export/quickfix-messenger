@@ -43,10 +43,9 @@ public class GroupsTypeProjectTreeNode extends
 {
 	private static final long serialVersionUID = 2481019310483427995L;
 
-	public GroupsTypeProjectTreeNode(GroupsType xmlObject,
-			AbstractProjectTreeNode<?> parent)
+	public GroupsTypeProjectTreeNode(GroupsType xmlObject)
 	{
-		super(xmlObject, parent, true);
+		super(xmlObject, true);
 	}
 
 	@Override
@@ -55,13 +54,14 @@ public class GroupsTypeProjectTreeNode extends
 		return getXmlObject().getName();
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void populateChildren(GroupsType xmlObject)
 	{
+		int i = 0;
 		for (GroupType child : xmlObject.getGroup())
 		{
-			children.add(new GroupTypeProjectTreeNode(child, this));
+			insert(new GroupTypeProjectTreeNode(child), i);
+			i++;
 		}
 	}
 }
