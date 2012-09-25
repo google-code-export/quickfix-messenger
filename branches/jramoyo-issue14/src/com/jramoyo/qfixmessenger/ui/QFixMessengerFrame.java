@@ -1829,10 +1829,9 @@ public class QFixMessengerFrame extends JFrame
 					{
 						xmlProjectType.setMessages(new ObjectFactory()
 								.createMessagesType());
-						xmlProjectType.getMessages().getMessage()
-								.add(xmlMessageType);
 					}
-
+					xmlProjectType.getMessages().getMessage()
+							.add(xmlMessageType);
 				} else
 				{
 					JOptionPane.showMessageDialog(frame,
