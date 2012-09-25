@@ -45,7 +45,7 @@ public class SessionTypeProjectTreeNode extends
 	public SessionTypeProjectTreeNode(SessionType xmlObject,
 			AbstractProjectTreeNode<?> parent)
 	{
-		super(xmlObject, parent, false);
+		super(xmlObject, parent, true);
 	}
 
 	@Override
