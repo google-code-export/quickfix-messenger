@@ -82,7 +82,7 @@ public class OpenProjectActionListener implements ActionListener
 						.unmarshal(file);
 				ProjectType xmlProjectType = rootElement.getValue();
 
-				frame.setXmlProject(xmlProjectType);
+				frame.setXmlProjectType(xmlProjectType);
 			} catch (Exception ex)
 			{
 				logger.error(

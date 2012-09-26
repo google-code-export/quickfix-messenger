@@ -56,17 +56,17 @@ public class NewProjectActionListener implements ActionListener
 	@Override
 	public void actionPerformed(ActionEvent e)
 	{
-		if (frame.getXmlProject() != null)
+		if (frame.getXmlProjectType() != null)
 		{
 			int choice = JOptionPane.showConfirmDialog(frame,
 					"Do you want to save "
-							+ frame.getXmlProject().getName() + "?");
+							+ frame.getXmlProjectType().getName() + "?");
 			switch (choice)
 			{
 			case JOptionPane.NO_OPTION:
 				break;
 			case JOptionPane.YES_NO_OPTION:
-				frame.saveXmlProject();
+				frame.marshallXmlProjectType();
 				break;
 			case JOptionPane.CANCEL_OPTION:
 				return;
@@ -81,7 +81,7 @@ public class NewProjectActionListener implements ActionListener
 			ProjectType xmlProjectType = new ObjectFactory()
 					.createProjectType();
 			xmlProjectType.setName(projectName);
-			frame.setXmlProject(xmlProjectType);
+			frame.setXmlProjectType(xmlProjectType);
 		}
 	}
 }

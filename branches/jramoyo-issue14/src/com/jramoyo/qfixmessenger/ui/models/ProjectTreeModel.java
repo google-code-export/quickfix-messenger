@@ -51,6 +51,12 @@ import com.jramoyo.fix.xml.SessionType;
 import com.jramoyo.fix.xml.TrailerType;
 
 /**
+ * Represents a tree model for an projects
+ * <p>
+ * This serves as an adapter for a JAXB ProjectType to be displayed into a
+ * JTree.
+ * </p>
+ * 
  * @author jramoyo
  */
 public class ProjectTreeModel implements TreeModel
@@ -63,6 +69,21 @@ public class ProjectTreeModel implements TreeModel
 	{
 		this.xmlProjectType = xmlProjectType;
 		eventListenerList = new EventListenerList();
+	}
+
+	/**
+	 * Updates the tree model that a message has been added to the project
+	 * 
+	 * @param xmlMessageType
+	 *            the added XML MessageType
+	 */
+	public void addedMessage(MessageType xmlMessageType)
+	{
+		Object[] path = { xmlProjectType, xmlProjectType.getMessages() };
+		int[] childIndices = { getIndexOfChild(xmlProjectType.getMessages(),
+				xmlMessageType) };
+		Object[] children = { xmlMessageType };
+		fireTreeNodesInserted(this, path, childIndices, children);
 	}
 
 	@Override
@@ -461,6 +482,11 @@ public class ProjectTreeModel implements TreeModel
 		return xmlProjectType;
 	}
 
+	/**
+	 * Returns the listeners to this tree model
+	 * 
+	 * @return the listeners to this tree model
+	 */
 	public TreeModelListener[] getTreeModelListeners()
 	{
 		return (TreeModelListener[]) eventListenerList
@@ -479,6 +505,9 @@ public class ProjectTreeModel implements TreeModel
 		}
 	}
 
+	/**
+	 * Reloads the entire tree model
+	 */
 	public void reload()
 	{
 		int n = getChildCount(xmlProjectType);
@@ -495,15 +524,12 @@ public class ProjectTreeModel implements TreeModel
 				childIdx, children);
 	}
 
-	public void addedMessage(MessageType xmlMessageType)
-	{
-		Object[] path = { xmlProjectType, xmlProjectType.getMessages() };
-		int[] childIndices = { getIndexOfChild(xmlProjectType.getMessages(),
-				xmlMessageType) };
-		Object[] children = { xmlMessageType };
-		fireTreeNodesInserted(this, path, childIndices, children);
-	}
-
+	/**
+	 * Updates the tree model that a message has been removed from the project
+	 * 
+	 * @param xmlMessageType
+	 *            the removed XML MessageType
+	 */
 	public void removedMessage(MessageType xmlMessageType, int index)
 	{
 		Object[] path = { xmlProjectType, xmlProjectType.getMessages() };

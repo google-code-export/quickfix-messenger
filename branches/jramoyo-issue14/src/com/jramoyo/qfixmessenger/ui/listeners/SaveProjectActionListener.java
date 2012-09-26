@@ -52,6 +52,6 @@ public class SaveProjectActionListener implements ActionListener
 	@Override
 	public void actionPerformed(ActionEvent e)
 	{
-		frame.saveXmlProject();
+		frame.marshallXmlProjectType();
 	}
 }

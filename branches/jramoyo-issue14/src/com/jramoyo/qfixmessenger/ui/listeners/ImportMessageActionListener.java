@@ -82,7 +82,7 @@ public class ImportMessageActionListener implements ActionListener
 						.unmarshal(file);
 				MessageType xmlMessageType = rootElement.getValue();
 
-				frame.importXmlMessage(xmlMessageType);
+				frame.loadXmlMessage(xmlMessageType);
 			} catch (Exception ex)
 			{
 				logger.error(

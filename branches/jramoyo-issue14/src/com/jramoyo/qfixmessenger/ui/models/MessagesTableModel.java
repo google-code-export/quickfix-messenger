@@ -46,6 +46,8 @@ import com.jramoyo.qfixmessenger.quickfix.util.QFixUtil;
 import com.jramoyo.qfixmessenger.ui.models.data.MessagesTableModelData;
 
 /**
+ * Represents a table for model for messages
+ * 
  * @author jamoyo
  */
 public class MessagesTableModel extends AbstractTableModel implements
@@ -60,11 +62,6 @@ public class MessagesTableModel extends AbstractTableModel implements
 		int row = tableData.size();
 		tableData.add(rowData);
 		fireTableRowsInserted(row, row);
-	}
-
-	public MessagesTableModelData getData(int row)
-	{
-		return tableData.get(row);
 	}
 
 	@Override
@@ -83,6 +80,11 @@ public class MessagesTableModel extends AbstractTableModel implements
 	public String getColumnName(int col)
 	{
 		return MessagesTableModelData.COLUMN_NAMES[col];
+	}
+
+	public MessagesTableModelData getData(int row)
+	{
+		return tableData.get(row);
 	}
 
 	@Override

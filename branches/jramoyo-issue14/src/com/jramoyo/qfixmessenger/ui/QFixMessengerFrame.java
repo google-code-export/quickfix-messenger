@@ -195,7 +195,7 @@ public class QFixMessengerFrame extends JFrame
 
 	private String projectTitle = "None";
 
-	private ProjectType xmlProject;
+	private ProjectType xmlProjectType;
 
 	private File xmlProjectFile;
 
@@ -309,6 +309,9 @@ public class QFixMessengerFrame extends JFrame
 		}
 	}
 
+	/**
+	 * Gracefully exits the application
+	 */
 	public void exit()
 	{
 		int choice = JOptionPane.showConfirmDialog(this,
@@ -320,7 +323,83 @@ public class QFixMessengerFrame extends JFrame
 		}
 	}
 
-	public void exportXmlMessage(MessageType xmlMessageType)
+	/**
+	 * Returns the JAXB context
+	 * 
+	 * @return the JAXB context
+	 */
+	public JAXBContext getJaxbContext()
+	{
+		return jaxbContext;
+	}
+
+	/**
+	 * Returns the application instance
+	 * 
+	 * @return the application instance
+	 */
+	public QFixMessenger getMessenger()
+	{
+		return messenger;
+	}
+
+	/**
+	 * Returns the active XML ProjectType
+	 * 
+	 * @return the active XML ProjectType
+	 */
+	public ProjectType getXmlProjectType()
+	{
+		return xmlProjectType;
+	}
+
+	/**
+	 * Launches the frame
+	 */
+	public void launch()
+	{
+		setIconImage(new ImageIcon(messenger.getConfig().getAppIconLocation())
+				.getImage());
+
+		if (messenger.getConfig().isInitiator())
+		{
+			frameTitle = "QuickFIX Messenger " + VERSION + " (Initiator)";
+		} else
+		{
+			frameTitle = "QuickFIX Messenger " + VERSION + " (Acceptor)";
+		}
+		loadFrameTitle();
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		addWindowListener(new FrameWindowAdapter(this));
+
+		initComponents();
+		setVisible(true);
+	}
+
+	/**
+	 * Loads an XML MessageType to the UI
+	 * 
+	 * @param xmlMessageType
+	 *            an XML MessageType
+	 */
+	public void loadXmlMessage(MessageType xmlMessageType)
+	{
+		if (selectSession(xmlMessageType.getSession()))
+		{
+			if (selectMessage(xmlMessageType))
+			{
+				populateMembers(xmlMessageType);
+			}
+		}
+	}
+
+	/**
+	 * Saves an XML MessageType to a file
+	 * 
+	 * @param xmlMessageType
+	 *            an XML MessageType
+	 */
+	public void marshallXmlMessage(MessageType xmlMessageType)
 	{
 		JFileChooser jFileChooser = new JFileChooser();
 		jFileChooser.setFileFilter(XmlFileFilter.INSTANCE);
@@ -353,53 +432,10 @@ public class QFixMessengerFrame extends JFrame
 		}
 	}
 
-	public JAXBContext getJaxbContext()
-	{
-		return jaxbContext;
-	}
-
-	public QFixMessenger getMessenger()
-	{
-		return messenger;
-	}
-
-	public ProjectType getXmlProject()
-	{
-		return xmlProject;
-	}
-
-	public void importXmlMessage(MessageType xmlMessageType)
-	{
-		if (selectSession(xmlMessageType.getSession()))
-		{
-			if (selectMessage(xmlMessageType))
-			{
-				populateMembers(xmlMessageType);
-			}
-		}
-	}
-
-	public void launch()
-	{
-		setIconImage(new ImageIcon(messenger.getConfig().getAppIconLocation())
-				.getImage());
-
-		if (messenger.getConfig().isInitiator())
-		{
-			frameTitle = "QuickFIX Messenger " + VERSION + " (Initiator)";
-		} else
-		{
-			frameTitle = "QuickFIX Messenger " + VERSION + " (Acceptor)";
-		}
-		loadFrameTitle();
-		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		addWindowListener(new FrameWindowAdapter(this));
-
-		initComponents();
-		setVisible(true);
-	}
-
-	public void saveXmlProject()
+	/**
+	 * Saves the active XML ProjectType to a file
+	 */
+	public void marshallXmlProjectType()
 	{
 		if (xmlProjectFile == null)
 		{
@@ -422,7 +458,7 @@ public class QFixMessengerFrame extends JFrame
 		{
 			JAXBElement<ProjectType> rootElement = new JAXBElement<ProjectType>(
 					new QName("http://xml.fix.jramoyo.com", "project"),
-					ProjectType.class, xmlProject);
+					ProjectType.class, xmlProjectType);
 			Marshaller marshaller = jaxbContext.createMarshaller();
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
 					Boolean.TRUE);
@@ -441,6 +477,13 @@ public class QFixMessengerFrame extends JFrame
 		}
 	}
 
+	/**
+	 * Serializes the message form to an XML MessageType
+	 * 
+	 * @param session
+	 *            the current session
+	 * @return an XML MessageType
+	 */
 	public MessageType serializeFormAsXmlMessage(Session session)
 	{
 		ObjectFactory xmlObjectFactory = new ObjectFactory();
@@ -531,11 +574,17 @@ public class QFixMessengerFrame extends JFrame
 		return xmlMessageType;
 	}
 
-	public void setXmlProject(ProjectType xmlProject)
+	/**
+	 * Sets the active XML ProjectType
+	 * 
+	 * @param xmlProjectType
+	 *            an XML ProjectType
+	 */
+	public void setXmlProjectType(ProjectType xmlProjectType)
 	{
-		this.xmlProject = xmlProject;
+		this.xmlProjectType = xmlProjectType;
 
-		projectTitle = xmlProject.getName();
+		projectTitle = xmlProjectType.getName();
 		loadFrameTitle();
 
 		if (projectFrame != null)
@@ -1016,7 +1065,7 @@ public class QFixMessengerFrame extends JFrame
 	{
 		if (projectFrame == null || !projectFrame.isDisplayable())
 		{
-			projectFrame = new ProjectFrame(this, xmlProject);
+			projectFrame = new ProjectFrame(this, xmlProjectType);
 			projectFrame.launch();
 		} else
 		{
@@ -1504,7 +1553,7 @@ public class QFixMessengerFrame extends JFrame
 					MessageType xmlMessageType = frame
 							.serializeFormAsXmlMessage(session);
 
-					ProjectType xmlProjectType = frame.getXmlProject();
+					ProjectType xmlProjectType = frame.getXmlProjectType();
 					if (xmlProjectType.getMessages() == null)
 					{
 						xmlProjectType.setMessages(new ObjectFactory()
@@ -1583,7 +1632,7 @@ public class QFixMessengerFrame extends JFrame
 				{
 					MessageType xmlMessageType = frame
 							.serializeFormAsXmlMessage(session);
-					frame.exportXmlMessage(xmlMessageType);
+					frame.marshallXmlMessage(xmlMessageType);
 				} else
 				{
 					JOptionPane.showMessageDialog(frame,
@@ -1793,7 +1842,7 @@ public class QFixMessengerFrame extends JFrame
 		@Override
 		public void actionPerformed(ActionEvent e)
 		{
-			if (frame.xmlProject != null)
+			if (frame.xmlProjectType != null)
 			{
 				frame.launchProjectFrame();
 			} else
