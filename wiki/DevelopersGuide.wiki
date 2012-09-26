@@ -35,6 +35,7 @@ _This guide assumes that Eclipse (with Subversion plugin) is the chosen IDE._
   * A different Ant target may be selected from the Ant run configuration (Right-click > Run As > Ant Build...)
  # The default Ant target will:
   # Clean all temporary files
+  # Generate classes from XSD
   # Compile the source code
   # Create the JAR file
   # Deploy all files to a working directory
