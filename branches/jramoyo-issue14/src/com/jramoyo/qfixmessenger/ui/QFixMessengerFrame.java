@@ -669,7 +669,7 @@ public class QFixMessengerFrame extends JFrame
 		JMenuItem exportMessageMenuItem = new JMenuItem("Export Message");
 		exportMessageMenuItem.setMnemonic('X');
 		exportMessageMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK));
+				KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK));
 		exportMessageMenuItem
 				.addActionListener(new ExportMessageActionListener(this));
 
@@ -1554,11 +1554,6 @@ public class QFixMessengerFrame extends JFrame
 							.serializeFormAsXmlMessage(session);
 
 					ProjectType xmlProjectType = frame.getXmlProjectType();
-					if (xmlProjectType.getMessages() == null)
-					{
-						xmlProjectType.setMessages(new ObjectFactory()
-								.createMessagesType());
-					}
 					xmlProjectType.getMessages().getMessage()
 							.add(xmlMessageType);
 					frame.projectFrame.addedMessage(xmlMessageType);

@@ -78,9 +78,10 @@ public class NewProjectActionListener implements ActionListener
 						JOptionPane.INFORMATION_MESSAGE);
 		if (projectName != null)
 		{
-			ProjectType xmlProjectType = new ObjectFactory()
-					.createProjectType();
+			ObjectFactory xmlObjectFactory = new ObjectFactory();
+			ProjectType xmlProjectType = xmlObjectFactory.createProjectType();
 			xmlProjectType.setName(projectName);
+			xmlProjectType.setMessages(xmlObjectFactory.createMessagesType());
 			frame.setXmlProjectType(xmlProjectType);
 		}
 	}
