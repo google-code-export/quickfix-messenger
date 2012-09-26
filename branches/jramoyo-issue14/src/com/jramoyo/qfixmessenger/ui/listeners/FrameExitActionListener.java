@@ -27,16 +27,31 @@
  * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH 
  * DAMAGE.
  *
- * ExportMessageActionListener.java
- * Sep 25, 2012
+ * FrameExitActionListener.java
+ * Sep 26, 2012
  */
 package com.jramoyo.qfixmessenger.ui.listeners;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import com.jramoyo.qfixmessenger.ui.QFixMessengerFrame;
+
 /**
- * 
  * @author jramoyo
  */
-public class ExportMessageActionListener
+public class FrameExitActionListener implements ActionListener
 {
+	private QFixMessengerFrame frame;
 
+	public FrameExitActionListener(QFixMessengerFrame frame)
+	{
+		this.frame = frame;
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e)
+	{
+		frame.exit();
+	}
 }

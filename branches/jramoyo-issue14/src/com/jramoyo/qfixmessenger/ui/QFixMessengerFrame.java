@@ -97,7 +97,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 import org.slf4j.Logger;
@@ -134,7 +133,9 @@ import com.jramoyo.qfixmessenger.QFixMessengerConstants;
 import com.jramoyo.qfixmessenger.quickfix.QFixMessageListener;
 import com.jramoyo.qfixmessenger.quickfix.util.QFixUtil;
 import com.jramoyo.qfixmessenger.ui.listeners.AboutActionListener;
+import com.jramoyo.qfixmessenger.ui.listeners.FrameExitActionListener;
 import com.jramoyo.qfixmessenger.ui.listeners.HelpActionListener;
+import com.jramoyo.qfixmessenger.ui.listeners.ImportMessageActionListener;
 import com.jramoyo.qfixmessenger.ui.listeners.LogoffAllSessionsActionListener;
 import com.jramoyo.qfixmessenger.ui.listeners.LogonAllSessionsActionListener;
 import com.jramoyo.qfixmessenger.ui.listeners.LogonSessionItemListener;
@@ -305,6 +306,17 @@ public class QFixMessengerFrame extends JFrame
 		{
 			logger.error("Unable to create JAXB context for com.jramoyo.fix.xml");
 			System.exit(1);
+		}
+	}
+
+	public void exit()
+	{
+		int choice = JOptionPane.showConfirmDialog(this,
+				"Exit QuickFIX Messenger?", "Quit", JOptionPane.YES_NO_OPTION);
+		if (choice == JOptionPane.YES_OPTION)
+		{
+			setVisible(false);
+			messenger.exit();
 		}
 	}
 
@@ -533,17 +545,6 @@ public class QFixMessengerFrame extends JFrame
 		}
 		saveButton.setEnabled(true);
 		launchProjectFrame();
-	}
-
-	private void exit()
-	{
-		int choice = JOptionPane.showConfirmDialog(this,
-				"Exit QuickFIX Messenger?", "Quit", JOptionPane.YES_NO_OPTION);
-		if (choice == JOptionPane.YES_OPTION)
-		{
-			setVisible(false);
-			messenger.exit();
-		}
 	}
 
 	private void initAppVersionsComboBox()
@@ -1466,7 +1467,6 @@ public class QFixMessengerFrame extends JFrame
 		{
 			return "XML Files (*.xml)";
 		}
-
 	}
 
 	private static class AppVersionsComboBoxActionListener implements
@@ -1540,22 +1540,6 @@ public class QFixMessengerFrame extends JFrame
 		}
 	}
 
-	private static class FrameExitActionListener implements ActionListener
-	{
-		private QFixMessengerFrame frame;
-
-		public FrameExitActionListener(QFixMessengerFrame frame)
-		{
-			this.frame = frame;
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e)
-		{
-			frame.exit();
-		}
-	}
-
 	private static class FrameWindowAdapter extends WindowAdapter
 	{
 		private QFixMessengerFrame frame;
@@ -1569,48 +1553,6 @@ public class QFixMessengerFrame extends JFrame
 		public void windowClosing(WindowEvent e)
 		{
 			frame.exit();
-		}
-	}
-
-	private static class ImportMessageActionListener implements ActionListener
-	{
-		private QFixMessengerFrame frame;
-
-		public ImportMessageActionListener(QFixMessengerFrame frame)
-		{
-			this.frame = frame;
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e)
-		{
-			JFileChooser jFileChooser = new JFileChooser();
-			jFileChooser.setFileFilter(XmlFileFilter.INSTANCE);
-
-			int choice = jFileChooser.showOpenDialog(frame);
-			if (choice == JFileChooser.APPROVE_OPTION)
-			{
-				File file = jFileChooser.getSelectedFile();
-				try
-				{
-					Unmarshaller unmarshaller = frame.jaxbContext
-							.createUnmarshaller();
-					@SuppressWarnings("unchecked")
-					JAXBElement<MessageType> rootElement = (JAXBElement<MessageType>) unmarshaller
-							.unmarshal(file);
-					MessageType xmlMessageType = rootElement.getValue();
-
-					frame.importXmlMessage(xmlMessageType);
-				} catch (JAXBException ex)
-				{
-					logger.error(
-							"A JAXBException occurred while importing message.",
-							ex);
-					JOptionPane.showMessageDialog(frame,
-							"Unable to open file!", "Error",
-							JOptionPane.ERROR_MESSAGE);
-				}
-			}
 		}
 	}
 
