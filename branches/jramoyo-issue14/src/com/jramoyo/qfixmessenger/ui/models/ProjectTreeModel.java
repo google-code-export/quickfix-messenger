@@ -30,7 +30,7 @@
  * ProjectTreeModel.java
  * Sep 25, 2012
  */
-package com.jramoyo.qfixmessenger.ui.model;
+package com.jramoyo.qfixmessenger.ui.models;
 
 import javax.swing.event.EventListenerList;
 import javax.swing.event.TreeModelEvent;
@@ -470,7 +470,7 @@ public class ProjectTreeModel implements TreeModel
 	@Override
 	public boolean isLeaf(Object node)
 	{
-		if (node instanceof String || node instanceof Integer)
+		if (node instanceof String)
 		{
 			return true;
 		} else
@@ -495,6 +495,23 @@ public class ProjectTreeModel implements TreeModel
 				childIdx, children);
 	}
 
+	public void addedMessage(MessageType xmlMessageType)
+	{
+		Object[] path = { xmlProjectType, xmlProjectType.getMessages() };
+		int[] childIndices = { getIndexOfChild(xmlProjectType.getMessages(),
+				xmlMessageType) };
+		Object[] children = { xmlMessageType };
+		fireTreeNodesInserted(this, path, childIndices, children);
+	}
+
+	public void removedMessage(MessageType xmlMessageType, int index)
+	{
+		Object[] path = { xmlProjectType, xmlProjectType.getMessages() };
+		int[] childIndices = { index };
+		Object[] children = { xmlMessageType };
+		fireTreeNodesRemoved(this, path, childIndices, children);
+	}
+
 	@Override
 	public void removeTreeModelListener(TreeModelListener listener)
 	{
@@ -502,10 +519,48 @@ public class ProjectTreeModel implements TreeModel
 	}
 
 	@Override
-	public void valueForPathChanged(TreePath path, Object newValue)
+	public void valueForPathChanged(TreePath treePath, Object newValue)
 	{
-		// TODO
-		path.getLastPathComponent();
+		Object[] path;
+		int[] childIndices = null;
+		Object[] children = null;
+		if (treePath.getPathCount() > 1)
+		{
+			Object parent = treePath.getParentPath().getLastPathComponent();
+			if (parent instanceof FieldType)
+			{
+				((FieldType) parent).setValue((String) newValue);
+				childIndices = new int[] { 0 };
+			}
+
+			else if (parent instanceof SessionType)
+			{
+				/*
+				 * TODO Find a better way to know whether the new value is a
+				 * session name or an application version
+				 */
+				String newString = (String) newValue;
+				if ((newString.contains("FIX.") || (newString.contains("FIXT.")))
+						&& newString.contains(">"))
+				{
+					((SessionType) parent).setName(newString);
+					childIndices = new int[] { 0 };
+				} else if (newString.contains("FIX."))
+				{
+					((SessionType) parent).setAppVersionId(newString);
+					childIndices = new int[] { 1 };
+				}
+			}
+
+			treePath = treePath.getParentPath().pathByAddingChild(newValue);
+			path = treePath.getParentPath().getPath();
+			children = new Object[] { newValue };
+		} else
+		{
+			path = treePath.getPath();
+		}
+
+		fireTreeNodesChanged(this, path, childIndices, children);
 	}
 
 	protected void fireTreeNodesChanged(Object source, Object[] path,
@@ -516,6 +571,28 @@ public class ProjectTreeModel implements TreeModel
 		for (TreeModelListener listener : getTreeModelListeners())
 		{
 			listener.treeNodesChanged(event);
+		}
+	}
+
+	protected void fireTreeNodesInserted(Object source, Object[] path,
+			int[] childIndices, Object[] children)
+	{
+		TreeModelEvent event = new TreeModelEvent(source, path, childIndices,
+				children);
+		for (TreeModelListener listener : getTreeModelListeners())
+		{
+			listener.treeNodesInserted(event);
+		}
+	}
+
+	protected void fireTreeNodesRemoved(Object source, Object[] path,
+			int[] childIndices, Object[] children)
+	{
+		TreeModelEvent event = new TreeModelEvent(source, path, childIndices,
+				children);
+		for (TreeModelListener listener : getTreeModelListeners())
+		{
+			listener.treeNodesRemoved(event);
 		}
 	}
 

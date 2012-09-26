@@ -42,8 +42,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 
+import com.jramoyo.fix.xml.MessageType;
 import com.jramoyo.fix.xml.ProjectType;
-import com.jramoyo.qfixmessenger.ui.model.ProjectTreeModel;
+import com.jramoyo.qfixmessenger.ui.models.ProjectTreeModel;
 import com.jramoyo.qfixmessenger.ui.renderers.ProjectTreeCellRenderer;
 
 /**
@@ -66,6 +67,12 @@ public class ProjectFrame extends JFrame
 	{
 		this.frame = frame;
 		this.xmlProjectType = xmlProjectType;
+	}
+
+	public void addedMessage(MessageType xmlMessageType)
+	{
+		((ProjectTreeModel) projectTree.getModel())
+				.addedMessage(xmlMessageType);
 	}
 
 	public void launch()
@@ -96,6 +103,7 @@ public class ProjectFrame extends JFrame
 		add(mainScrollPane, BorderLayout.CENTER);
 
 		projectTree = new JTree();
+		projectTree.setEditable(true);
 		projectTree.setModel(new ProjectTreeModel(xmlProjectType));
 		projectTree.setCellRenderer(new ProjectTreeCellRenderer());
 		mainScrollPane.getViewport().add(projectTree);

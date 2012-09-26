@@ -30,7 +30,7 @@
  * MessagesTableModelData.java
  * 14 Jun 2011
  */
-package com.jramoyo.qfixmessenger.ui.model.data;
+package com.jramoyo.qfixmessenger.ui.models.data;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

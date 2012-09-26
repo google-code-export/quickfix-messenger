@@ -146,8 +146,8 @@ import com.jramoyo.qfixmessenger.ui.listeners.ResetAllSessionsActionListener;
 import com.jramoyo.qfixmessenger.ui.listeners.ResetSessionActionListener;
 import com.jramoyo.qfixmessenger.ui.listeners.SessionStatusActionListener;
 import com.jramoyo.qfixmessenger.ui.listeners.SessionsListSessionStateListener;
-import com.jramoyo.qfixmessenger.ui.model.MessagesTableModel;
-import com.jramoyo.qfixmessenger.ui.model.data.MessagesTableModelData;
+import com.jramoyo.qfixmessenger.ui.models.MessagesTableModel;
+import com.jramoyo.qfixmessenger.ui.models.data.MessagesTableModelData;
 import com.jramoyo.qfixmessenger.ui.panels.ComponentPanel;
 import com.jramoyo.qfixmessenger.ui.panels.FieldPanel;
 import com.jramoyo.qfixmessenger.ui.panels.FreeTextMessagePanel;
@@ -245,7 +245,7 @@ public class QFixMessengerFrame extends JFrame
 
 	private JCheckBox previewBeforeSendCheckBox;
 
-	private JButton saveButton;
+	private JButton addButton;
 
 	private JButton sendButton;
 
@@ -543,7 +543,7 @@ public class QFixMessengerFrame extends JFrame
 			projectFrame.dispose();
 			projectFrame = null;
 		}
-		saveButton.setEnabled(true);
+		addButton.setEnabled(true);
 		launchProjectFrame();
 	}
 
@@ -599,38 +599,42 @@ public class QFixMessengerFrame extends JFrame
 		JMenuItem newProjectMenuItem = new JMenuItem("New Project");
 		newProjectMenuItem.setMnemonic('N');
 		newProjectMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,
-				InputEvent.CTRL_MASK));
+				InputEvent.CTRL_DOWN_MASK));
 		newProjectMenuItem
 				.addActionListener(new NewProjectActionListener(this));
 
 		JMenuItem saveProjectMenuItem = new JMenuItem("Save Project");
 		saveProjectMenuItem.setMnemonic('S');
 		saveProjectMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_S, InputEvent.CTRL_MASK));
-		saveProjectMenuItem.addActionListener(new SaveMessageActionListener(
-				this));
+				KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
+		saveProjectMenuItem
+				.addActionListener(new AddMessageActionListener(this));
 
 		JMenuItem openProjectMenuItem = new JMenuItem("Open Project");
 		openProjectMenuItem.setMnemonic('O');
 		openProjectMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_O, InputEvent.CTRL_MASK));
+				KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK));
 		openProjectMenuItem.addActionListener(new OpenProjectActionListener(
 				this));
 
 		JMenuItem exportMessageMenuItem = new JMenuItem("Export Message");
 		exportMessageMenuItem.setMnemonic('X');
+		exportMessageMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+				KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK));
 		exportMessageMenuItem
 				.addActionListener(new ExportMessageActionListener(this));
 
 		JMenuItem importMessageMenuItem = new JMenuItem("Import Message");
 		importMessageMenuItem.setMnemonic('I');
+		importMessageMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+				KeyEvent.VK_I, InputEvent.CTRL_DOWN_MASK));
 		importMessageMenuItem
 				.addActionListener(new ImportMessageActionListener(this));
 
 		JMenuItem exitMenuItem = new JMenuItem("Exit");
 		exitMenuItem.setMnemonic('x');
 		exitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X,
-				InputEvent.ALT_MASK));
+				InputEvent.ALT_DOWN_MASK));
 		exitMenuItem.addActionListener(new FrameExitActionListener(this));
 
 		fileMenu.add(newProjectMenuItem);
@@ -654,6 +658,8 @@ public class QFixMessengerFrame extends JFrame
 
 		JMenuItem helpMenuItem = new JMenuItem("Help");
 		helpMenuItem.setMnemonic('H');
+		helpMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F2,
+				InputEvent.SHIFT_DOWN_MASK));
 		helpMenuItem.addActionListener(new HelpActionListener(this));
 
 		helpMenu.add(helpMenuItem);
@@ -858,12 +864,12 @@ public class QFixMessengerFrame extends JFrame
 			}
 		});
 
-		ImageIcon saveImageIcon = new ImageIcon(messenger.getConfig()
-				.getSaveIconLocation());
-		saveButton = new JButton(saveImageIcon);
-		saveButton.addActionListener(new SaveMessageActionListener(this));
-		saveButton.setToolTipText("Adds the message to the current project");
-		saveButton.setEnabled(false);
+		ImageIcon addImageIcon = new ImageIcon(messenger.getConfig()
+				.getAddIconLocation());
+		addButton = new JButton(addImageIcon);
+		addButton.addActionListener(new AddMessageActionListener(this));
+		addButton.setToolTipText("Adds the message to the current project");
+		addButton.setEnabled(false);
 
 		ImageIcon sendImageIcon = new ImageIcon(messenger.getConfig()
 				.getSendIconLocation());
@@ -873,7 +879,7 @@ public class QFixMessengerFrame extends JFrame
 
 		c.gridx = 0;
 		c.gridy = 0;
-		sendPanel.add(saveButton, c);
+		sendPanel.add(addButton, c);
 
 		c.gridx = 0;
 		c.gridy = 1;
@@ -932,18 +938,24 @@ public class QFixMessengerFrame extends JFrame
 		JMenuItem logonAllSessionsMenuItem = new JMenuItem(
 				"All Sessions - Logon");
 		logonAllSessionsMenuItem.setMnemonic('n');
+		logonAllSessionsMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+				KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK));
 		logonAllSessionsMenuItem
 				.addActionListener(new LogonAllSessionsActionListener(this));
 
 		JMenuItem logoffAllSessionsMenuItem = new JMenuItem(
 				"All Sessions - Logoff");
 		logoffAllSessionsMenuItem.setMnemonic('f');
+		logoffAllSessionsMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+				KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK));
 		logoffAllSessionsMenuItem
 				.addActionListener(new LogoffAllSessionsActionListener(this));
 
 		JMenuItem resetAllSessionsMenuItem = new JMenuItem(
 				"All Sessions - Reset");
 		resetAllSessionsMenuItem.setMnemonic('R');
+		resetAllSessionsMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+				KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
 		resetAllSessionsMenuItem
 				.addActionListener(new ResetAllSessionsActionListener(this));
 
@@ -992,6 +1004,8 @@ public class QFixMessengerFrame extends JFrame
 
 		JMenuItem projectWindowMenuItem = new JMenuItem("Project Window");
 		projectWindowMenuItem.setMnemonic('P');
+		projectWindowMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+				KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK));
 		projectWindowMenuItem
 				.addActionListener(new ProjectWindowActionListener(this));
 
@@ -1469,6 +1483,51 @@ public class QFixMessengerFrame extends JFrame
 		}
 	}
 
+	private static class AddMessageActionListener implements ActionListener
+	{
+		private QFixMessengerFrame frame;
+
+		public AddMessageActionListener(QFixMessengerFrame frame)
+		{
+			this.frame = frame;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e)
+		{
+			Session session = (Session) frame.sessionsList.getSelectedValue();
+
+			if (frame.activeMessage != null)
+			{
+				if (!frame.activeMessage.equals(frame.freeTextMessage))
+				{
+					MessageType xmlMessageType = frame
+							.serializeFormAsXmlMessage(session);
+
+					ProjectType xmlProjectType = frame.getXmlProject();
+					if (xmlProjectType.getMessages() == null)
+					{
+						xmlProjectType.setMessages(new ObjectFactory()
+								.createMessagesType());
+					}
+					xmlProjectType.getMessages().getMessage()
+							.add(xmlMessageType);
+					frame.projectFrame.addedMessage(xmlMessageType);
+				} else
+				{
+					JOptionPane.showMessageDialog(frame,
+							"Free text message cannot be saved!", "Error",
+							JOptionPane.WARNING_MESSAGE);
+				}
+			} else
+			{
+				JOptionPane.showMessageDialog(frame,
+						"Please create a message!", "Error",
+						JOptionPane.WARNING_MESSAGE);
+			}
+		}
+	}
+
 	private static class AppVersionsComboBoxActionListener implements
 			ActionListener
 	{
@@ -1741,51 +1800,6 @@ public class QFixMessengerFrame extends JFrame
 			{
 				JOptionPane.showMessageDialog(frame, "No active project!",
 						"Error", JOptionPane.WARNING_MESSAGE);
-			}
-		}
-	}
-
-	private static class SaveMessageActionListener implements ActionListener
-	{
-		private QFixMessengerFrame frame;
-
-		public SaveMessageActionListener(QFixMessengerFrame frame)
-		{
-			this.frame = frame;
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e)
-		{
-			Session session = (Session) frame.sessionsList.getSelectedValue();
-
-			if (frame.activeMessage != null)
-			{
-				if (!frame.activeMessage.equals(frame.freeTextMessage))
-				{
-					MessageType xmlMessageType = frame
-							.serializeFormAsXmlMessage(session);
-
-					ProjectType xmlProjectType = frame.getXmlProject();
-					if (xmlProjectType.getMessages() == null)
-					{
-						xmlProjectType.setMessages(new ObjectFactory()
-								.createMessagesType());
-					}
-					xmlProjectType.getMessages().getMessage()
-							.add(xmlMessageType);
-					frame.projectFrame.reload();
-				} else
-				{
-					JOptionPane.showMessageDialog(frame,
-							"Free text message cannot be saved!", "Error",
-							JOptionPane.WARNING_MESSAGE);
-				}
-			} else
-			{
-				JOptionPane.showMessageDialog(frame,
-						"Please create a message!", "Error",
-						JOptionPane.WARNING_MESSAGE);
 			}
 		}
 	}

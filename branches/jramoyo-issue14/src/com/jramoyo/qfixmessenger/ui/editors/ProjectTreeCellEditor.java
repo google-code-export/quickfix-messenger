@@ -27,51 +27,22 @@
  * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH 
  * DAMAGE.
  *
- * MessagesTableCellRender.java
- * 15 Jun 2011
+ * ProjectTreeCellEditor.java
+ * Sep 26, 2012
  */
-package com.jramoyo.qfixmessenger.ui.renderers;
+package com.jramoyo.qfixmessenger.ui.editors;
 
-import java.awt.Color;
-import java.awt.Component;
-
-import javax.swing.JLabel;
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableCellRenderer;
-
-import com.jramoyo.qfixmessenger.quickfix.QFixMessageListener;
-import com.jramoyo.qfixmessenger.ui.models.MessagesTableModel;
-import com.jramoyo.qfixmessenger.ui.models.data.MessagesTableModelData;
+import javax.swing.JTree;
+import javax.swing.tree.DefaultTreeCellEditor;
+import javax.swing.tree.DefaultTreeCellRenderer;
 
 /**
- * @author jamoyo
+ * @author jramoyo
  */
-public class MessagesTableCellRender extends DefaultTableCellRenderer
+public class ProjectTreeCellEditor extends DefaultTreeCellEditor
 {
-	private static final long serialVersionUID = -5031829092122831674L;
-
-	@Override
-	public Component getTableCellRendererComponent(JTable table, Object value,
-			boolean isSelected, boolean hasFocus, int row, int column)
+	public ProjectTreeCellEditor(JTree tree, DefaultTreeCellRenderer renderer)
 	{
-		JLabel component = (JLabel) super.getTableCellRendererComponent(table,
-				value, isSelected, hasFocus, row, column);
-
-		if (!isSelected)
-		{
-			int modelRow = table.convertRowIndexToModel(row);
-			MessagesTableModel model = (MessagesTableModel) table.getModel();
-			MessagesTableModelData data = model.getData(modelRow);
-
-			if (data.getDirection().equals(QFixMessageListener.RECV))
-			{
-				component.setBackground(Color.ORANGE);
-			} else
-			{
-				component.setBackground(Color.GREEN);
-			}
-		}
-
-		return component;
+		super(tree, renderer);
 	}
 }

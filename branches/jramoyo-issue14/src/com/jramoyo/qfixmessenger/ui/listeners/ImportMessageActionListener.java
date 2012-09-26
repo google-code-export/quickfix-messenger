@@ -39,7 +39,6 @@ import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import org.slf4j.Logger;
@@ -84,7 +83,7 @@ public class ImportMessageActionListener implements ActionListener
 				MessageType xmlMessageType = rootElement.getValue();
 
 				frame.importXmlMessage(xmlMessageType);
-			} catch (JAXBException ex)
+			} catch (Exception ex)
 			{
 				logger.error(
 						"A JAXBException occurred while importing message.", ex);

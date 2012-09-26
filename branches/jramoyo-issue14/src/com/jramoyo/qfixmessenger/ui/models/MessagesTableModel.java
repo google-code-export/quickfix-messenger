@@ -30,7 +30,7 @@
  * MessagesTableModel.java
  * 14 Jun 2011
  */
-package com.jramoyo.qfixmessenger.ui.model;
+package com.jramoyo.qfixmessenger.ui.models;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -43,7 +43,7 @@ import quickfix.SessionID;
 
 import com.jramoyo.qfixmessenger.quickfix.QFixMessageListener;
 import com.jramoyo.qfixmessenger.quickfix.util.QFixUtil;
-import com.jramoyo.qfixmessenger.ui.model.data.MessagesTableModelData;
+import com.jramoyo.qfixmessenger.ui.models.data.MessagesTableModelData;
 
 /**
  * @author jamoyo
