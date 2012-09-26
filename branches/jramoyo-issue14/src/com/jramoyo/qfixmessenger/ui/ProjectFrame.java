@@ -33,30 +33,18 @@
 package com.jramoyo.qfixmessenger.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
-import javax.swing.tree.DefaultTreeCellRenderer;
 
-import com.jramoyo.fix.xml.BodyType;
-import com.jramoyo.fix.xml.ComponentType;
-import com.jramoyo.fix.xml.FieldType;
-import com.jramoyo.fix.xml.GroupType;
-import com.jramoyo.fix.xml.GroupsType;
-import com.jramoyo.fix.xml.HeaderType;
-import com.jramoyo.fix.xml.MessageType;
-import com.jramoyo.fix.xml.MessagesType;
 import com.jramoyo.fix.xml.ProjectType;
-import com.jramoyo.fix.xml.SessionType;
-import com.jramoyo.fix.xml.TrailerType;
 import com.jramoyo.qfixmessenger.ui.model.ProjectTreeModel;
+import com.jramoyo.qfixmessenger.ui.renderers.ProjectTreeCellRenderer;
 
 /**
  * ProjectFrame
@@ -113,84 +101,5 @@ public class ProjectFrame extends JFrame
 		mainScrollPane.getViewport().add(projectTree);
 
 		pack();
-	}
-
-	private static class ProjectTreeCellRenderer extends
-			DefaultTreeCellRenderer
-	{
-		private static final long serialVersionUID = -435212244413010769L;
-
-		public Component getTreeCellRendererComponent(JTree tree, Object value,
-				boolean sel, boolean expanded, boolean leaf, int row,
-				boolean hasFocus)
-		{
-			JLabel label = (JLabel) super.getTreeCellRendererComponent(tree,
-					value, sel, expanded, leaf, row, hasFocus);
-
-			if (value instanceof ProjectType)
-			{
-				ProjectType xmlProjectType = (ProjectType) value;
-				label.setText(xmlProjectType.getName());
-			}
-
-			else if (value instanceof MessagesType)
-			{
-				label.setText("Messages");
-			}
-
-			else if (value instanceof MessageType)
-			{
-				MessageType xmlMessageType = (MessageType) value;
-				label.setText(xmlMessageType.getName() + " ("
-						+ xmlMessageType.getMsgType() + ")");
-			}
-
-			else if (value instanceof SessionType)
-			{
-				label.setText("Session");
-			}
-
-			else if (value instanceof HeaderType)
-			{
-				label.setText("Header");
-			}
-
-			else if (value instanceof BodyType)
-			{
-				label.setText("Body");
-			}
-
-			else if (value instanceof TrailerType)
-			{
-				label.setText("Trailer");
-			}
-
-			else if (value instanceof GroupsType)
-			{
-				GroupsType xmlGroupsType = (GroupsType) value;
-				label.setText(xmlGroupsType.getName() + " ("
-						+ xmlGroupsType.getId() + ")");
-			}
-
-			else if (value instanceof GroupType)
-			{
-				label.setText("Group");
-			}
-
-			else if (value instanceof ComponentType)
-			{
-				ComponentType xmlComponentType = (ComponentType) value;
-				label.setText(xmlComponentType.getName());
-			}
-
-			else if (value instanceof FieldType)
-			{
-				FieldType xmlFieldType = (FieldType) value;
-				label.setText(xmlFieldType.getName() + " ("
-						+ xmlFieldType.getId() + ")");
-			}
-
-			return label;
-		}
 	}
 }

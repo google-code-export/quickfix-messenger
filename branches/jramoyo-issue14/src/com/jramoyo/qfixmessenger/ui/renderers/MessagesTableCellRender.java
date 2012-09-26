@@ -41,7 +41,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 import com.jramoyo.qfixmessenger.quickfix.QFixMessageListener;
 import com.jramoyo.qfixmessenger.ui.model.MessagesTableModel;
-import com.jramoyo.qfixmessenger.ui.model.MessagesTableModelData;
+import com.jramoyo.qfixmessenger.ui.model.data.MessagesTableModelData;
 
 /**
  * @author jamoyo

@@ -147,7 +147,7 @@ import com.jramoyo.qfixmessenger.ui.listeners.ResetSessionActionListener;
 import com.jramoyo.qfixmessenger.ui.listeners.SessionStatusActionListener;
 import com.jramoyo.qfixmessenger.ui.listeners.SessionsListSessionStateListener;
 import com.jramoyo.qfixmessenger.ui.model.MessagesTableModel;
-import com.jramoyo.qfixmessenger.ui.model.MessagesTableModelData;
+import com.jramoyo.qfixmessenger.ui.model.data.MessagesTableModelData;
 import com.jramoyo.qfixmessenger.ui.panels.ComponentPanel;
 import com.jramoyo.qfixmessenger.ui.panels.FieldPanel;
 import com.jramoyo.qfixmessenger.ui.panels.FreeTextMessagePanel;

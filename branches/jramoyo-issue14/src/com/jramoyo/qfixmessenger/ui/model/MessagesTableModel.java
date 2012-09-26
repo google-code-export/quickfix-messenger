@@ -43,6 +43,7 @@ import quickfix.SessionID;
 
 import com.jramoyo.qfixmessenger.quickfix.QFixMessageListener;
 import com.jramoyo.qfixmessenger.quickfix.util.QFixUtil;
+import com.jramoyo.qfixmessenger.ui.model.data.MessagesTableModelData;
 
 /**
  * @author jamoyo
@@ -109,8 +110,8 @@ public class MessagesTableModel extends AbstractTableModel implements
 	public void onMessage(String direction, Message message, SessionID sessionId)
 	{
 		MessagesTableModelData data = new MessagesTableModelData(new Date(),
-				direction, QFixUtil.getSessionName(sessionId), message
-						.toString());
+				direction, QFixUtil.getSessionName(sessionId),
+				message.toString());
 		addRow(data);
 	}
 }
