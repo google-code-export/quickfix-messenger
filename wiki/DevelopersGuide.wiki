@@ -1,4 +1,4 @@
-#summary Developer's Guide.
+#summary Guide for Developers and Contributors.
 
 =Introduction=
 
