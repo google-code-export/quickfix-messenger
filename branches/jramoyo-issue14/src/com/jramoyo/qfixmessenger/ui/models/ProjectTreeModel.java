@@ -71,21 +71,6 @@ public class ProjectTreeModel implements TreeModel
 		eventListenerList = new EventListenerList();
 	}
 
-	/**
-	 * Updates the tree model that a message has been added to the project
-	 * 
-	 * @param xmlMessageType
-	 *            the added XML MessageType
-	 */
-	public void addedMessage(MessageType xmlMessageType)
-	{
-		Object[] path = { xmlProjectType, xmlProjectType.getMessages() };
-		int[] childIndices = { getIndexOfChild(xmlProjectType.getMessages(),
-				xmlMessageType) };
-		Object[] children = { xmlMessageType };
-		fireTreeNodesInserted(this, path, childIndices, children);
-	}
-
 	@Override
 	public void addTreeModelListener(TreeModelListener listener)
 	{
@@ -505,10 +490,16 @@ public class ProjectTreeModel implements TreeModel
 		}
 	}
 
+	@Override
+	public void removeTreeModelListener(TreeModelListener listener)
+	{
+		eventListenerList.remove(TreeModelListener.class, listener);
+	}
+
 	/**
-	 * Reloads the entire tree model
+	 * Updates the entire tree model
 	 */
-	public void reload()
+	public void update()
 	{
 		int n = getChildCount(xmlProjectType);
 		int[] childIdx = new int[n];
@@ -525,23 +516,32 @@ public class ProjectTreeModel implements TreeModel
 	}
 
 	/**
+	 * Updates the tree model that a message has been added to the project
+	 * 
+	 * @param xmlMessageType
+	 *            the added XML MessageType
+	 */
+	public void updateMessageAdded(MessageType xmlMessageType)
+	{
+		Object[] path = { xmlProjectType, xmlProjectType.getMessages() };
+		int[] childIndices = { getIndexOfChild(xmlProjectType.getMessages(),
+				xmlMessageType) };
+		Object[] children = { xmlMessageType };
+		fireTreeNodesInserted(this, path, childIndices, children);
+	}
+
+	/**
 	 * Updates the tree model that a message has been removed from the project
 	 * 
 	 * @param xmlMessageType
 	 *            the removed XML MessageType
 	 */
-	public void removedMessage(MessageType xmlMessageType, int index)
+	public void updateMessageRemoved(MessageType xmlMessageType, int index)
 	{
 		Object[] path = { xmlProjectType, xmlProjectType.getMessages() };
 		int[] childIndices = { index };
 		Object[] children = { xmlMessageType };
 		fireTreeNodesRemoved(this, path, childIndices, children);
-	}
-
-	@Override
-	public void removeTreeModelListener(TreeModelListener listener)
-	{
-		eventListenerList.remove(TreeModelListener.class, listener);
 	}
 
 	@Override

@@ -46,6 +46,7 @@ import javax.swing.tree.TreeSelectionModel;
 import com.jramoyo.fix.xml.MessageType;
 import com.jramoyo.fix.xml.ProjectType;
 import com.jramoyo.qfixmessenger.ui.editors.ProjectTreeCellEditor;
+import com.jramoyo.qfixmessenger.ui.listeners.ProjectTreeMouseListener;
 import com.jramoyo.qfixmessenger.ui.models.ProjectTreeModel;
 import com.jramoyo.qfixmessenger.ui.renderers.ProjectTreeCellRenderer;
 
@@ -74,7 +75,7 @@ public class ProjectFrame extends JFrame
 	public void addedMessage(MessageType xmlMessageType)
 	{
 		((ProjectTreeModel) projectTree.getModel())
-				.addedMessage(xmlMessageType);
+				.updateMessageAdded(xmlMessageType);
 	}
 
 	public void launch()
@@ -90,7 +91,7 @@ public class ProjectFrame extends JFrame
 
 	public void reload()
 	{
-		((ProjectTreeModel) projectTree.getModel()).reload();
+		((ProjectTreeModel) projectTree.getModel()).update();
 	}
 
 	private void initComponents()
@@ -111,6 +112,8 @@ public class ProjectFrame extends JFrame
 		projectTree.setCellEditor(new ProjectTreeCellEditor(projectTree));
 		projectTree.getSelectionModel().setSelectionMode(
 				TreeSelectionModel.SINGLE_TREE_SELECTION);
+		projectTree.addMouseListener(new ProjectTreeMouseListener(frame,
+				projectTree));
 
 		mainScrollPane.getViewport().add(projectTree);
 

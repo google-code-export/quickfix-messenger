@@ -144,6 +144,7 @@ import com.jramoyo.qfixmessenger.ui.listeners.NewProjectActionListener;
 import com.jramoyo.qfixmessenger.ui.listeners.OpenProjectActionListener;
 import com.jramoyo.qfixmessenger.ui.listeners.ResetAllSessionsActionListener;
 import com.jramoyo.qfixmessenger.ui.listeners.ResetSessionActionListener;
+import com.jramoyo.qfixmessenger.ui.listeners.SaveProjectActionListener;
 import com.jramoyo.qfixmessenger.ui.listeners.SessionStatusActionListener;
 import com.jramoyo.qfixmessenger.ui.listeners.SessionsListSessionStateListener;
 import com.jramoyo.qfixmessenger.ui.models.MessagesTableModel;
@@ -656,8 +657,8 @@ public class QFixMessengerFrame extends JFrame
 		saveProjectMenuItem.setMnemonic('S');
 		saveProjectMenuItem.setAccelerator(KeyStroke.getKeyStroke(
 				KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
-		saveProjectMenuItem
-				.addActionListener(new AddMessageActionListener(this));
+		saveProjectMenuItem.addActionListener(new SaveProjectActionListener(
+				this));
 
 		JMenuItem openProjectMenuItem = new JMenuItem("Open Project");
 		openProjectMenuItem.setMnemonic('O');
