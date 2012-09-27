@@ -32,17 +32,33 @@
  */
 package com.jramoyo.qfixmessenger.ui.editors;
 
+import java.util.EventObject;
+
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellEditor;
-import javax.swing.tree.DefaultTreeCellRenderer;
 
 /**
  * @author jramoyo
  */
 public class ProjectTreeCellEditor extends DefaultTreeCellEditor
 {
-	public ProjectTreeCellEditor(JTree tree, DefaultTreeCellRenderer renderer)
+	public ProjectTreeCellEditor(JTree tree)
 	{
-		super(tree, renderer);
+		super(tree, null);
+	}
+
+	@Override
+	public boolean isCellEditable(EventObject event)
+	{
+		if (super.isCellEditable(event))
+		{
+			Object value = tree.getLastSelectedPathComponent();
+			if (value instanceof String)
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

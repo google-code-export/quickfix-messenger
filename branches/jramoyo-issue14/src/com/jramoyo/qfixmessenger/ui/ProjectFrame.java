@@ -41,9 +41,11 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
+import javax.swing.tree.TreeSelectionModel;
 
 import com.jramoyo.fix.xml.MessageType;
 import com.jramoyo.fix.xml.ProjectType;
+import com.jramoyo.qfixmessenger.ui.editors.ProjectTreeCellEditor;
 import com.jramoyo.qfixmessenger.ui.models.ProjectTreeModel;
 import com.jramoyo.qfixmessenger.ui.renderers.ProjectTreeCellRenderer;
 
@@ -106,6 +108,10 @@ public class ProjectFrame extends JFrame
 		projectTree.setEditable(true);
 		projectTree.setModel(new ProjectTreeModel(xmlProjectType));
 		projectTree.setCellRenderer(new ProjectTreeCellRenderer());
+		projectTree.setCellEditor(new ProjectTreeCellEditor(projectTree));
+		projectTree.getSelectionModel().setSelectionMode(
+				TreeSelectionModel.SINGLE_TREE_SELECTION);
+
 		mainScrollPane.getViewport().add(projectTree);
 
 		pack();
