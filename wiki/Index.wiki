@@ -61,7 +61,7 @@ Each instance comes with 3 configuration files:
 Please refer to QuickFIX/J's [http://www.quickfixj.org/quickfixj/usermanual/1.5.0/usage/configuration.html documentation] page for details on how to configure the QuickFIX engine.
 
 == Using the Graphical User Interface (GUI) ==
-http://img32.imageshack.us/img32/212/screen12lh.png
+https://quickfix-messenger.googlecode.com/svn/trunk/qfix-messenger-gfx/screen.png
 
 === Sessions List ===
 The top left corner of the application lists all sessions configured in the FIX engine. Selecting a session will load all messages allowed for that session. If the selected session is using FIXT, the correct `ApplVerID` must be selected.
@@ -90,7 +90,7 @@ Double-clicking on the field name will launch the browser to the selected field'
 
 As of version 1.1, QuickFIX Messenger comes with a feature to send FIX messages in free text form. Note that !CheckSum (10) and !SendingTime (52) will automatically be populated by QuickFIX/J.
 
-http://img696.imageshack.us/img696/2281/freetext12.png
+https://quickfix-messenger.googlecode.com/svn/trunk/qfix-messenger-gfx/free_text.png
 
 === Messages Table ===
 Messages sent or received from the application are logged at the bottom of the application.
@@ -99,4 +99,4 @@ Each row of the table represents a FIX message. Rows colored <font color='#FF804
 
 Double-clicking on a row will popup the details of the message.
 
-http://img10.imageshack.us/img10/7277/messagedetails.png
+https://quickfix-messenger.googlecode.com/svn/trunk/qfix-messenger-gfx/message_details.png
