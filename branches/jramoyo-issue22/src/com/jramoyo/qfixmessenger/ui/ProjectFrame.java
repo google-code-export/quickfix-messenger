@@ -81,7 +81,8 @@ public class ProjectFrame extends JFrame
 	public void launch()
 	{
 		setIconImage(new ImageIcon(frame.getMessenger().getConfig()
-				.getAppIconLocation()).getImage());
+				.getIconsLocation()
+				+ Icons.APP_ICON).getImage());
 		setTitle("Project Tree");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
