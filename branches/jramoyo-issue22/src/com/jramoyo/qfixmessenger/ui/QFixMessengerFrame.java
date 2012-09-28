@@ -133,6 +133,7 @@ import com.jramoyo.qfixmessenger.QFixMessengerConstants;
 import com.jramoyo.qfixmessenger.quickfix.QFixMessageListener;
 import com.jramoyo.qfixmessenger.quickfix.util.QFixUtil;
 import com.jramoyo.qfixmessenger.ui.listeners.AboutActionListener;
+import com.jramoyo.qfixmessenger.ui.listeners.CloseProjectActionListener;
 import com.jramoyo.qfixmessenger.ui.listeners.FrameExitActionListener;
 import com.jramoyo.qfixmessenger.ui.listeners.HelpActionListener;
 import com.jramoyo.qfixmessenger.ui.listeners.ImportMessageActionListener;
@@ -174,6 +175,8 @@ public class QFixMessengerFrame extends JFrame
 
 	private static final String VERSION = "2.0";
 
+	private static final String EMPTY_PROJECT = "None";
+
 	private static final int LEFT_PANEL_WIDTH = 170;
 
 	private static final int MIDDLE_PANEL_WIDTH = 600;
@@ -194,7 +197,7 @@ public class QFixMessengerFrame extends JFrame
 
 	private String frameTitle;
 
-	private String projectTitle = "None";
+	private String projectTitle = EMPTY_PROJECT;
 
 	private ProjectType xmlProjectType;
 
@@ -319,6 +322,23 @@ public class QFixMessengerFrame extends JFrame
 				"Exit QuickFIX Messenger?", "Quit", JOptionPane.YES_NO_OPTION);
 		if (choice == JOptionPane.YES_OPTION)
 		{
+			if (xmlProjectType != null)
+			{
+				choice = JOptionPane.showConfirmDialog(this,
+						"Do you want to save \"" + xmlProjectType.getName()
+								+ "\"?", "Save Current Project",
+						JOptionPane.YES_NO_CANCEL_OPTION);
+				switch (choice)
+				{
+				case JOptionPane.NO_OPTION:
+					break;
+				case JOptionPane.YES_OPTION:
+					marshallXmlProjectType();
+					break;
+				case JOptionPane.CANCEL_OPTION:
+					return;
+				}
+			}
 			setVisible(false);
 			messenger.exit();
 		}
@@ -584,17 +604,24 @@ public class QFixMessengerFrame extends JFrame
 	public void setXmlProjectType(ProjectType xmlProjectType)
 	{
 		this.xmlProjectType = xmlProjectType;
-
-		projectTitle = xmlProjectType.getName();
-		loadFrameTitle();
-
 		if (projectFrame != null)
 		{
 			projectFrame.dispose();
 			projectFrame = null;
 		}
-		addButton.setEnabled(true);
-		launchProjectFrame();
+
+		if (xmlProjectType != null)
+		{
+			projectTitle = xmlProjectType.getName();
+			loadFrameTitle();
+			addButton.setEnabled(true);
+			launchProjectFrame();
+		} else
+		{
+			projectTitle = EMPTY_PROJECT;
+			loadFrameTitle();
+			addButton.setEnabled(false);
+		}
 	}
 
 	private void initAppVersionsComboBox()
@@ -677,6 +704,8 @@ public class QFixMessengerFrame extends JFrame
 		closeProjectMenuItem.setIcon(new ImageIcon(messenger.getConfig()
 				.getIconsLocation() + Icons.CLOSE_ICON));
 		closeProjectMenuItem.setMnemonic('C');
+		closeProjectMenuItem.addActionListener(new CloseProjectActionListener(
+				this));
 
 		JMenuItem importMessageMenuItem = new JMenuItem("Import Message");
 		importMessageMenuItem.setIcon(new ImageIcon(messenger.getConfig()
