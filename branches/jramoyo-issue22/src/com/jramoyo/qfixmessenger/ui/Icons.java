@@ -71,7 +71,7 @@ public final class Icons
 	public static String PROJECT_OPEN_ICON = "/project_open.png";
 	public static String MESSAGES_ICON = "/messages.png";
 	public static String MESSAGES_OPEN_ICON = "/messages_open.png";
-	public static String MESSSAGE_ICON = "/message.png";
+	public static String MESSAGE_ICON = "/message.png";
 	public static String MESSAGE_OPEN_ICON = "/message_open.png";
 	public static String SESSION_ICON = "/session.png";
 	public static String COMPONENT_ICON = "/component.png";
