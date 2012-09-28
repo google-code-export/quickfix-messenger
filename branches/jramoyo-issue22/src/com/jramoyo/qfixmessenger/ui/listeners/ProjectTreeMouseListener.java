@@ -72,7 +72,7 @@ public class ProjectTreeMouseListener extends MouseAdapter
 			JMenuItem collapseAllMenuItem = new JMenuItem("Collapse All");
 			collapseAllMenuItem.setIcon(new ImageIcon(frame.getMessenger()
 					.getConfig().getIconsLocation()
-					+ Icons.COLLAPSE_SMALL_ICON));
+					+ Icons.COLLAPSE_ICON));
 			collapseAllMenuItem.addActionListener(new ActionListener()
 			{
 				@Override
@@ -93,7 +93,7 @@ public class ProjectTreeMouseListener extends MouseAdapter
 			JMenuItem expandAllMenuItem = new JMenuItem("Expand All");
 			expandAllMenuItem.setIcon(new ImageIcon(frame.getMessenger()
 					.getConfig().getIconsLocation()
-					+ Icons.EXPAND_SMALL_ICON));
+					+ Icons.EXPAND_ICON));
 			expandAllMenuItem.addActionListener(new ActionListener()
 			{
 				@Override
