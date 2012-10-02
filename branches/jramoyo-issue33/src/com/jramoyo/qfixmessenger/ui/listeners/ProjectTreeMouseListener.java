@@ -45,6 +45,7 @@ import javax.swing.JTree;
 
 import com.jramoyo.fix.xml.MessageType;
 import com.jramoyo.fix.xml.ProjectType;
+import com.jramoyo.qfixmessenger.QFixMessengerException;
 import com.jramoyo.qfixmessenger.ui.Icons;
 import com.jramoyo.qfixmessenger.ui.QFixMessengerFrame;
 import com.jramoyo.qfixmessenger.ui.models.ProjectTreeModel;
@@ -74,6 +75,29 @@ public class ProjectTreeMouseListener extends MouseAdapter
 			sendAllMenuItem.setIcon(new ImageIcon(frame.getMessenger()
 					.getConfig().getIconsLocation()
 					+ Icons.SEND_ALL_ICON));
+			sendAllMenuItem.addActionListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(ActionEvent e)
+				{
+					for (MessageType xmlMessageType : frame.getXmlProjectType()
+							.getMessages().getMessage())
+					{
+						try
+						{
+							frame.getMessenger().sendXmlMessage(xmlMessageType);
+						} catch (QFixMessengerException ex)
+						{
+							JOptionPane.showMessageDialog(
+									frame.getProjectFrame(),
+									"Unable to send message: "
+											+ ex.getMessage(), "Error",
+									JOptionPane.ERROR_MESSAGE);
+							break;
+						}
+					}
+				}
+			});
 
 			JMenuItem collapseAllMenuItem = new JMenuItem("Collapse All");
 			collapseAllMenuItem.setIcon(new ImageIcon(frame.getMessenger()
@@ -139,6 +163,26 @@ public class ProjectTreeMouseListener extends MouseAdapter
 				sendMenuItem.setIcon(new ImageIcon(frame.getMessenger()
 						.getConfig().getIconsLocation()
 						+ Icons.SEND_SMALL_ICON));
+				sendMenuItem.addActionListener(new ActionListener()
+				{
+					@Override
+					public void actionPerformed(ActionEvent e)
+					{
+						MessageType xmlMessageType = (MessageType) projectTree
+								.getLastSelectedPathComponent();
+						try
+						{
+							frame.getMessenger().sendXmlMessage(xmlMessageType);
+						} catch (QFixMessengerException ex)
+						{
+							JOptionPane.showMessageDialog(
+									frame.getProjectFrame(),
+									"Unable to send message: "
+											+ ex.getMessage(), "Error",
+									JOptionPane.ERROR_MESSAGE);
+						}
+					}
+				});
 
 				JMenuItem exportMenuItem = new JMenuItem("Export Message");
 				exportMenuItem.setIcon(new ImageIcon(frame.getMessenger()

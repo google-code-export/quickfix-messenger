@@ -41,6 +41,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.tree.TreeSelectionModel;
 
 import com.jramoyo.fix.xml.MessageType;
@@ -87,7 +88,14 @@ public class ProjectFrame extends JFrame
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
 		initComponents();
-		setVisible(true);
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				pack();
+				setVisible(true);
+			}
+		});
 	}
 
 	public void reload()

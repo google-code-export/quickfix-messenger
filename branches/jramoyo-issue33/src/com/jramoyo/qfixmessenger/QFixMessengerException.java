@@ -27,31 +27,27 @@
  * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH 
  * DAMAGE.
  *
- * FrameExitActionListener.java
- * Sep 26, 2012
+ * QFixMessengerException.java
+ * Oct 2, 2012
  */
-package com.jramoyo.qfixmessenger.ui.listeners;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import com.jramoyo.qfixmessenger.ui.QFixMessengerFrame;
+package com.jramoyo.qfixmessenger;
 
 /**
+ * QFixMessengerException
+ * 
  * @author jramoyo
  */
-public class FrameExitActionListener implements ActionListener
+public class QFixMessengerException extends Exception
 {
-	private QFixMessengerFrame frame;
+	private static final long serialVersionUID = -3835891077672513984L;
 
-	public FrameExitActionListener(QFixMessengerFrame frame)
+	public QFixMessengerException(String message)
 	{
-		this.frame = frame;
+		super(message);
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent e)
+	public QFixMessengerException(String message, Throwable ex)
 	{
-		frame.exitFrame();
+		super(message, ex);
 	}
 }

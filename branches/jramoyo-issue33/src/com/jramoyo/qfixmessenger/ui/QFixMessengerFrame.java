@@ -87,6 +87,7 @@ import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
@@ -94,7 +95,6 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -193,8 +193,6 @@ public class QFixMessengerFrame extends JFrame
 	private final FixDictionary fixTDictionary;
 
 	private final ReadWriteLock contentLock;
-
-	private JAXBContext jaxbContext;
 
 	private String frameTitle;
 
@@ -307,20 +305,12 @@ public class QFixMessengerFrame extends JFrame
 
 		contentLock = new ReentrantReadWriteLock();
 
-		try
-		{
-			jaxbContext = JAXBContext.newInstance("com.jramoyo.fix.xml");
-		} catch (JAXBException ex)
-		{
-			logger.error("Unable to create JAXB context for com.jramoyo.fix.xml");
-			System.exit(1);
-		}
 	}
 
 	/**
-	 * Gracefully exits the application
+	 * Disposes the frame and gracefully exits the application
 	 */
-	public void exit()
+	public void exitFrame()
 	{
 		int choice = JOptionPane.showConfirmDialog(this,
 				"Exit QuickFIX Messenger?", "Quit", JOptionPane.YES_NO_OPTION);
@@ -343,19 +333,9 @@ public class QFixMessengerFrame extends JFrame
 					return;
 				}
 			}
-			setVisible(false);
+			dispose();
 			messenger.exit();
 		}
-	}
-
-	/**
-	 * Returns the JAXB context
-	 * 
-	 * @return the JAXB context
-	 */
-	public JAXBContext getJaxbContext()
-	{
-		return jaxbContext;
 	}
 
 	/**
@@ -417,7 +397,13 @@ public class QFixMessengerFrame extends JFrame
 		setSize(screenWidth / 2, screenHeight / 2);
 		setLocation(screenWidth / 4, screenHeight / 4);
 
-		setVisible(true);
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				setVisible(true);
+			}
+		});
 	}
 
 	/**
@@ -459,7 +445,8 @@ public class QFixMessengerFrame extends JFrame
 				JAXBElement<MessageType> rootElement = new JAXBElement<MessageType>(
 						new QName("http://xml.fix.jramoyo.com", "message"),
 						MessageType.class, xmlMessageType);
-				Marshaller marshaller = jaxbContext.createMarshaller();
+				Marshaller marshaller = messenger.getJaxbContext()
+						.createMarshaller();
 				marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
 						Boolean.TRUE);
 				marshaller.marshal(rootElement, file);
@@ -507,7 +494,8 @@ public class QFixMessengerFrame extends JFrame
 			JAXBElement<ProjectType> rootElement = new JAXBElement<ProjectType>(
 					new QName("http://xml.fix.jramoyo.com", "project"),
 					ProjectType.class, xmlProjectType);
-			Marshaller marshaller = jaxbContext.createMarshaller();
+			Marshaller marshaller = messenger.getJaxbContext()
+					.createMarshaller();
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
 					Boolean.TRUE);
 			marshaller.marshal(rootElement, xmlProjectFile);
@@ -1768,7 +1756,7 @@ public class QFixMessengerFrame extends JFrame
 		@Override
 		public void windowClosing(WindowEvent e)
 		{
-			frame.exit();
+			frame.exitFrame();
 		}
 	}
 
@@ -2013,7 +2001,8 @@ public class QFixMessengerFrame extends JFrame
 							{
 								logger.info("Sending message "
 										+ message.toString());
-								session.send(message);
+								frame.getMessenger().sendQFixMessage(message,
+										session);
 							}
 						}
 					} else

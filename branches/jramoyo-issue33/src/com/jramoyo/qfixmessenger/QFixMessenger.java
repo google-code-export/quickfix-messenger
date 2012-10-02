@@ -39,10 +39,13 @@ import java.io.InputStream;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.UIManager;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +56,7 @@ import quickfix.DefaultMessageFactory;
 import quickfix.FileLogFactory;
 import quickfix.FileStoreFactory;
 import quickfix.LogFactory;
+import quickfix.Message;
 import quickfix.MessageFactory;
 import quickfix.MessageStoreFactory;
 import quickfix.Session;
@@ -60,11 +64,14 @@ import quickfix.SessionID;
 import quickfix.SessionSettings;
 import quickfix.SocketAcceptor;
 import quickfix.SocketInitiator;
+import quickfix.field.ApplVerID;
 
 import com.jramoyo.fix.model.parser.FixDictionaryParser;
+import com.jramoyo.fix.xml.MessageType;
 import com.jramoyo.qfixmessenger.config.QFixMessengerConfig;
 import com.jramoyo.qfixmessenger.quickfix.QFixMessengerApplication;
 import com.jramoyo.qfixmessenger.quickfix.parser.QFixDictionaryParser;
+import com.jramoyo.qfixmessenger.quickfix.util.QFixUtil;
 import com.jramoyo.qfixmessenger.ui.QFixMessengerFrame;
 
 /**
@@ -77,43 +84,6 @@ public class QFixMessenger
 	private static final Logger logger = LoggerFactory
 			.getLogger(QFixMessenger.class);
 	private static final CountDownLatch shutdownLatch = new CountDownLatch(1);
-
-	private final QFixMessengerConfig config;
-	private final FixDictionaryParser parser;
-
-	private final QFixMessengerApplication application;
-	private final Connector connector;
-	private final AtomicBoolean connectorStarted;
-
-	private QFixMessenger(String configFileName, SessionSettings settings)
-			throws ConfigError, IOException
-	{
-		// Load application configuration
-		config = new QFixMessengerConfig(configFileName);
-
-		// Create the dictionary parser
-		parser = new QFixDictionaryParser(config.getNoOfParserThreads());
-
-		// Create the QuickFIX application
-		application = new QFixMessengerApplication(settings);
-
-		// Initialise the factories
-		MessageStoreFactory messageStoreFactory = new FileStoreFactory(settings);
-		LogFactory logFactory = new FileLogFactory(settings);
-		MessageFactory messageFactory = new DefaultMessageFactory();
-
-		if (config.isInitiator())
-		{
-			connector = new SocketInitiator(application, messageStoreFactory,
-					settings, logFactory, messageFactory);
-		} else
-		{
-			connector = new SocketAcceptor(application, messageStoreFactory,
-					settings, logFactory, messageFactory);
-		}
-
-		connectorStarted = new AtomicBoolean(false);
-	}
 
 	public static void main(String[] args) throws Exception
 	{
@@ -198,6 +168,60 @@ public class QFixMessenger
 		}
 	}
 
+	private final QFixMessengerConfig config;
+
+	private final FixDictionaryParser parser;
+
+	private final QFixMessengerApplication application;
+
+	private final Connector connector;
+
+	private final AtomicBoolean connectorStarted;
+
+	private JAXBContext jaxbContext;
+
+	private QFixMessenger(String configFileName, SessionSettings settings)
+			throws ConfigError, IOException
+	{
+		// Load application configuration
+		config = new QFixMessengerConfig(configFileName);
+
+		// Create the dictionary parser
+		parser = new QFixDictionaryParser(config.getNoOfParserThreads());
+
+		// Create the QuickFIX application
+		application = new QFixMessengerApplication(settings);
+
+		// Initialise the factories
+		MessageStoreFactory messageStoreFactory = new FileStoreFactory(settings);
+		LogFactory logFactory = new FileLogFactory(settings);
+		MessageFactory messageFactory = new DefaultMessageFactory();
+
+		if (config.isInitiator())
+		{
+			connector = new SocketInitiator(application, messageStoreFactory,
+					settings, logFactory, messageFactory);
+		} else
+		{
+			connector = new SocketAcceptor(application, messageStoreFactory,
+					settings, logFactory, messageFactory);
+		}
+
+		connectorStarted = new AtomicBoolean(false);
+
+		try
+		{
+			jaxbContext = JAXBContext.newInstance("com.jramoyo.fix.xml");
+		} catch (JAXBException ex)
+		{
+			logger.error("Unable to create JAXB context for com.jramoyo.fix.xml");
+			System.exit(1);
+		}
+	}
+
+	/**
+	 * Gracefully exits the application
+	 */
 	public void exit()
 	{
 		logout();
@@ -205,26 +229,59 @@ public class QFixMessenger
 		shutdownLatch.countDown();
 	}
 
+	/**
+	 * Returns the QuickFIX application
+	 * 
+	 * @return the QuickFIX application
+	 */
 	public QFixMessengerApplication getApplication()
 	{
 		return application;
 	}
 
+	/**
+	 * Returns the QuickFIX configuration
+	 * 
+	 * @return the QuickFIX configuration
+	 */
 	public QFixMessengerConfig getConfig()
 	{
 		return config;
 	}
 
+	/**
+	 * Returns the QuickFIX connector
+	 * 
+	 * @return the QuickFIX connector
+	 */
 	public Connector getConnector()
 	{
 		return connector;
 	}
 
+	/**
+	 * Returns the JAXB context
+	 * 
+	 * @return the JAXB context
+	 */
+	public JAXBContext getJaxbContext()
+	{
+		return jaxbContext;
+	}
+
+	/**
+	 * Returns the FixDictionaryParser
+	 * 
+	 * @return the FixDictionaryParser
+	 */
 	public FixDictionaryParser getParser()
 	{
 		return parser;
 	}
 
+	/**
+	 * Logs the connector on
+	 */
 	public void logon()
 	{
 		if (!connectorStarted.get())
@@ -248,6 +305,9 @@ public class QFixMessenger
 		}
 	}
 
+	/**
+	 * Logs the connector out
+	 */
 	public void logout()
 	{
 		Iterator<SessionID> sessionIds = connector.getSessions().iterator();
@@ -258,4 +318,64 @@ public class QFixMessenger
 		}
 	}
 
+	/**
+	 * Sends a QuickFIX Message across a given session
+	 * 
+	 * @param message
+	 *            a QuickFIX Message
+	 * @param session
+	 *            a QuickFIX Session
+	 * @return whether the message was sent or not
+	 */
+	public boolean sendQFixMessage(Message message, Session session)
+	{
+		logger.info("Sending message: " + message.toString());
+		return session.send(message);
+	}
+
+	/**
+	 * Converts an XML Message to a QuickFIX Message and sends it across the
+	 * session
+	 * 
+	 * @param xmlMessageType
+	 *            an XML Message
+	 * @return whether the message was sent or not
+	 * @throws QFixMessengerException
+	 */
+	public boolean sendXmlMessage(MessageType xmlMessageType)
+			throws QFixMessengerException
+	{
+		Session session = null;
+		List<SessionID> sessionIds = connector.getSessions();
+		for (SessionID sessionId : sessionIds)
+		{
+			if (QFixUtil.getSessionName(sessionId).equals(
+					xmlMessageType.getSession().getName()))
+			{
+				session = Session.lookupSession(sessionId);
+			}
+		}
+
+		if (session != null)
+		{
+			quickfix.Message message = session.getMessageFactory().create(
+					session.getSessionID().getBeginString(),
+					xmlMessageType.getMsgType());
+
+			if (xmlMessageType.getSession().getAppVersionId() != null)
+			{
+				ApplVerID applVerID = new ApplVerID(xmlMessageType.getSession()
+						.getAppVersionId());
+				message.getHeader().setField(applVerID);
+			}
+
+			// TODO
+
+			return sendQFixMessage(message, session);
+		} else
+		{
+			throw new QFixMessengerException("Unrecognized session: "
+					+ xmlMessageType.getSession().getName());
+		}
+	}
 }
