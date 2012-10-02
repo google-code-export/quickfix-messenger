@@ -144,7 +144,6 @@ import com.jramoyo.qfixmessenger.ui.renderers.SessionsListCellRenderer;
  */
 public class QFixMessengerFrame extends JFrame
 {
-
 	public static final int LEFT_PANEL_WIDTH = 170;
 
 	public static final int MIDDLE_PANEL_WIDTH = 600;
@@ -165,8 +164,7 @@ public class QFixMessengerFrame extends JFrame
 
 	private final QFixMessenger messenger;
 
-	// This will no longer suffice once we have other FIXT versions
-	public final FixDictionary fixTDictionary;
+	private final FixDictionary fixTDictionary;
 
 	private String frameTitle;
 
@@ -231,8 +229,6 @@ public class QFixMessengerFrame extends JFrame
 	private JButton sendButton;
 
 	private JTable messagesTable;
-
-	private JPanel mainPanel;
 
 	private MessagePanel messagePanel;
 
@@ -390,11 +386,27 @@ public class QFixMessengerFrame extends JFrame
 	 */
 	public void loadXmlMessage(MessageType xmlMessageType)
 	{
+		class MessageLoader implements Runnable
+		{
+			private final MessageType xmlMessageType;
+
+			private MessageLoader(MessageType xmlMessageType)
+			{
+				this.xmlMessageType = xmlMessageType;
+			}
+
+			@Override
+			public void run()
+			{
+				messagePanel.populate(xmlMessageType);
+			}
+		}
+
 		if (selectSession(xmlMessageType.getSession()))
 		{
 			if (selectMessage(xmlMessageType))
 			{
-				messagePanel.populate(xmlMessageType);
+				SwingUtilities.invokeLater(new MessageLoader(xmlMessageType));
 			}
 		}
 	}
@@ -1057,6 +1069,7 @@ public class QFixMessengerFrame extends JFrame
 		bodyMembers.clear();
 		trailerMembers.clear();
 
+		JPanel mainPanel;
 		if (activeMessage != null)
 		{
 			if (!activeMessage.equals(freeTextMessage))
@@ -1106,13 +1119,23 @@ public class QFixMessengerFrame extends JFrame
 			mainPanel = blankPanel;
 		}
 
-		SwingUtilities.invokeLater(new Runnable()
+		class PanelLoader implements Runnable
 		{
+			private final JPanel panel;
+
+			private PanelLoader(JPanel panel)
+			{
+				this.panel = panel;
+			}
+
+			@Override
 			public void run()
 			{
-				mainPanelScrollPane.getViewport().add(mainPanel);
+				mainPanelScrollPane.getViewport().add(panel);
 			}
-		});
+		}
+
+		SwingUtilities.invokeLater(new PanelLoader(mainPanel));
 	}
 
 	private void loadMessagesList()
@@ -1304,7 +1327,7 @@ public class QFixMessengerFrame extends JFrame
 					ProjectType xmlProjectType = frame.getXmlProjectType();
 					xmlProjectType.getMessages().getMessage()
 							.add(xmlMessageType);
-					frame.projectFrame.addedMessage(xmlMessageType);
+					frame.projectFrame.updateMessageAdded(xmlMessageType);
 				} else
 				{
 					JOptionPane.showMessageDialog(frame,

@@ -73,12 +73,6 @@ public class ProjectFrame extends JFrame
 		this.xmlProjectType = xmlProjectType;
 	}
 
-	public void addedMessage(MessageType xmlMessageType)
-	{
-		((ProjectTreeModel) projectTree.getModel())
-				.updateMessageAdded(xmlMessageType);
-	}
-
 	public void launch()
 	{
 		setIconImage(new ImageIcon(frame.getMessenger().getConfig()
@@ -101,6 +95,12 @@ public class ProjectFrame extends JFrame
 	public void reload()
 	{
 		((ProjectTreeModel) projectTree.getModel()).update();
+	}
+
+	public void updateMessageAdded(MessageType xmlMessageType)
+	{
+		((ProjectTreeModel) projectTree.getModel())
+				.updateMessageAdded(xmlMessageType);
 	}
 
 	private void initComponents()
