@@ -37,9 +37,33 @@ import com.jramoyo.fix.model.Member;
 /**
  * @author jamoyo
  */
-public interface MemberPanel
+public interface MemberPanel<M extends Member, Q, X>
 {
+	/**
+	 * Returns the FIX String representation of this MemberPanel
+	 * 
+	 * @return the FIX String representation of this MemberPanel
+	 */
 	String getFixString();
 
-	Member getMember();
+	/**
+	 * Returns the member
+	 * 
+	 * @return the member
+	 */
+	M getMember();
+
+	/**
+	 * Returns the QuickFIX representation of this MemberPanel
+	 * 
+	 * @return the QuickFIX representation of this MemberPanel
+	 */
+	Q getQuickFixMember();
+
+	/**
+	 * Returns the XML representation of this MemberPanel
+	 * 
+	 * @return the XML representation of this MemberPanel
+	 */
+	X getXmlMember();
 }

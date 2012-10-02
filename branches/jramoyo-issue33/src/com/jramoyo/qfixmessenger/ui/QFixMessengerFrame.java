@@ -240,31 +240,31 @@ public class QFixMessengerFrame extends JFrame
 
 	private ProjectFrame projectFrame;
 
-	private List<MemberPanel> headerMembers;
+	private List<MemberPanel<?, ?, ?>> headerMembers;
 
-	private List<MemberPanel> prevHeaderMembers;
+	private List<MemberPanel<?, ?, ?>> prevHeaderMembers;
 
-	private List<MemberPanel> bodyMembers;
+	private List<MemberPanel<?, ?, ?>> bodyMembers;
 
-	private List<MemberPanel> prevBodyMembers;
+	private List<MemberPanel<?, ?, ?>> prevBodyMembers;
 
-	private List<MemberPanel> trailerMembers;
+	private List<MemberPanel<?, ?, ?>> trailerMembers;
 
-	private List<MemberPanel> prevTrailerMembers;
+	private List<MemberPanel<?, ?, ?>> prevTrailerMembers;
 
 	public QFixMessengerFrame(QFixMessenger messenger)
 	{
 		super();
 		this.messenger = messenger;
 
-		this.headerMembers = new ArrayList<MemberPanel>();
-		this.prevHeaderMembers = new ArrayList<MemberPanel>();
+		this.headerMembers = new ArrayList<MemberPanel<?, ?, ?>>();
+		this.prevHeaderMembers = new ArrayList<MemberPanel<?, ?, ?>>();
 
-		this.bodyMembers = new ArrayList<MemberPanel>();
-		this.prevBodyMembers = new ArrayList<MemberPanel>();
+		this.bodyMembers = new ArrayList<MemberPanel<?, ?, ?>>();
+		this.prevBodyMembers = new ArrayList<MemberPanel<?, ?, ?>>();
 
-		this.trailerMembers = new ArrayList<MemberPanel>();
-		this.prevTrailerMembers = new ArrayList<MemberPanel>();
+		this.trailerMembers = new ArrayList<MemberPanel<?, ?, ?>>();
+		this.prevTrailerMembers = new ArrayList<MemberPanel<?, ?, ?>>();
 
 		FixDictionaryParser parser = messenger.getParser();
 		String fixTDictionaryFile = messenger.getConfig()
@@ -1300,7 +1300,7 @@ public class QFixMessengerFrame extends JFrame
 				if (!frame.activeMessage.equals(frame.freeTextMessage))
 				{
 					MessageType xmlMessageType = frame.messagePanel
-							.getXmlMessage();
+							.getXmlMember();
 					ProjectType xmlProjectType = frame.getXmlProjectType();
 					xmlProjectType.getMessages().getMessage()
 							.add(xmlMessageType);
@@ -1372,7 +1372,7 @@ public class QFixMessengerFrame extends JFrame
 				if (!frame.activeMessage.equals(frame.freeTextMessage))
 				{
 					MessageType xmlMessageType = frame.messagePanel
-							.getXmlMessage();
+							.getXmlMember();
 					frame.marshallXmlMessage(xmlMessageType);
 				} else
 				{
@@ -1621,11 +1621,11 @@ public class QFixMessengerFrame extends JFrame
 						quickfix.Message message = null;
 						if (!frame.activeMessage.equals(frame.freeTextMessage))
 						{
-							message = frame.messagePanel.getQuickFixMessage();
+							message = frame.messagePanel.getQuickFixMember();
 						} else
 						{
 							message = frame.freeTextMessagePanel
-									.getQuickFixMessage();
+									.getQuickFixMember();
 						}
 
 						if (message != null)

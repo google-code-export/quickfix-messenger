@@ -40,6 +40,7 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -58,11 +59,13 @@ import com.jramoyo.fix.xml.FieldType;
 import com.jramoyo.fix.xml.GroupsType;
 import com.jramoyo.fix.xml.ObjectFactory;
 import com.jramoyo.qfixmessenger.QFixMessengerConstants;
+import com.jramoyo.qfixmessenger.ui.panels.ComponentPanel.QFixComponentWrapper;
 
 /**
  * @author jamoyo
  */
-public class ComponentPanel extends AbstractMemberPanel
+public class ComponentPanel extends
+		AbstractMemberPanel<Component, QFixComponentWrapper, ComponentType>
 {
 	private static final long serialVersionUID = 1982089310942186498L;
 
@@ -72,9 +75,9 @@ public class ComponentPanel extends AbstractMemberPanel
 
 	private final boolean isRequiredOnly;
 
-	private final List<MemberPanel> members;
+	private final List<MemberPanel<?, ?, ?>> members;
 
-	private final List<MemberPanel> prevMembers;
+	private final List<MemberPanel<?, ?, ?>> prevMembers;
 
 	private JLabel componentLabel;
 
@@ -87,87 +90,10 @@ public class ComponentPanel extends AbstractMemberPanel
 		this.isRequiredOnly = isRequiredOnly;
 		this.isRequired = isRequired;
 
-		this.members = new ArrayList<MemberPanel>();
-		this.prevMembers = new ArrayList<MemberPanel>();
+		this.members = new ArrayList<MemberPanel<?, ?, ?>>();
+		this.prevMembers = new ArrayList<MemberPanel<?, ?, ?>>();
 
 		initComponents();
-	}
-
-	public ComponentType getXmlComponent()
-	{
-		ObjectFactory xmlObjectFactory = new ObjectFactory();
-		ComponentType xmlComponentType = xmlObjectFactory.createComponentType();
-		xmlComponentType.setName(component.getName());
-
-		for (MemberPanel memberPanel : members)
-		{
-			if (memberPanel instanceof FieldPanel)
-			{
-				FieldType xmlFieldType = ((FieldPanel) memberPanel)
-						.getXmlField();
-				if (xmlFieldType != null)
-				{
-					xmlComponentType.getFieldOrGroupsOrComponent().add(
-							xmlFieldType);
-				}
-			}
-
-			if (memberPanel instanceof GroupPanel)
-			{
-				GroupsType xmlGroupsTypeMember = ((GroupPanel) memberPanel)
-						.getXmlGroups();
-				if (xmlGroupsTypeMember != null)
-				{
-					xmlComponentType.getFieldOrGroupsOrComponent().add(
-							xmlGroupsTypeMember);
-				}
-			}
-		}
-
-		return xmlComponentType;
-	}
-
-	/*
-	 * This is a work-around because QuickFIX does not provide a non type-safe
-	 * representation message components.
-	 */
-	public List<StringField> getQuickFixFields()
-	{
-		List<StringField> qfixFields = new ArrayList<StringField>();
-
-		for (MemberPanel memberPanel : members)
-		{
-			if (memberPanel instanceof FieldPanel)
-			{
-				FieldPanel fieldPanel = (FieldPanel) memberPanel;
-				if (fieldPanel.getQuickFixField() != null)
-				{
-					qfixFields.add(fieldPanel.getQuickFixField());
-				}
-			}
-		}
-
-		return qfixFields;
-	}
-
-	/*
-	 * This is a work-around because QuickFIX does not provide a non type-safe
-	 * representation message components.
-	 */
-	public List<quickfix.Group> getQuickFixGroups()
-	{
-		List<quickfix.Group> qfixGroups = new ArrayList<quickfix.Group>();
-
-		for (MemberPanel memberPanel : members)
-		{
-			if (memberPanel instanceof GroupPanel)
-			{
-				GroupPanel groupPanel = (GroupPanel) memberPanel;
-				qfixGroups.addAll(groupPanel.getQuickFixGroups());
-			}
-		}
-
-		return qfixGroups;
 	}
 
 	@Override
@@ -185,9 +111,75 @@ public class ComponentPanel extends AbstractMemberPanel
 	}
 
 	@Override
-	public Member getMember()
+	public Component getMember()
 	{
 		return component;
+	}
+
+	@Override
+	public QFixComponentWrapper getQuickFixMember()
+	{
+		List<StringField> qfixFields = new ArrayList<StringField>();
+
+		for (MemberPanel<?, ?, ?> memberPanel : members)
+		{
+			if (memberPanel instanceof FieldPanel)
+			{
+				FieldPanel fieldPanel = (FieldPanel) memberPanel;
+				if (fieldPanel.getQuickFixMember() != null)
+				{
+					qfixFields.add(fieldPanel.getQuickFixMember());
+				}
+			}
+		}
+
+		List<quickfix.Group> qfixGroups = new ArrayList<quickfix.Group>();
+
+		for (MemberPanel<?, ?, ?> memberPanel : members)
+		{
+			if (memberPanel instanceof GroupPanel)
+			{
+				GroupPanel groupPanel = (GroupPanel) memberPanel;
+				qfixGroups.addAll(groupPanel.getQuickFixMember());
+			}
+		}
+
+		return new QFixComponentWrapper(qfixFields, qfixGroups);
+	}
+
+	@Override
+	public ComponentType getXmlMember()
+	{
+		ObjectFactory xmlObjectFactory = new ObjectFactory();
+		ComponentType xmlComponentType = xmlObjectFactory.createComponentType();
+		xmlComponentType.setName(component.getName());
+
+		for (MemberPanel<?, ?, ?> memberPanel : members)
+		{
+			if (memberPanel instanceof FieldPanel)
+			{
+				FieldType xmlFieldType = ((FieldPanel) memberPanel)
+						.getXmlMember();
+				if (xmlFieldType != null)
+				{
+					xmlComponentType.getFieldOrGroupsOrComponent().add(
+							xmlFieldType);
+				}
+			}
+
+			if (memberPanel instanceof GroupPanel)
+			{
+				GroupsType xmlGroupsTypeMember = ((GroupPanel) memberPanel)
+						.getXmlMember();
+				if (xmlGroupsTypeMember != null)
+				{
+					xmlComponentType.getFieldOrGroupsOrComponent().add(
+							xmlGroupsTypeMember);
+				}
+			}
+		}
+
+		return xmlComponentType;
 	}
 
 	public void populate(ComponentType xmlComponentType)
@@ -339,5 +331,28 @@ public class ComponentPanel extends AbstractMemberPanel
 
 		// Cleanup
 		prevMembers.clear();
+	}
+
+	public static class QFixComponentWrapper
+	{
+		private final List<StringField> fields;
+		private final List<quickfix.Group> groups;
+
+		private QFixComponentWrapper(List<StringField> fields,
+				List<quickfix.Group> groups)
+		{
+			this.fields = fields;
+			this.groups = groups;
+		}
+
+		public List<StringField> getFields()
+		{
+			return Collections.unmodifiableList(fields);
+		}
+
+		public List<quickfix.Group> getGroups()
+		{
+			return Collections.unmodifiableList(groups);
+		}
 	}
 }

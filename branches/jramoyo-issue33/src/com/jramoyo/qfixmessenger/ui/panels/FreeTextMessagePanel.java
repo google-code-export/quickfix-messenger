@@ -48,17 +48,17 @@ import javax.swing.border.TitledBorder;
 import quickfix.ConfigError;
 import quickfix.DataDictionary;
 import quickfix.InvalidMessage;
-import quickfix.Message;
 import quickfix.Session;
 
-import com.jramoyo.fix.model.Member;
+import com.jramoyo.fix.model.Message;
 import com.jramoyo.fix.xml.MessageType;
 import com.jramoyo.qfixmessenger.QFixMessenger;
 
 /**
  * @author jamoyo
  */
-public class FreeTextMessagePanel extends JPanel implements MemberPanel
+public class FreeTextMessagePanel extends JPanel implements
+		MemberPanel<Message, quickfix.Message, MessageType>
 {
 	private static final long serialVersionUID = -7614167852761624847L;
 
@@ -83,31 +83,6 @@ public class FreeTextMessagePanel extends JPanel implements MemberPanel
 		initComponents();
 	}
 
-	private void initComponents()
-	{
-		setLayout(new BorderLayout());
-
-		TitledBorder titledBorder = new TitledBorder(
-				new LineBorder(Color.BLACK), "Free Text");
-		// TODO Workaround for Java Bug ID: 7022041
-		Font trailerTitleBorderFont = UIManager.getDefaults().getFont(
-				"TitledBorder.font");
-		if (trailerTitleBorderFont != null)
-		{
-			titledBorder.setTitleFont(new Font(
-					trailerTitleBorderFont.getName(), Font.BOLD, 15));
-		}
-		setBorder(titledBorder);
-
-		messageTextArea = new JTextArea(5, 60);
-		messageTextArea.setLineWrap(true);
-
-		JScrollPane messageTextScrollPane = new JScrollPane(messageTextArea);
-		messageTextScrollPane.setBorder(new EtchedBorder());
-
-		add(messageTextScrollPane, BorderLayout.NORTH);
-	}
-
 	@Override
 	public String getFixString()
 	{
@@ -115,18 +90,13 @@ public class FreeTextMessagePanel extends JPanel implements MemberPanel
 	}
 
 	@Override
-	public Member getMember()
+	public Message getMember()
 	{
 		return null;
 	}
 
-	public MessageType getXmlMessage()
-	{
-		throw new IllegalStateException(
-				"FreeTextMessagePanel does not support XML Messages!");
-	}
-
-	public Message getQuickFixMessage()
+	@Override
+	public quickfix.Message getQuickFixMember()
 	{
 		quickfix.Message message = null;
 		try
@@ -172,9 +142,42 @@ public class FreeTextMessagePanel extends JPanel implements MemberPanel
 		return message;
 	}
 
+	@Override
+	public MessageType getXmlMember()
+	{
+		throw new IllegalStateException(
+				"FreeTextMessagePanel does not support XML Messages!");
+	}
+
 	public void populate(MessageType xmlMessageType)
 	{
 		throw new IllegalStateException(
 				"FreeTextMessagePanel does not support XML Messages!");
 	}
+
+	private void initComponents()
+	{
+		setLayout(new BorderLayout());
+
+		TitledBorder titledBorder = new TitledBorder(
+				new LineBorder(Color.BLACK), "Free Text");
+		// TODO Workaround for Java Bug ID: 7022041
+		Font trailerTitleBorderFont = UIManager.getDefaults().getFont(
+				"TitledBorder.font");
+		if (trailerTitleBorderFont != null)
+		{
+			titledBorder.setTitleFont(new Font(
+					trailerTitleBorderFont.getName(), Font.BOLD, 15));
+		}
+		setBorder(titledBorder);
+
+		messageTextArea = new JTextArea(5, 60);
+		messageTextArea.setLineWrap(true);
+
+		JScrollPane messageTextScrollPane = new JScrollPane(messageTextArea);
+		messageTextScrollPane.setBorder(new EtchedBorder());
+
+		add(messageTextScrollPane, BorderLayout.NORTH);
+	}
+
 }
