@@ -45,13 +45,27 @@ import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
+import quickfix.Session;
+import quickfix.StringField;
+import quickfix.field.ApplVerID;
+
 import com.jramoyo.fix.model.Component;
 import com.jramoyo.fix.model.Field;
 import com.jramoyo.fix.model.FixDictionary;
 import com.jramoyo.fix.model.Group;
 import com.jramoyo.fix.model.Member;
 import com.jramoyo.fix.model.Message;
+import com.jramoyo.fix.xml.BodyType;
+import com.jramoyo.fix.xml.ComponentType;
+import com.jramoyo.fix.xml.FieldType;
+import com.jramoyo.fix.xml.GroupsType;
+import com.jramoyo.fix.xml.HeaderType;
 import com.jramoyo.fix.xml.MessageType;
+import com.jramoyo.fix.xml.ObjectFactory;
+import com.jramoyo.fix.xml.SessionType;
+import com.jramoyo.fix.xml.TrailerType;
+import com.jramoyo.qfixmessenger.QFixMessengerConstants;
+import com.jramoyo.qfixmessenger.quickfix.util.QFixUtil;
 import com.jramoyo.qfixmessenger.ui.QFixMessengerFrame;
 
 /**
@@ -60,6 +74,10 @@ import com.jramoyo.qfixmessenger.ui.QFixMessengerFrame;
 public class MessagePanel extends JPanel implements MemberPanel
 {
 	private static final long serialVersionUID = 7937359075224178112L;
+
+	private final Session session;
+
+	private final String appVersion;
 
 	private final Message message;
 
@@ -83,12 +101,15 @@ public class MessagePanel extends JPanel implements MemberPanel
 
 	private final List<MemberPanel> prevTrailerMembers;
 
-	private final FixDictionary activeDictionary;
+	private final FixDictionary dictionary;
 
 	private final FixDictionary fixTDictionary;
 
 	private MessagePanel(MessagePanelBuilder builder)
 	{
+		this.session = builder.session;
+		this.appVersion = builder.appVersion;
+
 		this.message = builder.message;
 
 		this.isRequiredOnly = builder.isRequiredOnly;
@@ -104,7 +125,7 @@ public class MessagePanel extends JPanel implements MemberPanel
 		this.prevBodyMembers = builder.prevBodyMembers;
 		this.prevTrailerMembers = builder.prevTrailerMembers;
 
-		this.activeDictionary = builder.activeDictionary;
+		this.dictionary = builder.dictionary;
 		this.fixTDictionary = builder.fixTDictionary;
 
 		initComponents();
@@ -147,8 +168,8 @@ public class MessagePanel extends JPanel implements MemberPanel
 
 			if (!isFixTSession)
 			{
-				for (Entry<Member, Boolean> entry : activeDictionary
-						.getHeader().getMembers().entrySet())
+				for (Entry<Member, Boolean> entry : dictionary.getHeader()
+						.getMembers().entrySet())
 				{
 					loadMember(headerPanel, prevHeaderMembers, headerMembers,
 							entry);
@@ -211,8 +232,8 @@ public class MessagePanel extends JPanel implements MemberPanel
 
 			if (!isFixTSession)
 			{
-				for (Entry<Member, Boolean> entry : activeDictionary
-						.getTrailer().getMembers().entrySet())
+				for (Entry<Member, Boolean> entry : dictionary.getTrailer()
+						.getMembers().entrySet())
 				{
 					loadMember(trailerPanel, prevTrailerMembers,
 							trailerMembers, entry);
@@ -301,20 +322,258 @@ public class MessagePanel extends JPanel implements MemberPanel
 
 	public MessageType getXmlMessage()
 	{
-		return null;
+		ObjectFactory xmlObjectFactory = new ObjectFactory();
+
+		MessageType xmlMessageType = xmlObjectFactory.createMessageType();
+		xmlMessageType.setName(message.getName());
+		xmlMessageType.setMsgType(message.getMsgType());
+		xmlMessageType.setIsRequiredOnly(isRequiredOnly);
+
+		SessionType xmlSessionType = xmlObjectFactory.createSessionType();
+		xmlSessionType.setName(QFixUtil.getSessionName(session.getSessionID()));
+		if (isFixTSession)
+		{
+			xmlSessionType.setAppVersionId(appVersion);
+		}
+
+		HeaderType xmlHeaderType = null;
+		BodyType xmlBodyType = null;
+		TrailerType xmlTrailerType = null;
+
+		if (isModifyHeader)
+		{
+			xmlHeaderType = xmlObjectFactory.createHeaderType();
+			for (MemberPanel memberPanel : headerMembers)
+			{
+				if (memberPanel instanceof FieldPanel)
+				{
+					FieldPanel fieldPanel = (FieldPanel) memberPanel;
+					FieldType xmlFieldType = fieldPanel.getXmlField();
+					if (xmlFieldType != null)
+					{
+						xmlHeaderType.getField().add(xmlFieldType);
+					}
+				}
+			}
+		}
+
+		xmlBodyType = xmlObjectFactory.createBodyType();
+		for (MemberPanel memberPanel : bodyMembers)
+		{
+			if (memberPanel instanceof FieldPanel)
+			{
+				FieldPanel fieldPanel = (FieldPanel) memberPanel;
+				FieldType xmlFieldType = fieldPanel.getXmlField();
+				if (xmlFieldType != null)
+				{
+					xmlBodyType.getFieldOrGroupsOrComponent().add(xmlFieldType);
+				}
+			}
+
+			if (memberPanel instanceof GroupPanel)
+			{
+				GroupPanel groupPanel = (GroupPanel) memberPanel;
+				GroupsType xmlGroupsType = groupPanel.getXmlGroups();
+				if (xmlGroupsType != null)
+				{
+					xmlBodyType.getFieldOrGroupsOrComponent()
+							.add(xmlGroupsType);
+				}
+			}
+
+			if (memberPanel instanceof ComponentPanel)
+			{
+				ComponentPanel componentPanel = (ComponentPanel) memberPanel;
+				ComponentType xmlComponentType = componentPanel
+						.getXmlComponent();
+				if (xmlComponentType != null)
+				{
+					xmlBodyType.getFieldOrGroupsOrComponent().add(
+							componentPanel.getXmlComponent());
+				}
+			}
+		}
+
+		if (isModifyTrailer)
+		{
+			xmlTrailerType = xmlObjectFactory.createTrailerType();
+			for (MemberPanel memberPanel : trailerMembers)
+			{
+				if (memberPanel instanceof FieldPanel)
+				{
+					FieldPanel fieldPanel = (FieldPanel) memberPanel;
+					FieldType xmlFieldType = fieldPanel.getXmlField();
+					if (xmlFieldType != null)
+					{
+						xmlTrailerType.getField().add(xmlFieldType);
+					}
+				}
+			}
+		}
+
+		xmlMessageType.setSession(xmlSessionType);
+		xmlMessageType.setHeader(xmlHeaderType);
+		xmlMessageType.setBody(xmlBodyType);
+		xmlMessageType.setTrailer(xmlTrailerType);
+
+		return xmlMessageType;
 	}
 
 	public quickfix.Message getQuickFixMessage()
 	{
-		return null;
+		quickfix.Message qfixMessage = session.getMessageFactory().create(
+				session.getSessionID().getBeginString(), message.getMsgType());
+
+		if (isFixTSession)
+		{
+			ApplVerID applVerID = new ApplVerID(
+					QFixMessengerConstants.APPVER_ID_MAP.get(appVersion));
+			qfixMessage.getHeader().setField(applVerID);
+		}
+
+		if (isModifyHeader)
+		{
+			for (MemberPanel memberPanel : headerMembers)
+			{
+				if (memberPanel instanceof FieldPanel)
+				{
+					FieldPanel fieldPanel = (FieldPanel) memberPanel;
+					if (fieldPanel.getQuickFixField() != null)
+					{
+						qfixMessage.getHeader().setField(
+								fieldPanel.getQuickFixField());
+					}
+				}
+			}
+		}
+
+		for (MemberPanel memberPanel : bodyMembers)
+		{
+			if (memberPanel instanceof FieldPanel)
+			{
+				FieldPanel fieldPanel = (FieldPanel) memberPanel;
+				if (fieldPanel.getQuickFixField() != null)
+				{
+					qfixMessage.setField(fieldPanel.getQuickFixField());
+				}
+			}
+
+			if (memberPanel instanceof GroupPanel)
+			{
+				GroupPanel groupPanel = (GroupPanel) memberPanel;
+				for (quickfix.Group group : groupPanel.getQuickFixGroups())
+				{
+					qfixMessage.addGroup(group);
+				}
+			}
+
+			if (memberPanel instanceof ComponentPanel)
+			{
+				ComponentPanel componentPanel = (ComponentPanel) memberPanel;
+				for (quickfix.StringField field : componentPanel
+						.getQuickFixFields())
+				{
+					qfixMessage.setField(field);
+				}
+
+				for (quickfix.Group group : componentPanel.getQuickFixGroups())
+				{
+					qfixMessage.addGroup(group);
+				}
+			}
+		}
+
+		if (isModifyTrailer)
+		{
+			for (MemberPanel memberPanel : trailerMembers)
+			{
+				if (memberPanel instanceof FieldPanel)
+				{
+					FieldPanel fieldPanel = (FieldPanel) memberPanel;
+					if (fieldPanel.getQuickFixField() != null)
+					{
+						StringField field = fieldPanel.getQuickFixField();
+						qfixMessage.getTrailer().setField(field);
+					}
+				}
+			}
+		}
+
+		return qfixMessage;
 	}
 
 	public void populate(MessageType xmlMessageType)
 	{
+		HeaderType xmlHeaderType = xmlMessageType.getHeader();
+		if (xmlHeaderType != null)
+		{
+			for (Object xmlMember : xmlHeaderType.getField())
+			{
+				if (xmlMember instanceof FieldType)
+				{
+					FieldType xmlFieldType = (FieldType) xmlMember;
+					FieldPanel fieldPanel = (FieldPanel) MemberPanelUtil
+							.findMemberPanelByName(xmlFieldType.getName(),
+									headerMembers);
+					fieldPanel.populate(xmlFieldType);
+				}
+			}
+		}
+
+		BodyType xmlBodyType = xmlMessageType.getBody();
+		for (Object xmlMember : xmlBodyType.getFieldOrGroupsOrComponent())
+		{
+			if (xmlMember instanceof FieldType)
+			{
+				FieldType xmlFieldType = (FieldType) xmlMember;
+				FieldPanel fieldPanel = (FieldPanel) MemberPanelUtil
+						.findMemberPanelByName(xmlFieldType.getName(),
+								bodyMembers);
+				fieldPanel.populate(xmlFieldType);
+			}
+
+			if (xmlMember instanceof GroupsType)
+			{
+				GroupsType xmlGroupsType = (GroupsType) xmlMember;
+				GroupPanel groupPanel = (GroupPanel) MemberPanelUtil
+						.findMemberPanelByName(xmlGroupsType.getName(),
+								bodyMembers);
+				groupPanel.populate(xmlGroupsType);
+			}
+
+			if (xmlMember instanceof ComponentType)
+			{
+				ComponentType xmlComponentTypeMember = (ComponentType) xmlMember;
+				ComponentPanel componentPanel = (ComponentPanel) MemberPanelUtil
+						.findMemberPanelByName(
+								xmlComponentTypeMember.getName(), bodyMembers);
+				componentPanel.populate(xmlComponentTypeMember);
+			}
+		}
+
+		TrailerType xmlTrailerType = xmlMessageType.getTrailer();
+		if (xmlTrailerType != null)
+		{
+			for (Object xmlMember : xmlTrailerType.getField())
+			{
+				if (xmlMember instanceof FieldType)
+				{
+					FieldType xmlFieldType = (FieldType) xmlMember;
+					FieldPanel fieldPanel = (FieldPanel) MemberPanelUtil
+							.findMemberPanelByName(xmlFieldType.getName(),
+									trailerMembers);
+					fieldPanel.populate(xmlFieldType);
+				}
+			}
+		}
 	}
 
 	public static class MessagePanelBuilder
 	{
+		private Session session;
+
+		private String appVersion;
+
 		private Message message;
 
 		private boolean isRequiredOnly;
@@ -337,13 +596,33 @@ public class MessagePanel extends JPanel implements MemberPanel
 
 		private List<MemberPanel> prevTrailerMembers;
 
-		private FixDictionary activeDictionary;
+		private FixDictionary dictionary;
 
 		private FixDictionary fixTDictionary;
 
 		public MessagePanel build()
 		{
 			return new MessagePanel(this);
+		}
+
+		public Session getSession()
+		{
+			return session;
+		}
+
+		public void setSession(Session session)
+		{
+			this.session = session;
+		}
+
+		public String getAppVersion()
+		{
+			return appVersion;
+		}
+
+		public void setAppVersion(String appVersion)
+		{
+			this.appVersion = appVersion;
 		}
 
 		public Message getMessage()
@@ -361,7 +640,7 @@ public class MessagePanel extends JPanel implements MemberPanel
 			return isRequiredOnly;
 		}
 
-		public void setRequiredOnly(boolean isRequiredOnly)
+		public void setIsRequiredOnly(boolean isRequiredOnly)
 		{
 			this.isRequiredOnly = isRequiredOnly;
 		}
@@ -371,7 +650,7 @@ public class MessagePanel extends JPanel implements MemberPanel
 			return isModifyHeader;
 		}
 
-		public void setModifyHeader(boolean isModifyHeader)
+		public void setIsModifyHeader(boolean isModifyHeader)
 		{
 			this.isModifyHeader = isModifyHeader;
 		}
@@ -381,7 +660,7 @@ public class MessagePanel extends JPanel implements MemberPanel
 			return isModifyTrailer;
 		}
 
-		public void setModifyTrailer(boolean isModifyTrailer)
+		public void setIsModifyTrailer(boolean isModifyTrailer)
 		{
 			this.isModifyTrailer = isModifyTrailer;
 		}
@@ -391,7 +670,7 @@ public class MessagePanel extends JPanel implements MemberPanel
 			return isFixTSession;
 		}
 
-		public void setFixTSession(boolean isFixTSession)
+		public void setIsFixTSession(boolean isFixTSession)
 		{
 			this.isFixTSession = isFixTSession;
 		}
@@ -456,14 +735,14 @@ public class MessagePanel extends JPanel implements MemberPanel
 			this.prevTrailerMembers = prevTrailerMembers;
 		}
 
-		public FixDictionary getActiveDictionary()
+		public FixDictionary getDictionary()
 		{
-			return activeDictionary;
+			return dictionary;
 		}
 
-		public void setActiveDictionary(FixDictionary activeDictionary)
+		public void setDictionary(FixDictionary dictionary)
 		{
-			this.activeDictionary = activeDictionary;
+			this.dictionary = dictionary;
 		}
 
 		public FixDictionary getFixTDictionary()
