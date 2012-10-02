@@ -7,4 +7,24 @@ It is a tool designed for technical individuals working on the Financial Informa
 
 QuickFIX Messenger is ideal for testing different messages and scenarios on FIX infrastructures.
 
-*TODO*
+= Getting Started =
+_Note that this guide requires QuickFIX Messenger version 2.0 or higher._
+
+== Downloading QuickFIX/J ==
+Download the binary distribution of the desired QuickFIX/J version from [http://sourceforge.net/projects/quickfixj/files/QuickFIX_J/ SourceForge].
+
+Binary distributions are usually named: 
+   * `quickfixj-<version>-bin.zip`
+   * `quickfixj-<version>.tar.gz`
+
+== Updating the QuickFIX/J Library ==
+   # Extract the distribution package to a desired directory location
+   # Copy `quickfixj-all-<version>.jar`
+   # Paste to the `<qfix-messenger>/lib/` directory
+   # Delete the JAR file of the previous version
+
+== Updating the QuickFIX/J Data Dictionaries ==
+   # Go to `<quickfixj>/etc/`
+   # Copy all `XML` files (`FIX*.xml` and `FIXT*.xml`)
+   # Paste to the `<qfix-messenger>/resources/` directory
+   # Overwrite files when required
