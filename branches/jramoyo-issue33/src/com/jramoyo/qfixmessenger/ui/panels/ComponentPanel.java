@@ -72,9 +72,9 @@ public class ComponentPanel extends AbstractMemberPanel
 
 	private final boolean isRequiredOnly;
 
-	private List<MemberPanel> members;
+	private final List<MemberPanel> members;
 
-	private List<MemberPanel> prevMembers;
+	private final List<MemberPanel> prevMembers;
 
 	private JLabel componentLabel;
 

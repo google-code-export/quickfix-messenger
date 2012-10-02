@@ -169,6 +169,11 @@ import com.jramoyo.qfixmessenger.ui.renderers.SessionsListCellRenderer;
  */
 public class QFixMessengerFrame extends JFrame
 {
+
+	public static final int LEFT_PANEL_WIDTH = 170;
+
+	public static final int MIDDLE_PANEL_WIDTH = 600;
+
 	private static final long serialVersionUID = 7906369617506618477L;
 
 	private static final Logger logger = LoggerFactory
@@ -178,10 +183,6 @@ public class QFixMessengerFrame extends JFrame
 
 	private static final String EMPTY_PROJECT = "None";
 
-	private static final int LEFT_PANEL_WIDTH = 170;
-
-	private static final int MIDDLE_PANEL_WIDTH = 600;
-
 	private final Message freeTextMessage = new Message("Free Text",
 			"FIX Message", null, new HashMap<Member, Boolean>());
 
@@ -190,7 +191,7 @@ public class QFixMessengerFrame extends JFrame
 	private final QFixMessenger messenger;
 
 	// This will no longer suffice once we have other FIXT versions
-	private final FixDictionary fixTDictionary;
+	public final FixDictionary fixTDictionary;
 
 	private final ReadWriteLock contentLock;
 
@@ -227,6 +228,7 @@ public class QFixMessengerFrame extends JFrame
 	private JMenu windowMenu;
 
 	private JMenuItem closeProjectMenuItem;
+
 	private JMenuItem saveProjectMenuItem;
 
 	private JPanel leftPanel;
@@ -1340,7 +1342,13 @@ public class QFixMessengerFrame extends JFrame
 				prevBodyMembers.clear();
 				trailerMembers.clear();
 
-				mainPanelScrollPane.getViewport().add(blankPanel);
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						mainPanelScrollPane.getViewport().add(blankPanel);
+					}
+				});
 			}
 		} finally
 		{
