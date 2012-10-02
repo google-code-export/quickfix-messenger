@@ -1,4 +1,8 @@
 #summary Guide for changing QuickFIX/J library versions.
 
 = Introduction =
-TODO
+QuickFIX Messenger is a front-end messaging application built around the [http://www.quickfixj.org QuickFIX/J] engine.
+
+It is a tool designed for individuals working on the Financial Information eXchange Protocol ("[http://fixprotocol.org/ FIX]"), an industry-driven messaging standard for the electronic communication of trade-related messages.
+
+QuickFIX Messenger is ideal for testing different messages and scenarios on your FIX infrastructure.
