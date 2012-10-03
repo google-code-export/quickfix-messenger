@@ -40,7 +40,6 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -59,13 +58,13 @@ import com.jramoyo.fix.xml.FieldType;
 import com.jramoyo.fix.xml.GroupsType;
 import com.jramoyo.fix.xml.ObjectFactory;
 import com.jramoyo.qfixmessenger.QFixMessengerConstants;
-import com.jramoyo.qfixmessenger.ui.panels.ComponentPanel.QFixComponentWrapper;
+import com.jramoyo.qfixmessenger.quickfix.ComponentHelper;
 
 /**
  * @author jamoyo
  */
 public class ComponentPanel extends
-		AbstractMemberPanel<Component, QFixComponentWrapper, ComponentType>
+		AbstractMemberPanel<Component, ComponentHelper, ComponentType>
 {
 	private static final long serialVersionUID = 1982089310942186498L;
 
@@ -117,10 +116,9 @@ public class ComponentPanel extends
 	}
 
 	@Override
-	public QFixComponentWrapper getQuickFixMember()
+	public ComponentHelper getQuickFixMember()
 	{
-		List<StringField> qfixFields = new ArrayList<StringField>();
-
+		List<StringField> fields = new ArrayList<StringField>();
 		for (MemberPanel<?, ?, ?> memberPanel : members)
 		{
 			if (memberPanel instanceof FieldPanel)
@@ -128,23 +126,22 @@ public class ComponentPanel extends
 				FieldPanel fieldPanel = (FieldPanel) memberPanel;
 				if (fieldPanel.getQuickFixMember() != null)
 				{
-					qfixFields.add(fieldPanel.getQuickFixMember());
+					fields.add(fieldPanel.getQuickFixMember());
 				}
 			}
 		}
 
-		List<quickfix.Group> qfixGroups = new ArrayList<quickfix.Group>();
-
+		List<quickfix.Group> groups = new ArrayList<quickfix.Group>();
 		for (MemberPanel<?, ?, ?> memberPanel : members)
 		{
 			if (memberPanel instanceof GroupPanel)
 			{
 				GroupPanel groupPanel = (GroupPanel) memberPanel;
-				qfixGroups.addAll(groupPanel.getQuickFixMember());
+				groups.addAll(groupPanel.getQuickFixMember());
 			}
 		}
 
-		return new QFixComponentWrapper(qfixFields, qfixGroups);
+		return new ComponentHelper(fields, groups);
 	}
 
 	@Override
@@ -331,28 +328,5 @@ public class ComponentPanel extends
 
 		// Cleanup
 		prevMembers.clear();
-	}
-
-	public static class QFixComponentWrapper
-	{
-		private final List<StringField> fields;
-		private final List<quickfix.Group> groups;
-
-		private QFixComponentWrapper(List<StringField> fields,
-				List<quickfix.Group> groups)
-		{
-			this.fields = fields;
-			this.groups = groups;
-		}
-
-		public List<StringField> getFields()
-		{
-			return Collections.unmodifiableList(fields);
-		}
-
-		public List<quickfix.Group> getGroups()
-		{
-			return Collections.unmodifiableList(groups);
-		}
 	}
 }

@@ -37,6 +37,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -55,6 +56,7 @@ import quickfix.Connector;
 import quickfix.DefaultMessageFactory;
 import quickfix.FileLogFactory;
 import quickfix.FileStoreFactory;
+import quickfix.Group;
 import quickfix.LogFactory;
 import quickfix.Message;
 import quickfix.MessageFactory;
@@ -64,11 +66,20 @@ import quickfix.SessionID;
 import quickfix.SessionSettings;
 import quickfix.SocketAcceptor;
 import quickfix.SocketInitiator;
+import quickfix.StringField;
 import quickfix.field.ApplVerID;
 
 import com.jramoyo.fix.model.parser.FixDictionaryParser;
+import com.jramoyo.fix.xml.BodyType;
+import com.jramoyo.fix.xml.ComponentType;
+import com.jramoyo.fix.xml.FieldType;
+import com.jramoyo.fix.xml.GroupType;
+import com.jramoyo.fix.xml.GroupsType;
+import com.jramoyo.fix.xml.HeaderType;
 import com.jramoyo.fix.xml.MessageType;
+import com.jramoyo.fix.xml.TrailerType;
 import com.jramoyo.qfixmessenger.config.QFixMessengerConfig;
+import com.jramoyo.qfixmessenger.quickfix.ComponentHelper;
 import com.jramoyo.qfixmessenger.quickfix.QFixMessengerApplication;
 import com.jramoyo.qfixmessenger.quickfix.parser.QFixDictionaryParser;
 import com.jramoyo.qfixmessenger.quickfix.util.QFixUtil;
@@ -358,24 +369,174 @@ public class QFixMessenger
 
 		if (session != null)
 		{
-			quickfix.Message message = session.getMessageFactory().create(
-					session.getSessionID().getBeginString(),
-					xmlMessageType.getMsgType());
-
-			if (xmlMessageType.getSession().getAppVersionId() != null)
+			if (session.isLoggedOn())
 			{
-				ApplVerID applVerID = new ApplVerID(xmlMessageType.getSession()
-						.getAppVersionId());
-				message.getHeader().setField(applVerID);
+				quickfix.Message message = session.getMessageFactory().create(
+						session.getSessionID().getBeginString(),
+						xmlMessageType.getMsgType());
+
+				if (xmlMessageType.getSession().getAppVersionId() != null)
+				{
+					ApplVerID applVerID = new ApplVerID(
+							QFixMessengerConstants.APPVER_ID_MAP
+									.get(xmlMessageType.getSession()
+											.getAppVersionId()));
+					message.getHeader().setField(applVerID);
+				}
+
+				if (xmlMessageType.getHeader() != null)
+				{
+					HeaderType xmlHeaderType = xmlMessageType.getHeader();
+					for (FieldType xmlFieldType : xmlHeaderType.getField())
+					{
+						message.getHeader().setField(
+								createStringField(xmlFieldType));
+					}
+				}
+
+				BodyType xmlBodyType = xmlMessageType.getBody();
+				for (Object xmlObject : xmlBodyType
+						.getFieldOrGroupsOrComponent())
+				{
+					if (xmlObject instanceof FieldType)
+					{
+						FieldType xmlFieldType = (FieldType) xmlObject;
+						message.setField(createStringField(xmlFieldType));
+					}
+
+					else if (xmlObject instanceof GroupsType)
+					{
+						GroupsType xmlGroupsType = (GroupsType) xmlObject;
+						for (Group group : createGroups(xmlGroupsType))
+						{
+							message.addGroup(group);
+						}
+					}
+
+					else if (xmlObject instanceof ComponentType)
+					{
+						ComponentType xmlComponentType = (ComponentType) xmlObject;
+						ComponentHelper componentHelper = createComponent(xmlComponentType);
+						for (StringField stringField : componentHelper
+								.getFields())
+						{
+							message.setField(stringField);
+						}
+
+						for (Group group : componentHelper.getGroups())
+						{
+							message.addGroup(group);
+						}
+					}
+				}
+
+				if (xmlMessageType.getTrailer() != null)
+				{
+					TrailerType xmlTrailerType = xmlMessageType.getTrailer();
+					for (FieldType xmlFieldType : xmlTrailerType.getField())
+					{
+						message.getTrailer().setField(
+								createStringField(xmlFieldType));
+					}
+				}
+
+				return sendQFixMessage(message, session);
+			} else
+			{
+				throw new QFixMessengerException("Session not logged on: "
+						+ xmlMessageType.getSession().getName());
 			}
-
-			// TODO
-
-			return sendQFixMessage(message, session);
 		} else
 		{
 			throw new QFixMessengerException("Unrecognized session: "
 					+ xmlMessageType.getSession().getName());
 		}
+	}
+
+	private ComponentHelper createComponent(ComponentType xmlComponentType)
+	{
+		List<StringField> fields = new ArrayList<StringField>();
+		for (Object xmlObject : xmlComponentType.getFieldOrGroupsOrComponent())
+		{
+			if (xmlObject instanceof FieldType)
+			{
+				fields.add(createStringField((FieldType) xmlObject));
+			}
+		}
+
+		List<quickfix.Group> groups = new ArrayList<quickfix.Group>();
+		for (Object xmlObject : xmlComponentType.getFieldOrGroupsOrComponent())
+		{
+			if (xmlObject instanceof GroupsType)
+			{
+				groups.addAll(createGroups((GroupsType) xmlObject));
+			}
+		}
+
+		return new ComponentHelper(fields, groups);
+	}
+
+	private List<Group> createGroups(GroupsType xmlGroupsType)
+	{
+		List<Group> groups = new ArrayList<Group>();
+
+		for (GroupType xmlGroupType : xmlGroupsType.getGroup())
+		{
+			Object firstMember = xmlGroupType.getFieldOrGroupsOrComponent()
+					.get(0);
+			FieldType firstFieldType;
+			if (firstMember instanceof ComponentType)
+			{
+				firstFieldType = (FieldType) ((ComponentType) firstMember)
+						.getFieldOrGroupsOrComponent().get(0);
+			} else
+			{
+				firstFieldType = (FieldType) firstMember;
+			}
+
+			Group group = new Group(xmlGroupsType.getId(),
+					firstFieldType.getId());
+			for (Object xmlObject : xmlGroupType.getFieldOrGroupsOrComponent())
+			{
+				if (xmlObject instanceof FieldType)
+				{
+					FieldType xmlFieldType = (FieldType) xmlObject;
+					group.setField(createStringField(xmlFieldType));
+				}
+
+				else if (xmlObject instanceof GroupsType)
+				{
+					GroupsType memberXmlGroupsType = (GroupsType) xmlObject;
+					for (Group memberGroup : createGroups(memberXmlGroupsType))
+					{
+						group.addGroup(memberGroup);
+					}
+				}
+
+				else if (xmlObject instanceof ComponentType)
+				{
+					ComponentType xmlComponentType = (ComponentType) xmlObject;
+					ComponentHelper componentHelper = createComponent(xmlComponentType);
+					for (StringField stringField : componentHelper.getFields())
+					{
+						group.setField(stringField);
+					}
+
+					for (Group memberGroup : componentHelper.getGroups())
+					{
+						group.addGroup(memberGroup);
+					}
+				}
+			}
+
+			groups.add(group);
+		}
+
+		return groups;
+	}
+
+	private StringField createStringField(FieldType xmlFieldType)
+	{
+		return new StringField(xmlFieldType.getId(), xmlFieldType.getValue());
 	}
 }

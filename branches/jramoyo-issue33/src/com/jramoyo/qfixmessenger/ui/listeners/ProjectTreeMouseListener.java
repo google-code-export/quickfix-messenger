@@ -90,7 +90,7 @@ public class ProjectTreeMouseListener extends MouseAdapter
 						{
 							JOptionPane.showMessageDialog(
 									frame.getProjectFrame(),
-									"Unable to send message: "
+									"Unable to send message:\n"
 											+ ex.getMessage(), "Error",
 									JOptionPane.ERROR_MESSAGE);
 							break;
@@ -177,7 +177,7 @@ public class ProjectTreeMouseListener extends MouseAdapter
 						{
 							JOptionPane.showMessageDialog(
 									frame.getProjectFrame(),
-									"Unable to send message: "
+									"Unable to send message:\n"
 											+ ex.getMessage(), "Error",
 									JOptionPane.ERROR_MESSAGE);
 						}
@@ -188,6 +188,16 @@ public class ProjectTreeMouseListener extends MouseAdapter
 				exportMenuItem.setIcon(new ImageIcon(frame.getMessenger()
 						.getConfig().getIconsLocation()
 						+ Icons.EXPORT_ICON));
+				exportMenuItem.addActionListener(new ActionListener()
+				{
+					@Override
+					public void actionPerformed(ActionEvent e)
+					{
+						MessageType xmlMessageType = (MessageType) projectTree
+								.getLastSelectedPathComponent();
+						frame.marshallXmlMessage(xmlMessageType);
+					}
+				});
 
 				JMenuItem deleteMessageMenuItem = new JMenuItem(
 						"Delete Message");
