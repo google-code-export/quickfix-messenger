@@ -236,15 +236,9 @@ public class QFixMessengerFrame extends JFrame
 
 	private ProjectFrame projectFrame;
 
-	private List<MemberPanel<?, ?, ?>> headerMembers;
-
 	private List<MemberPanel<?, ?, ?>> prevHeaderMembers;
 
-	private List<MemberPanel<?, ?, ?>> bodyMembers;
-
 	private List<MemberPanel<?, ?, ?>> prevBodyMembers;
-
-	private List<MemberPanel<?, ?, ?>> trailerMembers;
 
 	private List<MemberPanel<?, ?, ?>> prevTrailerMembers;
 
@@ -253,13 +247,8 @@ public class QFixMessengerFrame extends JFrame
 		super();
 		this.messenger = messenger;
 
-		this.headerMembers = new ArrayList<MemberPanel<?, ?, ?>>();
 		this.prevHeaderMembers = new ArrayList<MemberPanel<?, ?, ?>>();
-
-		this.bodyMembers = new ArrayList<MemberPanel<?, ?, ?>>();
 		this.prevBodyMembers = new ArrayList<MemberPanel<?, ?, ?>>();
-
-		this.trailerMembers = new ArrayList<MemberPanel<?, ?, ?>>();
 		this.prevTrailerMembers = new ArrayList<MemberPanel<?, ?, ?>>();
 
 		FixDictionaryParser parser = messenger.getParser();
@@ -1056,18 +1045,12 @@ public class QFixMessengerFrame extends JFrame
 
 	private void loadMainPanel()
 	{
-		prevHeaderMembers.clear();
-		prevHeaderMembers.addAll(bodyMembers);
-
-		prevBodyMembers.clear();
-		prevBodyMembers.addAll(bodyMembers);
-
-		prevTrailerMembers.clear();
-		prevTrailerMembers.addAll(bodyMembers);
-
-		headerMembers.clear();
-		bodyMembers.clear();
-		trailerMembers.clear();
+		if (messagePanel != null)
+		{
+			prevHeaderMembers.addAll(messagePanel.getHeaderMembers());
+			prevBodyMembers.addAll(messagePanel.getBodyMembers());
+			prevTrailerMembers.addAll(messagePanel.getTrailerMembers());
+		}
 
 		JPanel mainPanel;
 		if (activeMessage != null)
@@ -1083,9 +1066,6 @@ public class QFixMessengerFrame extends JFrame
 				builder.setIsModifyHeader(isModifyHeader);
 				builder.setIsModifyTrailer(isModifyTrailer);
 				builder.setIsFixTSession(isFixTSession);
-				builder.setHeaderMembers(headerMembers);
-				builder.setBodyMembers(bodyMembers);
-				builder.setTrailerMembers(trailerMembers);
 				builder.setPrevHeaderMembers(prevHeaderMembers);
 				builder.setPrevBodyMembers(prevBodyMembers);
 				builder.setPrevTrailerMembers(prevTrailerMembers);
@@ -1106,7 +1086,7 @@ public class QFixMessengerFrame extends JFrame
 
 				prevHeaderMembers.clear();
 				prevBodyMembers.clear();
-				trailerMembers.clear();
+				prevTrailerMembers.clear();
 
 				mainPanel = freeTextMessagePanel;
 			}
@@ -1114,7 +1094,7 @@ public class QFixMessengerFrame extends JFrame
 		{
 			prevHeaderMembers.clear();
 			prevBodyMembers.clear();
-			trailerMembers.clear();
+			prevTrailerMembers.clear();
 
 			mainPanel = blankPanel;
 		}

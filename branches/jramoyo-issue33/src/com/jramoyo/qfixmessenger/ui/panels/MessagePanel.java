@@ -35,6 +35,8 @@ package com.jramoyo.qfixmessenger.ui.panels;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -118,9 +120,9 @@ public class MessagePanel extends JPanel implements
 		this.isModifyTrailer = builder.isModifyTrailer;
 		this.isFixTSession = builder.isFixTSession;
 
-		this.headerMembers = builder.headerMembers;
-		this.bodyMembers = builder.bodyMembers;
-		this.trailerMembers = builder.trailerMembers;
+		this.headerMembers = new ArrayList<MemberPanel<?, ?, ?>>();
+		this.bodyMembers = new ArrayList<MemberPanel<?, ?, ?>>();
+		this.trailerMembers = new ArrayList<MemberPanel<?, ?, ?>>();
 
 		this.prevHeaderMembers = builder.prevHeaderMembers;
 		this.prevBodyMembers = builder.prevBodyMembers;
@@ -130,6 +132,21 @@ public class MessagePanel extends JPanel implements
 		this.fixTDictionary = builder.fixTDictionary;
 
 		initComponents();
+	}
+
+	public List<MemberPanel<?, ?, ?>> getHeaderMembers()
+	{
+		return Collections.unmodifiableList(headerMembers);
+	}
+
+	public List<MemberPanel<?, ?, ?>> getBodyMembers()
+	{
+		return Collections.unmodifiableList(bodyMembers);
+	}
+
+	public List<MemberPanel<?, ?, ?>> getTrailerMembers()
+	{
+		return Collections.unmodifiableList(trailerMembers);
 	}
 
 	@Override
@@ -397,19 +414,6 @@ public class MessagePanel extends JPanel implements
 
 	private void initComponents()
 	{
-		prevHeaderMembers.clear();
-		prevHeaderMembers.addAll(bodyMembers);
-
-		prevBodyMembers.clear();
-		prevBodyMembers.addAll(bodyMembers);
-
-		prevTrailerMembers.clear();
-		prevTrailerMembers.addAll(bodyMembers);
-
-		headerMembers.clear();
-		bodyMembers.clear();
-		trailerMembers.clear();
-
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 		// Load the header
@@ -587,12 +591,6 @@ public class MessagePanel extends JPanel implements
 
 		private boolean isFixTSession;
 
-		private List<MemberPanel<?, ?, ?>> headerMembers;
-
-		private List<MemberPanel<?, ?, ?>> bodyMembers;
-
-		private List<MemberPanel<?, ?, ?>> trailerMembers;
-
 		private List<MemberPanel<?, ?, ?>> prevHeaderMembers;
 
 		private List<MemberPanel<?, ?, ?>> prevBodyMembers;
@@ -613,11 +611,6 @@ public class MessagePanel extends JPanel implements
 			return appVersion;
 		}
 
-		public List<MemberPanel<?, ?, ?>> getBodyMembers()
-		{
-			return bodyMembers;
-		}
-
 		public FixDictionary getDictionary()
 		{
 			return dictionary;
@@ -626,11 +619,6 @@ public class MessagePanel extends JPanel implements
 		public FixDictionary getFixTDictionary()
 		{
 			return fixTDictionary;
-		}
-
-		public List<MemberPanel<?, ?, ?>> getHeaderMembers()
-		{
-			return headerMembers;
 		}
 
 		public Message getMessage()
@@ -658,11 +646,6 @@ public class MessagePanel extends JPanel implements
 			return session;
 		}
 
-		public List<MemberPanel<?, ?, ?>> getTrailerMembers()
-		{
-			return trailerMembers;
-		}
-
 		public boolean isFixTSession()
 		{
 			return isFixTSession;
@@ -688,11 +671,6 @@ public class MessagePanel extends JPanel implements
 			this.appVersion = appVersion;
 		}
 
-		public void setBodyMembers(List<MemberPanel<?, ?, ?>> bodyMembers)
-		{
-			this.bodyMembers = bodyMembers;
-		}
-
 		public void setDictionary(FixDictionary dictionary)
 		{
 			this.dictionary = dictionary;
@@ -701,11 +679,6 @@ public class MessagePanel extends JPanel implements
 		public void setFixTDictionary(FixDictionary fixTDictionary)
 		{
 			this.fixTDictionary = fixTDictionary;
-		}
-
-		public void setHeaderMembers(List<MemberPanel<?, ?, ?>> headerMembers)
-		{
-			this.headerMembers = headerMembers;
 		}
 
 		public void setIsFixTSession(boolean isFixTSession)
@@ -755,11 +728,5 @@ public class MessagePanel extends JPanel implements
 		{
 			this.session = session;
 		}
-
-		public void setTrailerMembers(List<MemberPanel<?, ?, ?>> trailerMembers)
-		{
-			this.trailerMembers = trailerMembers;
-		}
-
 	}
 }

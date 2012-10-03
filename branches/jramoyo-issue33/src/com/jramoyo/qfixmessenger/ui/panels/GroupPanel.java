@@ -86,7 +86,7 @@ public class GroupPanel extends
 
 	private JTextField groupTextField;
 
-	private JButton generateButton;
+	private JButton setButton;
 
 	private JScrollPane membersScrollPane;
 
@@ -305,8 +305,8 @@ public class GroupPanel extends
 				BoxLayout.X_AXIS));
 
 		groupTextField = new JTextField();
-		generateButton = new JButton("Generate");
-		generateButton.addActionListener(new ActionListener()
+		setButton = new JButton("Set");
+		setButton.addActionListener(new ActionListener()
 		{
 			@Override
 			public void actionPerformed(ActionEvent e)
@@ -316,7 +316,7 @@ public class GroupPanel extends
 		});
 
 		groupValuePanel.add(groupTextField);
-		groupValuePanel.add(generateButton);
+		groupValuePanel.add(setButton);
 
 		membersScrollPane = new JScrollPane();
 
