@@ -1,4 +1,4 @@
-#summary QuickFIX Messenger User's Manual.
+#summary QuickFIX Messenger User's Guide.
 
 = Introduction =
 
