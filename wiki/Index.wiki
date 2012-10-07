@@ -13,7 +13,7 @@ QuickFIX Messenger is ideal for testing different messages and scenarios on FIX 
 == Downloading QuickFIX Messenger ==
 QuickFIX Messenger can be downloaded as an executable binary or can be built from source.
 
-Both binary and source distributions can be downloaded from [http://code.google.com/p/quickfix-messenger/downloads/list Google Code]
+Both binary and source distributions are available for download at [http://code.google.com/p/quickfix-messenger/downloads/list Google Code]
 
 === Executable Binary ===
 Unless planning to make changes to the default distribution, it is recommended to download the executable binary.
@@ -21,44 +21,44 @@ Unless planning to make changes to the default distribution, it is recommended t
 The binary distribution file is usually named `qfix-messenger-<version>-bin.zip`.
 
 === Source ===
-The source distribution contains an Eclipse project which can be directly imported to an existing Eclipse workspace.
+The source distribution contains an [http://www.eclipse.org/downloads/ Eclipse] project which can be directly imported to an existing Eclipse workspace.
 
 The source distribution file is usually named `qfix-messenger-<version>-src.zip`.
 
 == Running QuickFIX Messenger ==
-As of version 1.1, the binary distribution includes executable batch files for an Initiator instance and an Acceptor instance. Both batch files comes in 2 flavors: (`qfix-messenger-<instance>.bat` for Windows, `qfix-messenger=<instance>.sh` for Linux/Unix).
+The binary distribution includes executable scripts for an _Initiator_ instance and an _Acceptor_ instance. Both scripts come in 2 flavors: *`qfix-messenger-<instance>.bat`* for Windows, *`qfix-messenger-<instance>.sh`* for Linux/Unix.
 
-By default, QuickFIX Messenger uses a cross-platform look-and-feel called [http://sourceforge.net/projects/lipstiklf/ Lipstik]. To switch to the native look-and-feel of the OS, run QuickFIX Messenger with the following property:
-{{{-DuseSystemLAF=true}}}
-
-Note that *JRE 1.6* or later is required to run QuickFIX Messenger.
+Note that *Java 7* or later is required to run QuickFIX Messenger.
 
 == Building from Source ==
-The source distribution includes an *Ant* script which should be used to build QuickFIX Messenger. The default target is `clean.deploy` which will build the project and copy all files to the `deploy` directory.
+The source distribution includes an *Ant* script (`build.xml`) which should be used to build QuickFIX Messenger. The default target is `clean.deploy` which will build the project and copy all files to the `deploy` directory.
 
-The `deploy` directory works the same way as the binary distribution.
+The `deploy` directory is structured same way as the binary distribution.
+
+Visit our [http://code.google.com/p/quickfix-messenger/wiki/DevelopersGuide Developer's Guide] for more information.
 
 = User's Manual =
 
 == Configuration == 
-As of version 1.1, QuickFIX Messenger comes with 2 sets of configuration files, one for an Initiator instance (`cfg/initiator`), and another for an Acceptor instance (`cfg/acceptor`).
+QuickFIX Messenger comes with 2 sets of configuration files, one for an Initiator instance (`cfg/initiator`), and another for an Acceptor instance (`cfg/acceptor`).
 
 Each instance comes with 3 configuration files:
   * `log4j.properties` - Configure logging
-  * `messenger.cfg` - Configure the messenger
+  * `messenger.cfg` - Configure the messenger application
   * `quickfix.cfg` - Configure the QuickFIX engine
 
 === Messenger Configuration ===
   * `messenger.isInitiator` - Indicates whether the messenger acts as a connection initiator or not (acceptor)
   * `messenger.parser.threads` - Indicates the number of threads to use when parsing a QuickFIX dictionary XML
   * `messenger.license` - Indicates the file path to the BSD license
-  * `messenger.icon.send` - Indicates which icon to use for the Send Button
+  * `messenger.icons` - Indicates the directory path of the icon files
   * `messenger.home.url` - Indicates the QuickFIX Messenger website
   * `messenger.help.url` - Indicates the QuickFIX Messenger Help website
+  * `messenger.fixwiki.url` - Indicates the FIXwiki website
   * `messenger.dict.fix<version>` - Indicates the file path to the QuickFIX dictionary XML indicated by `version`
 
 === QuickFIX Configuration ===
-Please refer to QuickFIX/J's [http://www.quickfixj.org/quickfixj/usermanual/1.5.0/usage/configuration.html documentation] page for details on how to configure the QuickFIX engine.
+Please refer to QuickFIX/J's [http://www.quickfixj.org/quickfixj/usermanual/1.5.1/usage/configuration.html documentation] page for details on how to configure the QuickFIX engine.
 
 == Using the Graphical User Interface (GUI) ==
 https://quickfix-messenger.googlecode.com/svn/trunk/qfix-messenger-gfx/screen.png
