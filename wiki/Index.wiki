@@ -1,6 +1,7 @@
 #summary QuickFIX Messenger User's Guide.
 
 = Introduction =
+_Note that this guide is updated for the upcoming 2.0 version._
 
 QuickFIX Messenger is a front-end messaging application built around the [http://www.quickfixj.org QuickFIX/J] engine.
 
@@ -43,60 +44,219 @@ Visit our [http://code.google.com/p/quickfix-messenger/wiki/DevelopersGuide Deve
 QuickFIX Messenger comes with 2 sets of configuration files, one for an Initiator instance (`cfg/initiator`), and another for an Acceptor instance (`cfg/acceptor`).
 
 Each instance comes with 3 configuration files:
-  * `log4j.properties` - Configure logging
-  * `messenger.cfg` - Configure the messenger application
-  * `quickfix.cfg` - Configure the QuickFIX engine
+  * *`log4j.properties`* - Configure logging
+  * *`messenger.cfg`* - Configure the messenger application
+  * *`quickfix.cfg`* - Configure the QuickFIX engine
 
 === Messenger Configuration ===
-  * `messenger.isInitiator` - Indicates whether the messenger acts as a connection initiator or not (acceptor)
-  * `messenger.parser.threads` - Indicates the number of threads to use when parsing a QuickFIX dictionary XML
-  * `messenger.license` - Indicates the file path to the BSD license
-  * `messenger.icons` - Indicates the directory path of the icon files
-  * `messenger.home.url` - Indicates the QuickFIX Messenger website
-  * `messenger.help.url` - Indicates the QuickFIX Messenger Help website
-  * `messenger.fixwiki.url` - Indicates the FIXwiki website
-  * `messenger.dict.fix<version>` - Indicates the file path to the QuickFIX dictionary XML indicated by `version`
+  * *`messenger.isInitiator`* - Indicates whether the messenger acts as a connection initiator or not (acceptor)
+  * *`messenger.parser.threads`* - Indicates the number of threads to use when parsing a QuickFIX dictionary XML
+  * *`messenger.license`* - Indicates the file path to the BSD license
+  * *`messenger.icons`* - Indicates the directory path of the icon files
+  * *`messenger.home.url`* - Indicates the QuickFIX Messenger website
+  * *`messenger.help.url`* - Indicates the QuickFIX Messenger Help website
+  * *`messenger.fixwiki.url`* - Indicates the FIXwiki website
+  * *`messenger.dict.fix<version>`* - Indicates the file path to the QuickFIX dictionary XML indicated by `version`
 
 === QuickFIX Configuration ===
 Please refer to QuickFIX/J's [http://www.quickfixj.org/quickfixj/usermanual/1.5.1/usage/configuration.html documentation] page for details on how to configure the QuickFIX engine.
 
-== Using the Graphical User Interface (GUI) ==
-https://quickfix-messenger.googlecode.com/svn/trunk/qfix-messenger-gfx/screen.png
+== Graphical User Interface (GUI) ==
+http://quickfix-messenger.googlecode.com/svn/images/2_0/project-view.png
 
-=== Sessions List ===
-The top left corner of the application lists all sessions configured in the FIX engine. Selecting a session will load all messages allowed for that session. If the selected session is using FIXT, the correct `ApplVerID` must be selected.
+== Creating a Message ==
+ # Select a session from the list; this will display all messages supported by the session's FIX version.
+  * If a FIXT session is selected, select the desired `ApplVerID` to use
+ # Select a message from the list; this will display a form containing all fields available to the message.
+  * By default, only the required fields are displayed. To change this, unselect the _Required Only_ check box.
+  * To show the `Header` fields, select the _Modify Header_ check box.
+  * To show the `Trailer` fields, select the _Modify Trailer_ check box.
 
-Sessions in <font color='blue'>blue</font> are connected, while sessions in <font color='red'>red</font> are disconnected.
+http://quickfix-messenger.googlecode.com/svn/images/2_0/options.png
 
-Right-clicking on the selected session will popup a menu allowing you to disconnect/connect, reset, and view the status of the session.
+== Free Text ==
+Existing FIX message texts (i.e. from a log file) can be used to send a message. Select _Free Text_ from the message list and paste the message to the text area provided.
 
-=== Messages List ===
-All messages allowed on the selected session will be listed on the bottom left corner of the application. Selecting a message will load fields available for that message.
+Note that `CheckSum(10)` and `SendingTime(52)` will automatically be populated/updated by QuickFIX/J.
 
-Messages in <font color='blue'>blue</font> are application messages, while messages in <font color='gray'>gray</font> are session/admin messages
+http://quickfix-messenger.googlecode.com/svn/images/2_0/free-text.png
 
-Double-clicking on a selected message will launch the browser to the selected message's [http://fixwiki.org/ FIXwiki] page.
+== Repeating Groups ==
+For _Repeating Group_ fields, put the desired number of groups and click on _Set_; this is will regenerate the form to display the desired number of groups.
 
-=== Fields ===
-Fields available to a message are shown as a form at the center of the application.
+http://quickfix-messenger.googlecode.com/svn/images/2_0/repeating-group.png
 
-Fields can be filtered to only show required fields. There is also an option whether to modify the header or trailer.
+== Field Checking ==
+While QuickFIX Messenger does not support message validation, it does support checking field formats. This means that a warning symbol will appear if the input value does not match the expected format defined for the field.
 
-Fields whose names are shown in <font color='blue'>blue</font> are required.
+http://quickfix-messenger.googlecode.com/svn/images/2_0/format-check.png
 
-Fields belonging to a message component (FIX 4.3 or later), are displayed under the component name.
+Because QuickFIX Messenger is designed as a testing tool, fields with incorrect format will not prevent the message from being sent.
 
-Double-clicking on the field name will launch the browser to the selected field's [http://fixwiki.org/ FIXwiki] page.
+== Message Actions ==
+ * Click on the _shredder_ button to destroy the message and all fields stored in the cache.
+ * If an active project is available, click on the _tray_ button to add the message to the project.
+ * Click on the _envelope_ button to send the message across the session.
 
-As of version 1.1, QuickFIX Messenger comes with a feature to send FIX messages in free text form. Note that !CheckSum (10) and !SendingTime (52) will automatically be populated by QuickFIX/J.
+http://quickfix-messenger.googlecode.com/svn/images/2_0/buttons.png
 
-https://quickfix-messenger.googlecode.com/svn/trunk/qfix-messenger-gfx/free_text.png
+If the _Preview Before Sending_ check box is selected, a confirmation will popup before the message gets sent.
 
-=== Messages Table ===
-Messages sent or received from the application are logged at the bottom of the application.
+http://quickfix-messenger.googlecode.com/svn/images/2_0/preview.png
 
-Each row of the table represents a FIX message. Rows colored <font color='#FF8040'>orange</font> are received, while rows colored <font color='#669900'>green</font> are sent.
+== Sessions List ==
+Active sessions can be managed from the _Sessions List_
+
+http://quickfix-messenger.googlecode.com/svn/images/2_0/session-popup.png
+
+Selecting _Status_ will display the session details.
+
+http://quickfix-messenger.googlecode.com/svn/images/2_0/session-status.png
+
+== Message Table ==
+Messages sent or received are all logged to the _Message Table_.
+
+Each row in the table represents a FIX message. Rows colored _orange_ are received, while rows colored _green_ are sent.
 
 Double-clicking on a row will popup the details of the message.
 
-https://quickfix-messenger.googlecode.com/svn/trunk/qfix-messenger-gfx/message_details.png
+http://quickfix-messenger.googlecode.com/svn/images/2_0/message-details.png
+
+To clear the table, right-click then select clear.
+
+http://quickfix-messenger.googlecode.com/svn/images/2_0/message-popup.png
+
+== Project View ==
+A separate window is displayed whenever a project is activated (new or open).
+
+All messages added to the project are displayed in the window as a tree. Right-clicking on a selected message brings-up a popup menu.
+
+ * *`Load Message`* - Loads the message to the form
+ * *`Send Message`* - Sends the message across the session
+ * *`Export Message`* - Exports the message as an XML file
+ * *`Delete Message`* - Deletes the message from the project
+ * *`Send All Messages`* - Sends all messages in project
+ * *`Collapse All`* - Collapses the entire tree
+ * *`Expand All`* - Expands the entire tree
+
+At anytime, the Project View window can be activated via _Window_ > _Project Window_ or `CTRL-P`
+
+http://quickfix-messenger.googlecode.com/svn/images/2_0/project-tree.png
+
+== Menus ==
+=== File Menu ===
+http://quickfix-messenger.googlecode.com/svn/images/2_0/file-menu.png
+
+ * *`New Project`* - Creates a new project
+ * *`Save Project`* - Saves the active project
+ * *`Open Project`* - Opens a project
+ * *`Close Project`* - Closes the active project
+ * *`Import Message`* - Imports an XML message to the form
+ * *`Export Message`* - Exports the form message to an XML file
+ * *`Exit`* - Exits the application
+
+=== Session Menu ===
+http://quickfix-messenger.googlecode.com/svn/images/2_0/session-menu.png
+
+ * *`All Sessions - Logon`* - Logon all sessions
+ * *`All Sessions - Logoff`* - Logoff all sessions
+ * *`All Sessions - Reset`* - Reset all sessions
+
+=== Help Menu ===
+http://quickfix-messenger.googlecode.com/svn/images/2_0/help-menu.png
+
+ * *`Help`* - Displays this Wiki page
+ * *`About`* - Displays the application information, including license
+
+=== Window Menu ===
+http://quickfix-messenger.googlecode.com/svn/images/2_0/window-menu.png
+
+ * *`Project Window`* - Opens the _Project View_ of the active project
+
+== FIXWiki ==
+Double-click on fields in the form or messages in the list to bring-up the corresponding FIXWiki page.
+
+= Advanced =
+== Custom Logon ==
+QuickFIX Messenger supports populating certain fields when sending a `Logon(A)` message.
+
+To do this, modify the QuickFIX/J configuration and add the following attributes under a session configuration:
+{{{
+Username=<String>
+Password=<String>
+RawData=<String>
+RawDataLength=<Integer>
+TestMessageIndicator=<Boolean>
+}}}
+
+For example:
+{{{
+[session]
+BeginString=FIX.4.3
+SocketAcceptPort=9879
+Username=username
+Password=password
+RawData=test data
+RawDataLength=9
+TestMessageIndicator=true
+}}}
+
+Note that the configured fields will be populated regardless of the session's FIX version. This means that `Username(553)`, `Password(554)`, and `TestMessageIndicator(464)` will still get populated for FIX versions below 4.3.
+
+== XML Format==
+
+=== Message ===
+Exported messages are saved in an XML file having a structure similar to the message form.
+
+Sample _Message_ XML
+{{{
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:message xmlns:ns2="http://xml.fix.jramoyo.com" name="NewOrderSingle" msgType="D" isRequiredOnly="true">
+    <session>
+        <name>FIXT.1.1:INIT&gt;ACCEPT</name>
+        <appVersionId>FIX.4.4</appVersionId>
+    </session>
+    <body>
+        <field name="ClOrdID" id="11">12345</field>
+        <component name="Instrument">
+            <field name="Symbol" id="55">MSFT</field>
+        </component>
+        <field name="OrdType" id="40">1</field>
+        <component name="OrderQtyData">
+            <field name="OrderQty" id="38">2400</field>
+        </component>
+        <field name="Side" id="54">1</field>
+        <field name="TransactTime" id="60">20120930-14:20:05.917</field>
+    </body>
+</ns2:message>
+}}}
+
+=== Project ===
+Projects are saved in an XML file enclosing multiple Message XMLs.
+
+Sample _Project_ XML
+{{{
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:project xmlns:ns2="http://xml.fix.jramoyo.com" name="Project">
+    <messages>
+        <message name="NewOrderSingle" msgType="D" isRequiredOnly="true">
+            <session>
+                <name>FIXT.1.1:INIT&gt;ACCEPT</name>
+                <appVersionId>FIX.4.4</appVersionId>
+            </session>
+            <body>
+                <field name="ClOrdID" id="11">12345</field>
+                <component name="Instrument">
+                    <field name="Symbol" id="55">MSFT</field>
+                </component>
+                <field name="OrdType" id="40">1</field>
+                <component name="OrderQtyData">
+                    <field name="OrderQty" id="38">2400</field>
+                </component>
+                <field name="Side" id="54">1</field>
+                <field name="TransactTime" id="60">20120930-14:20:05.917</field>
+            </body>
+        </message>      
+    </messages>
+</ns2:project>
+}}}
