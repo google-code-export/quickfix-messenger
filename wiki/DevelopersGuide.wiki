@@ -60,6 +60,42 @@ _This guide assumes that Eclipse (with Subversion plugin) is the chosen IDE._
  # Running in debug mode should work the same way
   * Right-click > Debug As > Java Application
 
+=Source=
+==Packages==
+ * *`com.jramoyo`* - Root package
+  * *`fix`* - Generic FIX-related classes
+   * *`model`* - Generic FIX model classes
+  * *`qfixmessenger`* - QuickFIX Messenger specific classes
+   * *`quickfix`* - QuickFIX/J components
+    * *`parser`* - QuickFIX specific `FixDictionaryParser`
+   * *`ui`* - Swing classes
+    * *`editors`* - TreeCellEditors, TableCellEditors, etc.
+    * *`layers`* - LayerUIs
+    * *`models`* - TreeModels, TableModels, etc.
+    * *`panels`* - JPanels
+    * *`renderers`* - TreeCellRenderers, TableCellRenderers, etc.
+
+==Directories==
+ * *`src`* - Source
+ * *`src-gen`* - Generated source
+ * *`src-test`* - Unit test source
+ * *`lib`* - Libraries
+ * *`package`* - Generated JAR files
+ * *`deploy`* - Executables
+ * *`scripts`* - Executable scripts
+ * *`cfg`* - Sample configuration
+ * *`resources`* - Resources
+  * *`dictionary`* - QuickFIX/J dictionaries (XML)
+  * *`icons`* - Icon files
+  * *`xsd`* - XML schema files
+
+==Ant Targets==
+ * *`clean.build`* - Cleans the project and build the source code
+ * *`clean.package`* - Cleans the project and packages the JAR file
+ * *`clean.deploy`* - Cleans the project and creates a working directory
+ * *`clean.release`* - Cleans the project and creates a binary distribution package 
+ * *`clean.source`* - Cleans the project and creates a source distribution package
+
 =Development Standards=
 ==Code Standards==
 _The included Eclipse project files contains the 'Java Code Style' used throughout the project_
