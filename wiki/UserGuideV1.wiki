@@ -1,5 +1,4 @@
 #summary User's Guide for QuickFIX Messenger Version 1.X
-#labels Deprecated
 
 = Introduction =
 
