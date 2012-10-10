@@ -90,7 +90,7 @@ Note that `CheckSum(10)` and `SendingTime(52)` will automatically be populated/u
 
 ----
 == Repeating Groups ==
-For _Repeating Group_ fields, put the desired number of groups and click on _Set_; this is will regenerate the form to display the desired number of groups.
+For _Repeating Group_ fields, put the desired number of groups and click on _Set_; this is will update the form to display the desired number of groups.
 
 http://quickfix-messenger.googlecode.com/svn/images/2_0/repeating-group.png
 
@@ -150,7 +150,7 @@ All messages added to the project are displayed in the window as a tree. Right-c
  * *`Send Message`* - Sends the message across the session
  * *`Export Message`* - Exports the message as an XML file
  * *`Delete Message`* - Deletes the message from the project
- * *`Send All Messages`* - Sends all messages in project
+ * *`Send All Messages`* - Sends all messages in the project
  * *`Collapse All`* - Collapses the entire tree
  * *`Expand All`* - Expands the entire tree
 
