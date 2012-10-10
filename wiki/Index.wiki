@@ -241,6 +241,10 @@ Linux/Unix example:
 java -DuseSystemLaF=true -cp "$CLASSPATH" com.jramoyo.qfixmessenger.QFixMessenger "cfg/acceptor/messenger.cfg" "cfg/acceptor/quickfix.cfg"
 }}}
 
+QuickFIX Messenger running on a Windows 7 look and feel.
+
+http://quickfix-messenger.googlecode.com/svn/images/2_0/system-laf.png
+
 ----
 == Save Files ==
 QuickFIX Messenger uses XML documents as save files; this allows for a save format that is human-readable and editable from any text editor.
