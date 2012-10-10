@@ -9,6 +9,7 @@ It is a tool designed for technical individuals working on the Financial Informa
 
 QuickFIX Messenger is ideal for testing different messages and scenarios on FIX infrastructures. It provides a simple graphical user interface (GUI) for constructing and sending FIX messages across a given FIX session.
 
+----
 = Getting Started =
 
 == Downloading QuickFIX Messenger ==
@@ -38,6 +39,7 @@ The `deploy` directory is structured same way as the binary distribution.
 
 Visit our [http://code.google.com/p/quickfix-messenger/wiki/DevelopersGuide Developer's Guide] for more information.
 
+----
 = User's Manual =
 
 == Configuration == 
@@ -61,9 +63,11 @@ Each instance comes with 3 configuration files:
 === QuickFIX Configuration ===
 Please refer to QuickFIX/J's [http://www.quickfixj.org/quickfixj/usermanual/1.5.1/usage/configuration.html documentation] page for details on how to configure the QuickFIX engine.
 
+----
 == Graphical User Interface (GUI) ==
 http://quickfix-messenger.googlecode.com/svn/images/2_0/project-view.png
 
+----
 == Creating a Message ==
  # Select a session from the list; this will display all messages supported by the session's FIX version.
   * If a FIXT session is selected, select the desired `ApplVerID` to use
@@ -74,25 +78,29 @@ http://quickfix-messenger.googlecode.com/svn/images/2_0/project-view.png
 
 http://quickfix-messenger.googlecode.com/svn/images/2_0/options.png
 
+----
 == Free Text ==
 Existing FIX message texts (i.e. from a log file) can be used to send a message. Select _Free Text_ from the message list and paste the message to the text area provided.
 
-Note that `CheckSum(10)` and `SendingTime(52)` will automatically be populated/updated by QuickFIX/J.
-
 http://quickfix-messenger.googlecode.com/svn/images/2_0/free-text.png
 
+Note that `CheckSum(10)` and `SendingTime(52)` will automatically be populated/updated by QuickFIX/J.
+
+----
 == Repeating Groups ==
 For _Repeating Group_ fields, put the desired number of groups and click on _Set_; this is will regenerate the form to display the desired number of groups.
 
 http://quickfix-messenger.googlecode.com/svn/images/2_0/repeating-group.png
 
+----
 == Field Checking ==
-While QuickFIX Messenger does not support message validation, it does support checking field formats. This means that a warning symbol will appear if the input value does not match the expected format defined for the field.
+While QuickFIX Messenger does not support message validation, it does support checking field formats; this means that a warning symbol will appear if the input value does not match the expected format defined for the field.
 
 http://quickfix-messenger.googlecode.com/svn/images/2_0/format-check.png
 
 Because QuickFIX Messenger is designed as a testing tool, fields with incorrect format will not prevent the message from being sent.
 
+----
 == Message Actions ==
  * Click on the _shredder_ button to destroy the message and all fields stored in the cache.
  * If an active project is available, click on the _tray_ button to add the message to the project.
@@ -104,15 +112,19 @@ If the _Preview Before Sending_ check box is selected, a confirmation will popup
 
 http://quickfix-messenger.googlecode.com/svn/images/2_0/preview.png
 
+----
 == Sessions List ==
-Active sessions can be managed from the _Sessions List_
+Active sessions can be managed from the _Sessions List_.
 
 http://quickfix-messenger.googlecode.com/svn/images/2_0/session-popup.png
 
-Selecting _Status_ will display the session details.
+  * Selecting the _Logon_ check box, initiates a logon sequence to the receiver.
+  * Clicking _Reset_ will reset the session' sequence numbers to 1/1.
+  * Clicking _Status_ will display the session details.
 
 http://quickfix-messenger.googlecode.com/svn/images/2_0/session-status.png
 
+----
 == Message Table ==
 Messages sent or received are all logged to the _Message Table_.
 
@@ -122,10 +134,11 @@ Double-clicking on a row will popup the details of the message.
 
 http://quickfix-messenger.googlecode.com/svn/images/2_0/message-details.png
 
-To clear the table, right-click then select clear.
+To clear the table, right-click then select _Clear All_.
 
 http://quickfix-messenger.googlecode.com/svn/images/2_0/message-popup.png
 
+----
 == Project View ==
 A separate window is displayed whenever a project is activated (new or open).
 
@@ -143,6 +156,7 @@ At anytime, the Project View window can be activated via _Window_ > _Project Win
 
 http://quickfix-messenger.googlecode.com/svn/images/2_0/project-tree.png
 
+----
 == Menus ==
 === File Menu ===
 http://quickfix-messenger.googlecode.com/svn/images/2_0/file-menu.png
@@ -173,9 +187,11 @@ http://quickfix-messenger.googlecode.com/svn/images/2_0/window-menu.png
 
  * *`Project Window`* - Opens the _Project View_ of the active project
 
+----
 == FIXWiki ==
 Double-click on fields in the form or messages in the list to bring-up the corresponding FIXWiki page.
 
+----
 = Advanced =
 == Custom Logon ==
 QuickFIX Messenger supports populating certain fields when sending a `Logon(A)` message.
@@ -203,10 +219,30 @@ TestMessageIndicator=true
 
 Note that the configured fields will be populated regardless of the session's FIX version. This means that `Username(553)`, `Password(554)`, and `TestMessageIndicator(464)` will still get populated for FIX versions below 4.3.
 
-== XML Format==
+----
+== Switching to the Operating System "Look and Feel" ==
+QuickFIX Messenger uses a cross-platform look and feel provided by [http://insubstantial.github.com/insubstantial/substance/docs/getting-started.html Substance].
+
+To change this and use the default look and feel provided by the Operating System, modify the script and add the following property to the Java command: `-DuseSystemLAF=true`
+
+Windows example:
+{{{
+javaw -DuseSystemLAF=true -cp %CLASSPATH% com.jramoyo.qfixmessenger.QFixMessenger "cfg\acceptor\messenger.cfg" "cfg\acceptor\quickfix.cfg"
+}}}
+
+Linux/Unix example:
+{{{
+java -DuseSystemLAF=true -cp "$CLASSPATH" com.jramoyo.qfixmessenger.QFixMessenger "cfg/acceptor/messenger.cfg" "cfg/acceptor/quickfix.cfg"
+}}}
+
+----
+== Save Files ==
+QuickFIX Messenger uses XML documents as save files; this allows for a save format that is human-readable and editable from any text editor.
 
 === Message ===
 Exported messages are saved in an XML file having a structure similar to the message form.
+
+The schema can be obtained from [http://quickfix-messenger.googlecode.com/svn/trunk/qfix-messenger/resources/xsd/message.xsd Subversion].
 
 Sample _Message_ XML
 {{{
@@ -233,6 +269,8 @@ Sample _Message_ XML
 
 === Project ===
 Projects are saved in an XML file enclosing multiple Message XMLs.
+
+The schema can be obtained from [http://quickfix-messenger.googlecode.com/svn/trunk/qfix-messenger/resources/xsd/project.xsd Subversion].
 
 Sample _Project_ XML
 {{{
