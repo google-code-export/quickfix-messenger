@@ -10,6 +10,7 @@ QuickFIX Messenger is ideal for testing different messages and scenarios on FIX 
 
 QuickFIX Messenger is fully open source under the [http://opensource.org/licenses/BSD-3-Clause new BSD License]. Interested contributors may let their intentions known to jramoyo@gmail.com.
 
+----
 =Development Environment=
 ==Required Tools==
  * A modern Java IDE; [http://www.eclipse.org/downloads/ Eclipse] is highly recommended
@@ -58,6 +59,7 @@ _This guide assumes that Eclipse (with Subversion plugin) is the chosen IDE._
  # Running in debug mode should work the same way
   * Right-click > Debug As > Java Application
 
+----
 =Source=
 ==Packages==
  * *`com.jramoyo`* - Root package
@@ -94,6 +96,7 @@ _This guide assumes that Eclipse (with Subversion plugin) is the chosen IDE._
  * *`clean.release`* - Cleans the project and creates a binary distribution package 
  * *`clean.source`* - Cleans the project and creates a source distribution package
 
+----
 =Development Standards=
 ==Code Standards==
 _The included Eclipse project files contains the 'Java Code Style' used throughout the project_
