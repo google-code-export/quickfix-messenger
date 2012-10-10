@@ -67,7 +67,7 @@ Please refer to QuickFIX/J's [http://www.quickfixj.org/quickfixj/usermanual/1.5.
 
 ----
 == Graphical User Interface (GUI) ==
-http://quickfix-messenger.googlecode.com/svn/images/2_0/project-view.png
+http://quickfix-messenger.googlecode.com/svn/images/2_0/main.png
 
 ----
 == Creating a Message ==
@@ -130,6 +130,8 @@ http://quickfix-messenger.googlecode.com/svn/images/2_0/session-status.png
 == Message Table ==
 Messages sent or received are all logged to the _Message Table_.
 
+http://quickfix-messenger.googlecode.com/svn/images/2_0/message-table.png
+
 Each row in the table represents a FIX message. Rows colored _orange_ are received, while rows colored _green_ are sent.
 
 Double-clicking on a row will popup the details of the message.
@@ -143,6 +145,8 @@ http://quickfix-messenger.googlecode.com/svn/images/2_0/message-popup.png
 ----
 == Project View ==
 A separate window is displayed whenever a project is activated (new or open).
+
+http://quickfix-messenger.googlecode.com/svn/images/2_0/project-view.png
 
 All messages added to the project are displayed in the window as a tree. Right-clicking on a selected message brings-up a popup menu.
 
@@ -225,16 +229,16 @@ Note that the configured fields will be populated regardless of the session's FI
 == Switching to the Operating System "Look and Feel" ==
 QuickFIX Messenger uses a cross-platform look and feel provided by [http://insubstantial.github.com/insubstantial/substance/docs/getting-started.html Substance].
 
-To change this and use the default look and feel provided by the Operating System, modify the script and add the following property to the Java command: `-DuseSystemLAF=true`
+To change this and use the default look and feel provided by the Operating System, modify the script and add the following property to the Java command: `-useSystemLaF=true`
 
 Windows example:
 {{{
-javaw -DuseSystemLAF=true -cp %CLASSPATH% com.jramoyo.qfixmessenger.QFixMessenger "cfg\acceptor\messenger.cfg" "cfg\acceptor\quickfix.cfg"
+javaw -DuseSystemLaF=true -cp %CLASSPATH% com.jramoyo.qfixmessenger.QFixMessenger "cfg\acceptor\messenger.cfg" "cfg\acceptor\quickfix.cfg"
 }}}
 
 Linux/Unix example:
 {{{
-java -DuseSystemLAF=true -cp "$CLASSPATH" com.jramoyo.qfixmessenger.QFixMessenger "cfg/acceptor/messenger.cfg" "cfg/acceptor/quickfix.cfg"
+java -DuseSystemLaF=true -cp "$CLASSPATH" com.jramoyo.qfixmessenger.QFixMessenger "cfg/acceptor/messenger.cfg" "cfg/acceptor/quickfix.cfg"
 }}}
 
 ----
