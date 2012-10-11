@@ -1,4 +1,4 @@
-#summary Wiki Side Bar.
+#summary Default Wiki Side Bar
 
   * [Index User's Guide]
   * [DevelopersGuide Developer's Guide]
