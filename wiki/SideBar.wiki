@@ -1,3 +1,5 @@
+#summary Wiki Side Bar.
+
   * [Index User's Guide]
   * [DevelopersGuide Developer's Guide]
-  * [ChangingQuickFIXVersions Changing QuickFIX Versions]
+  * [ChangingQuickFIXVersions QuickFIX Update Guide]
