@@ -1,4 +1,4 @@
-#summary Guide for changing QuickFIX/J library versions.
+#summary Guide for updating QuickFIX/J library versions.
 #sidebar SideBar
 
 = Introduction =
