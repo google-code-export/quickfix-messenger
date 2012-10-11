@@ -12,6 +12,10 @@ QuickFIX Messenger is ideal for testing different messages and scenarios on FIX 
 For support, questions, or general discussions, kindly visit our [https://groups.google.com/forum/?fromgroups#!forum/quickfix-messenger-discuss forum].
 
 ----
+
+<wiki:toc max_depth="2" />
+
+----
 = Getting Started =
 
 == Downloading QuickFIX Messenger ==
@@ -66,11 +70,11 @@ Each instance comes with 3 configuration files:
 Please refer to QuickFIX/J's [http://www.quickfixj.org/quickfixj/usermanual/1.5.1/usage/configuration.html documentation] page for details on how to configure the QuickFIX engine.
 
 ----
-== Graphical User Interface (GUI) ==
+== User Interface ==
 http://quickfix-messenger.googlecode.com/svn/images/2_0/main.png
 
 ----
-== Creating a Message ==
+=== Creating a Message ===
  # Select a session from the list; this will display all messages supported by the session's FIX version.
   * If a FIXT session is selected, select the desired `ApplVerID` to use
  # Select a message from the list; this will display a form containing all fields available to the message.
@@ -81,7 +85,7 @@ http://quickfix-messenger.googlecode.com/svn/images/2_0/main.png
 http://quickfix-messenger.googlecode.com/svn/images/2_0/options.png
 
 ----
-== Free Text ==
+=== Free Text ===
 Existing FIX message texts (i.e. from a log file) can be used to send a message. Select _Free Text_ from the message list and paste the message to the text area provided.
 
 http://quickfix-messenger.googlecode.com/svn/images/2_0/free-text.png
@@ -89,13 +93,13 @@ http://quickfix-messenger.googlecode.com/svn/images/2_0/free-text.png
 Note that `CheckSum(10)` and `SendingTime(52)` will automatically be populated/updated by QuickFIX/J.
 
 ----
-== Repeating Groups ==
+=== Repeating Groups ===
 For _Repeating Group_ fields, put the desired number of groups and click on _Set_; this is will update the form to display the desired number of groups.
 
 http://quickfix-messenger.googlecode.com/svn/images/2_0/repeating-group.png
 
 ----
-== Data Format Verification ==
+=== Data Format Verification ===
 While QuickFIX Messenger does not support message validation, it does support verification of field data formats; this means that a warning symbol will appear if the input data does not match the expected format defined for the field.
 
 http://quickfix-messenger.googlecode.com/svn/images/2_0/format-check.png
@@ -103,7 +107,7 @@ http://quickfix-messenger.googlecode.com/svn/images/2_0/format-check.png
 Because QuickFIX Messenger is designed as a testing tool, fields with incorrect format will not prevent the message from being sent.
 
 ----
-== Message Actions ==
+=== Message Actions ===
  * Click on the _shredder_ button to destroy the message and all fields stored in the cache.
  * If an active project is available, click on the _tray_ button to add the message to the project.
  * Click on the _envelope_ button to send the message across the session.
@@ -115,7 +119,7 @@ If the _Preview Before Sending_ check box is selected, a confirmation will popup
 http://quickfix-messenger.googlecode.com/svn/images/2_0/preview.png
 
 ----
-== Sessions List ==
+=== Sessions List ===
 Active sessions can be managed from the _Sessions List_.
 
 http://quickfix-messenger.googlecode.com/svn/images/2_0/session-popup.png
@@ -127,7 +131,7 @@ http://quickfix-messenger.googlecode.com/svn/images/2_0/session-popup.png
 http://quickfix-messenger.googlecode.com/svn/images/2_0/session-status.png
 
 ----
-== Message Table ==
+=== Message Table ===
 Messages sent or received are all logged to the _Message Table_.
 
 http://quickfix-messenger.googlecode.com/svn/images/2_0/message-table.png
@@ -143,7 +147,7 @@ To clear the table, right-click then select _Clear All_.
 http://quickfix-messenger.googlecode.com/svn/images/2_0/message-popup.png
 
 ----
-== Project View ==
+=== Project View ===
 A separate window is displayed whenever a project is activated (new or open).
 
 http://quickfix-messenger.googlecode.com/svn/images/2_0/project-view.png
@@ -163,8 +167,8 @@ At anytime, the Project View window can be activated via _Window_ > _Project Win
 http://quickfix-messenger.googlecode.com/svn/images/2_0/project-tree.png
 
 ----
-== Menus ==
-=== File Menu ===
+=== Menus ===
+==== File Menu ====
 http://quickfix-messenger.googlecode.com/svn/images/2_0/file-menu.png
 
  * *`New Project`* - Creates a new project
@@ -175,26 +179,26 @@ http://quickfix-messenger.googlecode.com/svn/images/2_0/file-menu.png
  * *`Export Message`* - Exports the form message to an XML file
  * *`Exit`* - Exits the application
 
-=== Session Menu ===
+==== Session Menu ====
 http://quickfix-messenger.googlecode.com/svn/images/2_0/session-menu.png
 
  * *`All Sessions - Logon`* - Logon all sessions
  * *`All Sessions - Logoff`* - Logoff all sessions
  * *`All Sessions - Reset`* - Reset all sessions
 
-=== Help Menu ===
+==== Help Menu ====
 http://quickfix-messenger.googlecode.com/svn/images/2_0/help-menu.png
 
  * *`Help`* - Displays this Wiki page
  * *`About`* - Displays the application information, including license
 
-=== Window Menu ===
+==== Window Menu ====
 http://quickfix-messenger.googlecode.com/svn/images/2_0/window-menu.png
 
  * *`Project Window`* - Opens the _Project View_ of the active project
 
 ----
-== FIXWiki ==
+=== FIXWiki ===
 Double-click on fields in the form or messages in the list to bring-up the corresponding FIXWiki page.
 
 ----
@@ -224,26 +228,6 @@ TestMessageIndicator=true
 }}}
 
 Note that the configured fields will be populated regardless of the session's FIX version. This means that despite not being supported, `Username(553)`, `Password(554)`, and `TestMessageIndicator(464)` will still get populated for FIX versions below 4.3.
-
-----
-== Switching to the Operating System "Look and Feel" ==
-QuickFIX Messenger uses a cross-platform look and feel provided by [http://insubstantial.github.com/insubstantial/substance/docs/getting-started.html Substance].
-
-To change this and use the default look and feel provided by the Operating System, modify the script and add the following property to the Java command: `-useSystemLaF=true`
-
-Windows example:
-{{{
-javaw -DuseSystemLaF=true -cp %CLASSPATH% com.jramoyo.qfixmessenger.QFixMessenger "cfg\acceptor\messenger.cfg" "cfg\acceptor\quickfix.cfg"
-}}}
-
-Linux/Unix example:
-{{{
-java -DuseSystemLaF=true -cp "$CLASSPATH" com.jramoyo.qfixmessenger.QFixMessenger "cfg/acceptor/messenger.cfg" "cfg/acceptor/quickfix.cfg"
-}}}
-
-QuickFIX Messenger running on a Windows 7 look and feel.
-
-http://quickfix-messenger.googlecode.com/svn/images/2_0/system-laf.png
 
 ----
 == Save Files ==
@@ -308,3 +292,23 @@ Sample _Project_ XML
     </messages>
 </ns2:project>
 }}}
+
+----
+== Changing the "Look and Feel" ==
+QuickFIX Messenger uses a cross-platform look and feel provided by [http://insubstantial.github.com/insubstantial/substance/docs/getting-started.html Substance].
+
+To change this and use the default look and feel provided by the Operating System, modify the script and add the following property to the Java command: `-useSystemLaF=true`
+
+Windows example:
+{{{
+javaw -DuseSystemLaF=true -cp %CLASSPATH% com.jramoyo.qfixmessenger.QFixMessenger "cfg\acceptor\messenger.cfg" "cfg\acceptor\quickfix.cfg"
+}}}
+
+Linux/Unix example:
+{{{
+java -DuseSystemLaF=true -cp "$CLASSPATH" com.jramoyo.qfixmessenger.QFixMessenger "cfg/acceptor/messenger.cfg" "cfg/acceptor/quickfix.cfg"
+}}}
+
+QuickFIX Messenger running on a Windows 7 look and feel.
+
+http://quickfix-messenger.googlecode.com/svn/images/2_0/system-laf.png
