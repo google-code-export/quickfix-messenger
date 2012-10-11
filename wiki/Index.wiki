@@ -204,7 +204,7 @@ Double-click on fields in the form or messages in the list to bring-up the corre
 ----
 = Advanced =
 == Custom Logon ==
-QuickFIX Messenger supports populating certain fields when sending a `Logon(A)` message.
+QuickFIX Messenger supports populating selected fields when sending a `Logon(A)` message.
 
 To do this, modify the QuickFIX/J configuration and add the following attributes under a session configuration:
 {{{
