@@ -95,8 +95,8 @@ For _Repeating Group_ fields, put the desired number of groups and click on _Set
 http://quickfix-messenger.googlecode.com/svn/images/2_0/repeating-group.png
 
 ----
-== Field Checking ==
-While QuickFIX Messenger does not support message validation, it does support checking field formats; this means that a warning symbol will appear if the input value does not match the expected format defined for the field.
+== Data Format Verification ==
+While QuickFIX Messenger does not support message validation, it does support verification of field data formats; this means that a warning symbol will appear if the input data does not match the expected format defined for the field.
 
 http://quickfix-messenger.googlecode.com/svn/images/2_0/format-check.png
 
