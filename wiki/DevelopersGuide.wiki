@@ -1,5 +1,4 @@
 #summary Guide for Developers and Contributors.
-#sidebar SideBar
 
 =Introduction=
 
