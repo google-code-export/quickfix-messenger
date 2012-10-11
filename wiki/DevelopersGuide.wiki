@@ -1,4 +1,5 @@
 #summary Guide for Developers and Contributors.
+#sidebar SideBar
 
 =Introduction=
 
@@ -9,6 +10,10 @@ It is a tool designed for technical individuals working on the Financial Informa
 QuickFIX Messenger is ideal for testing different messages and scenarios on FIX infrastructures. It provides a simple graphical user interface (GUI) for constructing and sending FIX messages across a given FIX session.
 
 QuickFIX Messenger is fully open source under the [http://opensource.org/licenses/BSD-3-Clause new BSD License]. Interested contributors may let their intentions known to jramoyo@gmail.com.
+
+----
+
+<wiki:toc max_depth="2" />
 
 ----
 =Development Environment=
