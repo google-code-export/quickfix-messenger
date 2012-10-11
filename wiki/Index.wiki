@@ -3,7 +3,7 @@
 = Introduction =
 _Note that this guide is updated for the upcoming 2.0 version._
 
-QuickFIX Messenger is a front-end messaging application built around the [http://www.quickfixj.org QuickFIX/J] engine.
+QuickFIX Messenger is a front-end messaging application built on-top of the [http://www.quickfixj.org QuickFIX/J] engine.
 
 It is a tool designed for technical individuals working on the Financial Information eXchange ("[http://fixprotocol.org/ FIX]") Protocol. The FIX Protocol is an industry-driven messaging standard for the electronic communication of trade-related messages.
 
