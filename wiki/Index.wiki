@@ -1,5 +1,4 @@
 #summary QuickFIX Messenger User's Guide.
-#sidebar SideBar
 
 = Introduction =
 _Note that this guide is updated for the upcoming 2.0 version._
