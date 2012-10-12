@@ -1,7 +1,6 @@
 #summary Guide for QuickFIX Messenger Users
 
 = Introduction =
-_Note that this guide is updated for the upcoming 2.0 version._
 
 QuickFIX Messenger is a front-end messaging application built on-top of the [http://www.quickfixj.org QuickFIX/J] engine.
 
