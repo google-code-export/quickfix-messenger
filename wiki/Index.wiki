@@ -226,7 +226,7 @@ RawDataLength=9
 TestMessageIndicator=true
 }}}
 
-Note that the configured fields will be populated regardless of the session's FIX version. This means that despite not being supported, `Username(553)`, `Password(554)`, and `TestMessageIndicator(464)` will still get populated for FIX versions below 4.3.
+Note that the configured fields will be populated regardless of the session's FIX version. This means that despite being unsupported, `Username(553)`, `Password(554)`, and `TestMessageIndicator(464)` will still get populated for FIX versions below 4.3.
 
 ----
 == Save Files ==
