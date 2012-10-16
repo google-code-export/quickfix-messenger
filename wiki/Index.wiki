@@ -99,7 +99,7 @@ http://quickfix-messenger.googlecode.com/svn/images/2_0/repeating-group.png
 
 ----
 === Data Format Verification ===
-While QuickFIX Messenger does not support message validation, it does support verification of field data formats; this means that a warning symbol will appear if the input data does not match the expected format defined for the field.
+While QuickFIX Messenger does not support message validation, it does support verification of field data formats. This means that if the input data does not match the expected format defined for the field, a warning symbol will appear on the text field.
 
 http://quickfix-messenger.googlecode.com/svn/images/2_0/format-check.png
 
