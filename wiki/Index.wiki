@@ -165,6 +165,8 @@ At anytime, the Project View window can be activated via _Window_ > _Project Win
 
 http://quickfix-messenger.googlecode.com/svn/images/2_0/project-tree.png
 
+Note that text values can be modified from tree. Double-click on the text node to enable editing; press _Enter_ to save, _Esc_ to revert.
+
 ----
 === Menus ===
 ==== File Menu ====
