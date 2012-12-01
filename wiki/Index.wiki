@@ -232,6 +232,8 @@ TestMessageIndicator=true
 
 Note that the configured fields will be populated regardless of the session's FIX version. This means that despite being unsupported, `Username(553)`, `Password(554)`, and `TestMessageIndicator(464)` will still get populated for FIX versions below 4.3.
 
+*Bug*: the application will only apply the custom logon settings if all custom fields are present. As a workaround, include all custom fields in the config and set the unused ones to empty. See [http://code.google.com/p/quickfix-messenger/issues/detail?id=51&can=1&q=milestone%3DRelease2.1 Issue #51]
+
 ----
 == Save Files ==
 QuickFIX Messenger uses XML documents as save files; this allows for a save format that is human-readable and editable from any text editor.
