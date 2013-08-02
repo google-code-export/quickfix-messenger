@@ -33,6 +33,7 @@
 package com.jramoyo.qfixmessenger.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -56,10 +57,12 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ComboBoxModel;
+import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -76,6 +79,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
@@ -245,7 +249,12 @@ public class QFixMessengerFrame extends JFrame
 	private JList<Session> sessionsList;
 
 	private JList<Message> messagesList;
-
+	
+	//info.yyc
+	private DefaultListModel<Message> recentMessagesListModel;
+	private JList<Message> recentMessagesList;
+	private Map<String,DefaultListModel<Message>> recentMessagesMap;
+	
 	private JComboBox<String> appVersionsComboBox;
 
 	private JCheckBox requiredCheckBox;
@@ -719,17 +728,30 @@ public class QFixMessengerFrame extends JFrame
 
 		// Messages Panel
 		messagesList = new JList<Message>();
+		//info.yyc
+		recentMessagesMap = new HashMap<>();
+		recentMessagesListModel = new DefaultListModel<Message>();
+		recentMessagesList = new JList<Message>(recentMessagesListModel);
+		
 		JPanel messagesPanel = new JPanel();
 		messagesPanel.setBorder(new TitledBorder("Available Messages"));
 		messagesPanel.setLayout(new BoxLayout(messagesPanel, BoxLayout.Y_AXIS));
 
 		initMessagesList();
+		
 		JScrollPane messagesListScrollPane = new JScrollPane(messagesList);
 		messagesListScrollPane.setPreferredSize(new Dimension(LEFT_PANEL_WIDTH,
 				300));
-
-		messagesPanel.add(messagesListScrollPane);
-
+		//info.yyc
+		JScrollPane recentMessagesListScrollPane = new JScrollPane(recentMessagesList);
+		JTabbedPane messagesTabPane = new JTabbedPane();
+		messagesTabPane.setPreferredSize(new Dimension(LEFT_PANEL_WIDTH,
+				300));
+		messagesTabPane.addTab("All", messagesListScrollPane);
+		messagesTabPane.addTab("Recently", recentMessagesListScrollPane);
+//		messagesPanel.add(messagesListScrollPane);
+		messagesPanel.add(messagesTabPane);
+		
 		leftPanel.add(sessionsPanel);
 		leftPanel.add(messagesPanel);
 		add(leftPanel, BorderLayout.WEST);
@@ -765,6 +787,13 @@ public class QFixMessengerFrame extends JFrame
 		messagesList.getSelectionModel().addListSelectionListener(
 				new MessagesListSelectionListener(this));
 		messagesList.addMouseListener(new MessagesListMouseAdapter(this));
+		
+		//info.yyc
+		recentMessagesList.setCellRenderer(new MessagesListCellRenderer());
+		recentMessagesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		recentMessagesList.getSelectionModel().addListSelectionListener(
+				new MessagesListSelectionListener(this));
+		recentMessagesList.addMouseListener(new MessagesListMouseAdapter(this));
 	}
 
 	private void initRightPanel()
@@ -1058,8 +1087,15 @@ public class QFixMessengerFrame extends JFrame
 			messages.add(0, freeTextMessage);
 
 			messagesList.setListData(messages.toArray(new Message[] {}));
+			//info.yyc
+			DefaultListModel<Message> listModel = recentMessagesMap.get(activeDictionary.getFullVersion());
+			if(listModel!=null){
+				recentMessagesListModel = listModel;
+			}
 		} else
 		{
+			//info.yyc
+			recentMessagesListModel = new DefaultListModel<Message>();
 			messagesList.setListData(new Message[] {});
 		}
 	}
@@ -1778,6 +1814,8 @@ public class QFixMessengerFrame extends JFrame
 									logger.info("Sending message "
 											+ message.toString());
 									session.send(message);
+									//info.yyc
+									updateRecentList();
 								}
 							} else
 							{
@@ -1785,6 +1823,8 @@ public class QFixMessengerFrame extends JFrame
 										+ message.toString());
 								frame.getMessenger().sendQFixMessage(message,
 										session);
+								//info.yyc
+								updateRecentList();
 							}
 						}
 					} else
@@ -1805,6 +1845,28 @@ public class QFixMessengerFrame extends JFrame
 				JOptionPane.showMessageDialog(frame,
 						"Please create a message!", "Error",
 						JOptionPane.WARNING_MESSAGE);
+			}
+		}
+		
+		//info.yyc
+		private void updateRecentList(){
+			Message recentlyMsg = frame.messagesList.getSelectedValue();
+			String key = frame.activeDictionary.getFullVersion();
+			Map<String,DefaultListModel<Message>> tmpMap = frame.recentMessagesMap;
+			DefaultListModel<Message> tmpListModel;
+			
+			if(tmpMap.containsKey(key)){
+				tmpListModel = tmpMap.get(key);
+				if(tmpListModel.contains(recentlyMsg)){
+					tmpListModel.remove(tmpListModel.indexOf(recentlyMsg));
+					tmpListModel.add(0, recentlyMsg);
+				}else{
+					tmpListModel.add(0, recentlyMsg);
+				}
+			}else{
+				tmpListModel= new DefaultListModel<Message>();
+				tmpListModel.add(0, recentlyMsg);
+				tmpMap.put(key, tmpListModel);
 			}
 		}
 	}
