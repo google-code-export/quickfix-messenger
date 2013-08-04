@@ -33,7 +33,6 @@
 package com.jramoyo.qfixmessenger.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -145,6 +144,7 @@ import com.jramoyo.qfixmessenger.ui.util.Icons;
  * Main application frame
  * 
  * @author jamoyo
+ * @author info.yyc
  */
 public class QFixMessengerFrame extends JFrame
 {
@@ -249,12 +249,13 @@ public class QFixMessengerFrame extends JFrame
 	private JList<Session> sessionsList;
 
 	private JList<Message> messagesList;
-	
-	//info.yyc
+
 	private DefaultListModel<Message> recentMessagesListModel;
-	private JList<Message> recentMessagesList;
-	private Map<String,DefaultListModel<Message>> recentMessagesMap;
 	
+	private JList<Message> recentMessagesList;
+	
+	private Map<String, DefaultListModel<Message>> recentMessagesMap;
+
 	private JComboBox<String> appVersionsComboBox;
 
 	private JCheckBox requiredCheckBox;
@@ -728,30 +729,30 @@ public class QFixMessengerFrame extends JFrame
 
 		// Messages Panel
 		messagesList = new JList<Message>();
-		//info.yyc
+		
 		recentMessagesMap = new HashMap<>();
 		recentMessagesListModel = new DefaultListModel<Message>();
 		recentMessagesList = new JList<Message>(recentMessagesListModel);
-		
+
 		JPanel messagesPanel = new JPanel();
 		messagesPanel.setBorder(new TitledBorder("Available Messages"));
 		messagesPanel.setLayout(new BoxLayout(messagesPanel, BoxLayout.Y_AXIS));
 
 		initMessagesList();
-		
+
 		JScrollPane messagesListScrollPane = new JScrollPane(messagesList);
 		messagesListScrollPane.setPreferredSize(new Dimension(LEFT_PANEL_WIDTH,
 				300));
-		//info.yyc
-		JScrollPane recentMessagesListScrollPane = new JScrollPane(recentMessagesList);
+		
+		JScrollPane recentMessagesListScrollPane = new JScrollPane(
+				recentMessagesList);
 		JTabbedPane messagesTabPane = new JTabbedPane();
-		messagesTabPane.setPreferredSize(new Dimension(LEFT_PANEL_WIDTH,
-				300));
+		messagesTabPane.setPreferredSize(new Dimension(LEFT_PANEL_WIDTH, 300));
 		messagesTabPane.addTab("All", messagesListScrollPane);
 		messagesTabPane.addTab("Recently", recentMessagesListScrollPane);
-//		messagesPanel.add(messagesListScrollPane);
-		messagesPanel.add(messagesTabPane);
 		
+		messagesPanel.add(messagesTabPane);
+
 		leftPanel.add(sessionsPanel);
 		leftPanel.add(messagesPanel);
 		add(leftPanel, BorderLayout.WEST);
@@ -787,13 +788,14 @@ public class QFixMessengerFrame extends JFrame
 		messagesList.getSelectionModel().addListSelectionListener(
 				new MessagesListSelectionListener(this));
 		messagesList.addMouseListener(new MessagesListMouseAdapter(this));
-		
-		//info.yyc
+
 		recentMessagesList.setCellRenderer(new MessagesListCellRenderer());
-		recentMessagesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		recentMessagesList
+				.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		recentMessagesList.getSelectionModel().addListSelectionListener(
-				new MessagesListSelectionListener(this));
-		recentMessagesList.addMouseListener(new MessagesListMouseAdapter(this));
+				new RecentMessagesListSelectionListener(this));
+		recentMessagesList.addMouseListener(new RecentMessagesListMouseAdapter(
+				this)); 
 	}
 
 	private void initRightPanel()
@@ -1087,17 +1089,25 @@ public class QFixMessengerFrame extends JFrame
 			messages.add(0, freeTextMessage);
 
 			messagesList.setListData(messages.toArray(new Message[] {}));
-			//info.yyc
-			DefaultListModel<Message> listModel = recentMessagesMap.get(activeDictionary.getFullVersion());
-			if(listModel!=null){
+			
+			DefaultListModel<Message> listModel = recentMessagesMap
+					.get(activeDictionary.getFullVersion());
+			if (listModel != null)
+			{
 				recentMessagesListModel = listModel;
+			} else
+			{
+				recentMessagesListModel = new DefaultListModel<>();
 			}
+
 		} else
 		{
-			//info.yyc
 			recentMessagesListModel = new DefaultListModel<Message>();
 			messagesList.setListData(new Message[] {});
 		}
+		
+		recentMessagesList.setModel(recentMessagesListModel);
+
 	}
 
 	/*
@@ -1519,6 +1529,88 @@ public class QFixMessengerFrame extends JFrame
 		}
 	}
 
+	private class RecentMessagesListMouseAdapter extends MouseAdapter
+	{
+		private QFixMessengerFrame frame;
+
+		public RecentMessagesListMouseAdapter(QFixMessengerFrame frame)
+		{
+			this.frame = frame;
+		}
+
+		@Override
+		public void mouseClicked(MouseEvent e)
+		{
+			if (e.getClickCount() == 2)
+			{
+				int index = frame.recentMessagesList.locationToIndex(e
+						.getPoint());
+				if (index != -1)
+				{
+					Message message = (Message) frame.recentMessagesList
+							.getModel().getElementAt(index);
+
+					Message selectedMessage = (Message) frame.recentMessagesList
+							.getSelectedValue();
+					if (message == selectedMessage
+							&& message.getCategory() != null)
+					{
+						try
+						{
+							String url = frame.getMessenger().getConfig()
+									.getFixWikiUrl()
+									+ message.getName();
+							java.awt.Desktop.getDesktop().browse(
+									java.net.URI.create(url));
+						} catch (IOException ex)
+						{
+							JOptionPane.showMessageDialog(
+									frame,
+									"An exception occured:\n"
+											+ Arrays.toString(ex
+													.getStackTrace()), "Error",
+									JOptionPane.ERROR_MESSAGE);
+						}
+					}
+				}
+
+			}
+		}
+	}
+
+	private static class RecentMessagesListSelectionListener implements
+			ListSelectionListener
+	{
+		private QFixMessengerFrame frame;
+
+		public RecentMessagesListSelectionListener(QFixMessengerFrame frame)
+		{
+			this.frame = frame;
+		}
+
+		@Override
+		public void valueChanged(ListSelectionEvent e)
+		{
+			if (!e.getValueIsAdjusting())
+			{
+				frame.activeMessage = (Message) frame.recentMessagesList
+						.getSelectedValue();
+
+				if (logger.isDebugEnabled())
+				{
+					logger.debug("Selected message " + frame.activeMessage);
+				}
+
+				frame.requiredCheckBox.setSelected(true);
+				frame.modifyHeaderCheckBox.setSelected(false);
+				frame.modifyTrailerCheckBox.setSelected(false);
+
+				frame.updateButtons();
+				frame.displayMainPanel();
+			}
+		}
+	}
+
 	private class MessagesListMouseAdapter extends MouseAdapter
 	{
 		private QFixMessengerFrame frame;
@@ -1814,7 +1906,6 @@ public class QFixMessengerFrame extends JFrame
 									logger.info("Sending message "
 											+ message.toString());
 									session.send(message);
-									//info.yyc
 									updateRecentList();
 								}
 							} else
@@ -1823,7 +1914,6 @@ public class QFixMessengerFrame extends JFrame
 										+ message.toString());
 								frame.getMessenger().sendQFixMessage(message,
 										session);
-								//info.yyc
 								updateRecentList();
 							}
 						}
@@ -1847,27 +1937,38 @@ public class QFixMessengerFrame extends JFrame
 						JOptionPane.WARNING_MESSAGE);
 			}
 		}
-		
-		//info.yyc
-		private void updateRecentList(){
-			Message recentlyMsg = frame.messagesList.getSelectedValue();
+
+		private void updateRecentList()
+		{
+			// Get Message from recently list or message list
+			Message recentlyMsg = frame.recentMessagesList.getSelectedValue();
+			if (recentlyMsg == null)
+			{
+				recentlyMsg = frame.messagesList.getSelectedValue();
+			}
 			String key = frame.activeDictionary.getFullVersion();
-			Map<String,DefaultListModel<Message>> tmpMap = frame.recentMessagesMap;
+			Map<String, DefaultListModel<Message>> tmpMap = frame.recentMessagesMap;
 			DefaultListModel<Message> tmpListModel;
-			
-			if(tmpMap.containsKey(key)){
+
+			if (tmpMap.containsKey(key))
+			{
 				tmpListModel = tmpMap.get(key);
-				if(tmpListModel.contains(recentlyMsg)){
+				if (tmpListModel.contains(recentlyMsg))
+				{
 					tmpListModel.remove(tmpListModel.indexOf(recentlyMsg));
 					tmpListModel.add(0, recentlyMsg);
-				}else{
+				} else
+				{
 					tmpListModel.add(0, recentlyMsg);
 				}
-			}else{
-				tmpListModel= new DefaultListModel<Message>();
+			} else
+			{
+				tmpListModel = new DefaultListModel<Message>();
 				tmpListModel.add(0, recentlyMsg);
 				tmpMap.put(key, tmpListModel);
 			}
+
+			frame.recentMessagesList.setModel(tmpMap.get(key));
 		}
 	}
 
