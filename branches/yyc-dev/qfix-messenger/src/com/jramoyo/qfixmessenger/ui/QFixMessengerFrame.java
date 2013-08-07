@@ -251,10 +251,12 @@ public class QFixMessengerFrame extends JFrame
 	private JList<Message> messagesList;
 
 	private DefaultListModel<Message> recentMessagesListModel;
-	
+
 	private JList<Message> recentMessagesList;
-	
+
 	private Map<String, DefaultListModel<Message>> recentMessagesMap;
+
+	private JTabbedPane messagesTabPane;
 
 	private JComboBox<String> appVersionsComboBox;
 
@@ -279,6 +281,8 @@ public class QFixMessengerFrame extends JFrame
 	private FreeTextMessagePanel freeTextMessagePanel;
 
 	private ProjectDialog projectDialog;
+
+	private LogfileDialog logfileDialog;
 
 	private QFixMessengerFrame(QFixMessenger messenger)
 	{
@@ -729,7 +733,7 @@ public class QFixMessengerFrame extends JFrame
 
 		// Messages Panel
 		messagesList = new JList<Message>();
-		
+
 		recentMessagesMap = new HashMap<>();
 		recentMessagesListModel = new DefaultListModel<Message>();
 		recentMessagesList = new JList<Message>(recentMessagesListModel);
@@ -743,14 +747,14 @@ public class QFixMessengerFrame extends JFrame
 		JScrollPane messagesListScrollPane = new JScrollPane(messagesList);
 		messagesListScrollPane.setPreferredSize(new Dimension(LEFT_PANEL_WIDTH,
 				300));
-		
+
 		JScrollPane recentMessagesListScrollPane = new JScrollPane(
 				recentMessagesList);
-		JTabbedPane messagesTabPane = new JTabbedPane();
+		messagesTabPane = new JTabbedPane();
 		messagesTabPane.setPreferredSize(new Dimension(LEFT_PANEL_WIDTH, 300));
 		messagesTabPane.addTab("All", messagesListScrollPane);
-		messagesTabPane.addTab("Recently", recentMessagesListScrollPane);
-		
+		messagesTabPane.addTab("Recent", recentMessagesListScrollPane);
+
 		messagesPanel.add(messagesTabPane);
 
 		leftPanel.add(sessionsPanel);
@@ -795,7 +799,7 @@ public class QFixMessengerFrame extends JFrame
 		recentMessagesList.getSelectionModel().addListSelectionListener(
 				new RecentMessagesListSelectionListener(this));
 		recentMessagesList.addMouseListener(new RecentMessagesListMouseAdapter(
-				this)); 
+				this));
 	}
 
 	private void initRightPanel()
@@ -1050,6 +1054,8 @@ public class QFixMessengerFrame extends JFrame
 		windowMenu.setMnemonic('W');
 
 		JMenuItem projectWindowMenuItem = new JMenuItem("Project Window");
+		JMenuItem logfileWindowMenuItem = new JMenuItem("Logfile Window");
+
 		projectWindowMenuItem.setIcon(new ImageIcon(messenger.getConfig()
 				.getIconsLocation() + Icons.WINDOW_ICON));
 		projectWindowMenuItem.setMnemonic('P');
@@ -1058,6 +1064,15 @@ public class QFixMessengerFrame extends JFrame
 		projectWindowMenuItem
 				.addActionListener(new ProjectWindowActionListener(this));
 
+		logfileWindowMenuItem.setIcon(new ImageIcon(messenger.getConfig()
+				.getIconsLocation() + Icons.WINDOW_ICON));
+		logfileWindowMenuItem.setMnemonic('L');
+		logfileWindowMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+				KeyEvent.VK_L, InputEvent.CTRL_DOWN_MASK));
+		logfileWindowMenuItem
+				.addActionListener(new LogfileWindowActionListener(this));
+
+		windowMenu.add(logfileWindowMenuItem);
 		windowMenu.add(projectWindowMenuItem);
 	}
 
@@ -1070,6 +1085,23 @@ public class QFixMessengerFrame extends JFrame
 		} else
 		{
 			projectDialog.requestFocus();
+		}
+	}
+
+	private void launchLogfileDialog()
+	{
+		String beginStr = sessionsList.getSelectedValue().getSessionID()
+				.getBeginString();
+
+		if (logfileDialog == null || !logfileDialog.isDisplayable())
+		{
+
+			logfileDialog = new LogfileDialog(this);
+			logfileDialog.launch(beginStr);
+		} else
+		{
+			logfileDialog.loadLogfile(beginStr);
+			logfileDialog.requestFocus();
 		}
 	}
 
@@ -1089,7 +1121,7 @@ public class QFixMessengerFrame extends JFrame
 			messages.add(0, freeTextMessage);
 
 			messagesList.setListData(messages.toArray(new Message[] {}));
-			
+
 			DefaultListModel<Message> listModel = recentMessagesMap
 					.get(activeDictionary.getFullVersion());
 			if (listModel != null)
@@ -1105,7 +1137,7 @@ public class QFixMessengerFrame extends JFrame
 			recentMessagesListModel = new DefaultListModel<Message>();
 			messagesList.setListData(new Message[] {});
 		}
-		
+
 		recentMessagesList.setModel(recentMessagesListModel);
 
 	}
@@ -1271,6 +1303,14 @@ public class QFixMessengerFrame extends JFrame
 			destroyButton.setEnabled(false);
 			sendButton.setEnabled(false);
 			addButton.setEnabled(false);
+		}
+	}
+
+	private void updateLogFile(String beginStr)
+	{
+		if (logfileDialog != null && logfileDialog.isVisible())
+		{
+			logfileDialog.loadLogfile(beginStr);
 		}
 	}
 
@@ -1835,6 +1875,32 @@ public class QFixMessengerFrame extends JFrame
 		}
 	}
 
+	private static class LogfileWindowActionListener implements ActionListener
+	{
+		private QFixMessengerFrame frame;
+
+		public LogfileWindowActionListener(QFixMessengerFrame frame)
+		{
+			this.frame = frame;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e)
+		{
+			if (!frame.sessionsList.isSelectionEmpty())
+			{
+				frame.launchLogfileDialog();
+			} else
+			{
+				JOptionPane.showMessageDialog(frame,
+						"Please select a session first!", "Error",
+						JOptionPane.WARNING_MESSAGE);
+			}
+
+		}
+
+	}
+
 	private static class SendActionListener implements ActionListener
 	{
 		private QFixMessengerFrame frame;
@@ -1906,7 +1972,7 @@ public class QFixMessengerFrame extends JFrame
 									logger.info("Sending message "
 											+ message.toString());
 									session.send(message);
-									updateRecentList();
+									updateRecentList(frame.activeMessage);
 								}
 							} else
 							{
@@ -1914,7 +1980,7 @@ public class QFixMessengerFrame extends JFrame
 										+ message.toString());
 								frame.getMessenger().sendQFixMessage(message,
 										session);
-								updateRecentList();
+								updateRecentList(frame.activeMessage);
 							}
 						}
 					} else
@@ -1937,15 +2003,15 @@ public class QFixMessengerFrame extends JFrame
 						JOptionPane.WARNING_MESSAGE);
 			}
 		}
-
-		private void updateRecentList()
+		
+		//Get Message from ActiveMessage rather than recent list or message list
+		public void updateRecentList(Message recentMsg)
 		{
-			// Get Message from recently list or message list
-			Message recentlyMsg = frame.recentMessagesList.getSelectedValue();
-			if (recentlyMsg == null)
+			if ("Free Text".equals(recentMsg.getName()))
 			{
-				recentlyMsg = frame.messagesList.getSelectedValue();
+				return;
 			}
+			
 			String key = frame.activeDictionary.getFullVersion();
 			Map<String, DefaultListModel<Message>> tmpMap = frame.recentMessagesMap;
 			DefaultListModel<Message> tmpListModel;
@@ -1953,18 +2019,18 @@ public class QFixMessengerFrame extends JFrame
 			if (tmpMap.containsKey(key))
 			{
 				tmpListModel = tmpMap.get(key);
-				if (tmpListModel.contains(recentlyMsg))
+				if (tmpListModel.contains(recentMsg))
 				{
-					tmpListModel.remove(tmpListModel.indexOf(recentlyMsg));
-					tmpListModel.add(0, recentlyMsg);
+					tmpListModel.remove(tmpListModel.indexOf(recentMsg));
+					tmpListModel.add(0, recentMsg);
 				} else
 				{
-					tmpListModel.add(0, recentlyMsg);
+					tmpListModel.add(0, recentMsg);
 				}
 			} else
 			{
 				tmpListModel = new DefaultListModel<Message>();
-				tmpListModel.add(0, recentlyMsg);
+				tmpListModel.add(0, recentMsg);
 				tmpMap.put(key, tmpListModel);
 			}
 
@@ -2091,6 +2157,7 @@ public class QFixMessengerFrame extends JFrame
 				frame.updateButtons();
 				frame.displayMainPanel();
 				frame.loadMessagesList();
+				frame.updateLogFile(sessionId.getBeginString());
 			}
 		}
 	}
