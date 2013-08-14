@@ -1,6 +1,7 @@
 #summary Guide for Developers and Contributors
 
 =Introduction=
+<wiki:gadget url="https://goo.gl/Uql18" width="728" height="90" border="0" up_ad_client="7386150814279344" up_ad_slot="5169503048" up_ad_keywords="trading stocks fx bonds" />
 
 QuickFIX Messenger is a front-end messaging application built on-top of the [http://www.quickfixj.org QuickFIX/J] engine.
 
