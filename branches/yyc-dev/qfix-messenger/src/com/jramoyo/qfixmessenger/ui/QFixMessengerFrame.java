@@ -98,6 +98,7 @@ import javax.xml.namespace.QName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import quickfix.InvalidMessage;
 import quickfix.Session;
 import quickfix.SessionID;
 
@@ -1832,6 +1833,8 @@ public class QFixMessengerFrame extends JFrame
 				JPopupMenu popupMenu = new JPopupMenu();
 
 				JMenuItem clearAllMenuItem = new JMenuItem("Clear All");
+				JMenuItem resendMenuItem = new JMenuItem("Resend");
+
 				clearAllMenuItem.setIcon(new ImageIcon(frame.getMessenger()
 						.getConfig().getIconsLocation()
 						+ Icons.CLEAR_ALL_ICON));
@@ -1846,10 +1849,58 @@ public class QFixMessengerFrame extends JFrame
 					}
 				});
 
+				resendMenuItem.setIcon(new ImageIcon(frame.getMessenger()
+						.getConfig().getIconsLocation()
+						+ Icons.SEND_SMALL_ICON));
+				resendMenuItem
+						.addActionListener(new ResendMessagesActionListener(
+								frame, e));
+
 				popupMenu.add(clearAllMenuItem);
+				popupMenu.add(resendMenuItem);
 				popupMenu.show(frame.messagesTable, e.getX(), e.getY());
 			}
 		}
+	}
+
+	private class ResendMessagesActionListener implements ActionListener
+	{
+
+		private QFixMessengerFrame frame;
+		private MouseEvent event;
+		private Session session;
+		
+		public ResendMessagesActionListener(QFixMessengerFrame frame,
+				MouseEvent event)
+		{
+			this.frame = frame;
+			this.event = event;
+			this.session = frame.sessionsList.getSelectedValue();
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e)
+		{
+			int viewRow = frame.messagesTable.rowAtPoint(event.getPoint());
+			int modelRow = frame.messagesTable.convertRowIndexToModel(viewRow);
+
+			quickfix.Message message = new quickfix.Message();
+
+			MessagesTableModel model = (MessagesTableModel) frame.messagesTable
+					.getModel();
+			MessagesTableModelData data = model.getData(modelRow);
+			
+			try
+			{
+				message.fromString(data.getMessage(), session.getDataDictionary(), false);
+				session.send(message);
+			} catch (InvalidMessage e1)
+			{
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+
 	}
 
 	private static class ProjectWindowActionListener implements ActionListener
@@ -2003,15 +2054,16 @@ public class QFixMessengerFrame extends JFrame
 						JOptionPane.WARNING_MESSAGE);
 			}
 		}
-		
-		//Get Message from ActiveMessage rather than recent list or message list
+
+		// Get Message from ActiveMessage rather than recent list or message
+		// list
 		public void updateRecentList(Message recentMsg)
 		{
 			if ("Free Text".equals(recentMsg.getName()))
 			{
 				return;
 			}
-			
+
 			String key = frame.activeDictionary.getFullVersion();
 			Map<String, DefaultListModel<Message>> tmpMap = frame.recentMessagesMap;
 			DefaultListModel<Message> tmpListModel;
